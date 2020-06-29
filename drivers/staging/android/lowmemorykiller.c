@@ -125,14 +125,6 @@ void handle_lmk_event(struct task_struct *selected, short min_score_adj)
 	int tail;
 	struct lmk_event *events;
 	struct lmk_event *event;
-	int res;
-	long rss_in_pages = -1;
-	struct mm_struct *mm = get_task_mm(selected);
-
-	if (mm) {
-		rss_in_pages = get_mm_rss(mm);
-		mmput(mm);
-	}
 
 	spin_lock(&lmk_event_lock);
 
@@ -148,16 +140,7 @@ void handle_lmk_event(struct task_struct *selected, short min_score_adj)
 	events = (struct lmk_event *) event_buffer.buf;
 	event = &events[head];
 
-	res = get_cmdline(selected, event->taskname, MAX_TASKNAME - 1);
-
-	/* No valid process name means this is definitely not associated with a
-	 * userspace activity.
-	 */
-
-	if (res <= 0 || res >= MAX_TASKNAME) {
-		spin_unlock(&lmk_event_lock);
-		return;
-	}
+	strncpy(event->taskname, selected->comm, MAX_TASKNAME);
 
 	event->taskname[res] = '\0';
 	event->pid = selected->pid;
@@ -741,6 +724,7 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 		}
 
 		task_lock(selected);
+		get_task_struct(selected);
 		send_sig(SIGKILL, selected, 0);
 		if (selected->mm) {
 			task_set_lmk_waiting(selected);
@@ -800,6 +784,12 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 	lowmem_print(4, "lowmem_scan %lu, %x, return %lu\n",
 		     sc->nr_to_scan, sc->gfp_mask, rem);
 	mutex_unlock(&scan_mutex);
+
+	if (selected) {
+		handle_lmk_event(selected, selected_tasksize, min_score_adj);
+		put_task_struct(selected);
+	}
+
 	return rem;
 }
 
