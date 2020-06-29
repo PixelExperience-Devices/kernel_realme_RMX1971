@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2017, 2020, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -11,25 +11,14 @@
  * GNU General Public License for more details.
  */
 
-#include "sdm429w-pm660.dtsi"
-
-&pm660_misc {
-	qcom,support-twm-config;
+&modem_adsp_mem {
+	reg = <0x0 0x88000000 0x0 0x03c00000>;
 };
 
-&pm660_pbs {
-	status = "okay";
+&peripheral_mem {
+	reg = <0x0 0x8bc00000 0x0 0x0300000>;
 };
 
-&pm660_pon {
-	qcom,support-twm-config;
-	qcom,pbs-client = <&pm660_pbs>;
-};
-
-&pm660_fg {
-	qcom,fg-disable-in-twm;
-};
-
-&pm660_haptics {
-	qcom,haptics-ext-pin-twm;
+&venus_qseecom_mem {
+	reg = <0 0 0 0x800000>;
 };
