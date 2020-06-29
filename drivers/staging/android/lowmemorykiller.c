@@ -119,7 +119,8 @@ struct lmk_event {
 	struct list_head list;
 };
 
-void handle_lmk_event(struct task_struct *selected, short min_score_adj)
+void handle_lmk_event(struct task_struct *selected, int selected_tasksize,
+		      short min_score_adj)
 {
 	int head;
 	int tail;
@@ -142,7 +143,6 @@ void handle_lmk_event(struct task_struct *selected, short min_score_adj)
 
 	strncpy(event->taskname, selected->comm, MAX_TASKNAME);
 
-	event->taskname[res] = '\0';
 	event->pid = selected->pid;
 	event->uid = from_kuid_munged(current_user_ns(), task_uid(selected));
 	if (selected->group_leader)
@@ -153,7 +153,7 @@ void handle_lmk_event(struct task_struct *selected, short min_score_adj)
 	event->maj_flt = selected->maj_flt;
 	event->oom_score_adj = selected->signal->oom_score_adj;
 	event->start_time = nsec_to_clock_t(selected->real_start_time);
-	event->rss_in_pages = rss_in_pages;
+	event->rss_in_pages = selected_tasksize;
 	event->min_score_adj = min_score_adj;
 
 	event_buffer.head = (head + 1) & (MAX_BUFFERED_EVENTS - 1);
@@ -769,13 +769,15 @@ static unsigned long lowmem_scan(struct shrinker *s, struct shrink_control *sc)
 
 		lowmem_deathpending_timeout = jiffies + HZ;
 		rem += selected_tasksize;
-		handle_lmk_event(selected, min_score_adj);
+
 		rcu_read_unlock();
 		/* give the system time to free up the memory */
 		msleep_interruptible(20);
 		trace_almk_shrink(selected_tasksize, ret,
 				  other_free, other_file,
 				  selected_oom_score_adj);
+
+		get_task_struct(selected);
 	} else {
 		trace_almk_shrink(1, ret, other_free, other_file, 0);
 		rcu_read_unlock();
@@ -902,4 +904,3 @@ module_param_array_named(minfree, lowmem_minfree, uint, &lowmem_minfree_size,
 			 S_IRUGO | S_IWUSR);
 module_param_named(debug_level, lowmem_debug_level, uint, S_IRUGO | S_IWUSR);
 module_param_named(lmk_fast_run, lmk_fast_run, int, S_IRUGO | S_IWUSR);
-

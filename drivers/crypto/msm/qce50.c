@@ -6105,6 +6105,7 @@ err_mem:
 		dma_free_coherent(pce_dev->pdev, pce_dev->memsize,
 			pce_dev->coh_vmem, pce_dev->coh_pmem);
 err_iobase:
+	arm_iommu_detach_device(pce_dev->pdev);
 	if (pce_dev->enable_s1_smmu)
 		qce_iommu_release_iomapping(pce_dev);
 
@@ -6138,6 +6139,7 @@ int qce_close(void *handle)
 				pce_dev->coh_vmem, pce_dev->coh_pmem);
 	kfree(pce_dev->dummyreq_in_buf);
 	kfree(pce_dev->iovec_vmem);
+	arm_iommu_detach_device(pce_dev->pdev);
 
 	if (pce_dev->enable_s1_smmu)
 		qce_iommu_release_iomapping(pce_dev);
