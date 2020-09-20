@@ -49,8 +49,7 @@
 #include "ufs-debugfs.h"
 #include "ufs-qcom.h"
 
-#ifdef VENDOR_EDIT
-//zhenjian Jiang@PSW.BSP.Storage.UFS, 2018-05-04 add for ufs device in /proc/devinfo 
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <soc/oppo/device_info.h>
 unsigned long ufs_outstanding;
 #endif
@@ -1575,11 +1574,6 @@ start:
 		 */
 		if (ufshcd_can_hibern8_during_gating(hba) &&
 		    ufshcd_is_link_hibern8(hba)) {
-			if (async) {
-				rc = -EAGAIN;
-				hba->clk_gating.active_reqs--;
-				break;
-			}
 			spin_unlock_irqrestore(hba->host->host_lock, flags);
 			flush_work(&hba->clk_gating.ungate_work);
 			spin_lock_irqsave(hba->host->host_lock, flags);
@@ -3252,7 +3246,7 @@ static int ufshcd_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
 	spin_lock_irqsave(hba->host->host_lock, flags);
 
 	err = ufshcd_send_command(hba, tag);
-#ifdef  VENDOR_EDIT
+#ifdef  CONFIG_PRODUCT_REALME_SDM710
     //hank.liu@TECH.BSP.Storage.UFS, 2019-04-26, Add for monitor ufs driver io time
 	ufs_outstanding=hba->outstanding_reqs;
 	cmd->request->ufs_io_start = ktime_get();
@@ -3463,7 +3457,7 @@ static int ufshcd_exec_dev_cmd(struct ufs_hba *hba,
 {
 	struct ufshcd_lrb *lrbp;
 	int err;
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //Tong.Han@Bsp.Group.Tp,2018-6-4,Added for Dealth_healer
 	int tag = 0;
 #endif
@@ -3810,10 +3804,10 @@ static int __ufshcd_query_descriptor(struct ufs_hba *hba,
 		goto out_unlock;
 	}
 
+	hba->dev_cmd.query.descriptor = NULL;
 	*buf_len = be16_to_cpu(response->upiu_res.length);
 
 out_unlock:
-	hba->dev_cmd.query.descriptor = NULL;
 	mutex_unlock(&hba->dev_cmd.lock);
 	if (has_read_lock)
 		up_read(&hba->lock);
@@ -3933,8 +3927,7 @@ int ufshcd_map_desc_id_to_length(struct ufs_hba *hba,
 	case QUERY_DESC_IDN_RFU_1:
 		*desc_len = 0;
 		break;
-#ifdef VENDOR_EDIT
-	//xiaofan.yang@PSW.TECH.Stability, 2019/03/15,Add for check storage endurance
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	case QUERY_DESC_IDN_HEALTH:
 		*desc_len = hba->desc_size.hlth_desc;
 		break;
@@ -5904,7 +5897,7 @@ static void __ufshcd_transfer_req_compl(struct ufs_hba *hba,
 
 			req = cmd->request;
 			if (req) {
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 				req->flash_io_latency = ktime_us_delta(ktime_get(), req->ufs_io_start);
 #endif
 				/* Update IO svc time latency histogram */
@@ -5919,7 +5912,7 @@ static void __ufshcd_transfer_req_compl(struct ufs_hba *hba,
 						(rq_data_dir(req) == READ) ?
 						&hba->io_lat_read :
 						&hba->io_lat_write, delta_us);
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //yh@BSP.Storage.UFS, 2019-02-19 add for ufs io latency info calculate
 					if (bio_has_data(req->bio) && (delta_us > 5000))
 					{
@@ -6906,7 +6899,6 @@ static irqreturn_t ufshcd_intr(int irq, void *__hba)
 
 	spin_lock(hba->host->host_lock);
 	intr_status = ufshcd_readl(hba, REG_INTERRUPT_STATUS);
-
 	hba->ufs_stats.last_intr_status = intr_status;
 	hba->ufs_stats.last_intr_ts = ktime_get();
 	/*
@@ -6975,7 +6967,7 @@ static int ufshcd_issue_tm_cmd(struct ufs_hba *hba, int lun_id, int task_id,
 	struct utp_upiu_task_req *task_req_upiup;
 	struct Scsi_Host *host;
 	unsigned long flags;
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //Tong.Han@Bsp.Group.Tp,2018-6-4,Added for Dealth_healer
 	int free_slot = 0;
 #endif
@@ -7634,8 +7626,7 @@ static int ufshcd_scsi_add_wlus(struct ufs_hba *hba)
 	struct scsi_device *sdev_boot = NULL;
 	bool is_bootable_dev = false;
 	bool is_embedded_dev = false;
-#ifdef VENDOR_EDIT
-//yh@PSW.BSP.Storage.UFS, 2018-05-31 add for ufs device in /proc/devinfo
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	static char temp_version[5] = {0};
 	static char vendor[9] = {0};
 	static char model[17] = {0};
@@ -7658,8 +7649,7 @@ static int ufshcd_scsi_add_wlus(struct ufs_hba *hba)
 		goto out;
 	}
 	scsi_device_put(hba->sdev_ufs_device);
-#ifdef VENDOR_EDIT
-//yh@PSW.BSP.Storage.UFS, 2018-05-31 add for ufs device in /proc/devinfo
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	strncpy(temp_version, hba->sdev_ufs_device->rev, 4);
 	strncpy(vendor, hba->sdev_ufs_device->vendor, 8);
 	strncpy(model, hba->sdev_ufs_device->model, 16);
@@ -8058,8 +8048,7 @@ static void ufshcd_init_desc_sizes(struct ufs_hba *hba)
 		&hba->desc_size.geom_desc);
 	if (err)
 		hba->desc_size.geom_desc = QUERY_DESC_GEOMETRY_DEF_SIZE;
-#ifdef VENDOR_EDIT
-	//xiaofan.yang@PSW.TECH.Stability, 2019/03/15,Add for check storage endurance
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	err = ufshcd_read_desc_length(hba, QUERY_DESC_IDN_HEALTH, 0,
 	    &hba->desc_size.hlth_desc);
 	if (err)
@@ -8075,8 +8064,7 @@ static void ufshcd_def_desc_sizes(struct ufs_hba *hba)
 	hba->desc_size.conf_desc = QUERY_DESC_CONFIGURATION_DEF_SIZE;
 	hba->desc_size.unit_desc = QUERY_DESC_UNIT_DEF_SIZE;
 	hba->desc_size.geom_desc = QUERY_DESC_GEOMETRY_DEF_SIZE;
-#ifdef VENDOR_EDIT
-	//xiaofan.yang@PSW.TECH.Stability, 2019/03/15,Add for check storage endurance
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	hba->desc_size.hlth_desc = QUERY_DESC_HEALTH_DEF_SIZE;
 #endif
 }
@@ -8177,8 +8165,7 @@ static int ufshcd_probe_hba(struct ufs_hba *hba)
 			hba->dev_info.f_power_on_wp_en = flag;
 
 		/* Add required well known logical units to scsi mid layer */
-		ret = ufshcd_scsi_add_wlus(hba);
-		if (ret)
+		if (ufshcd_scsi_add_wlus(hba))
 			goto out;
 
 		/* Initialize devfreq after UFS device is detected */
@@ -8236,8 +8223,7 @@ out:
 	 * emmc to vote for the shared regulator.
 	 */
 	if (ret && !ufshcd_eh_in_progress(hba) && !hba->pm_op_in_progress) {
-	//#ifndef VENDOR_EDIT
-	//PengNan@BSP.Power.Basic,remove ufs and emmc compatibility for standby current, 2019/07/30
+	//#ifndef CONFIG_PRODUCT_REALME_SDM710
 	//	pm_runtime_put_noidle(hba->dev);
 	//	pm_schedule_suspend(hba->dev, MSEC_PER_SEC * 10);
 	//#else
@@ -10214,8 +10200,7 @@ out_error:
 }
 EXPORT_SYMBOL(ufshcd_alloc_host);
 
-#ifdef VENDOR_EDIT
-//xiaofan.yang@PSW.TECH.Stability, 2019/03/15,Add for check storage endurance
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <asm/unaligned.h>
 static ssize_t ufs_sysfs_read_desc_param(struct ufs_hba *hba,
 				  enum desc_idn desc_id,
@@ -10988,8 +10973,7 @@ int ufshcd_init(struct ufs_hba *hba, void __iomem *mmio_base, unsigned int irq)
 	ufsdbg_add_debugfs(hba);
 
 	ufshcd_add_sysfs_nodes(hba);
-#ifdef VENDOR_EDIT
-    //xiaofan.yang@PSW.TECH.Stability, 2019/03/15,Add for check storage endurance
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	ufs_sysfs_add_nodes(hba->dev);
 #endif
 	return 0;
