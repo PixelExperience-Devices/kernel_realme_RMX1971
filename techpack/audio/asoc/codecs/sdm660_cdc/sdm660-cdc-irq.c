@@ -32,14 +32,13 @@
 
 #define MAX_NUM_IRQS 14
 #define NUM_IRQ_REGS 2
-#ifndef VENDOR_EDIT
-/* Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2017/03/30,
+#ifndef CONFIG_PRODUCT_REALME_SDM710
  * Modify for headphone detect issue on suspend/resume.
  */
 #define WCD9XXX_SYSTEM_RESUME_TIMEOUT_MS 700
-#else /* VENDOR_EDIT */
+#else /* CONFIG_PRODUCT_REALME_SDM710 */
 #define WCD9XXX_SYSTEM_RESUME_TIMEOUT_MS 2000
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 #define BYTE_BIT_MASK(nr) (1UL << ((nr) % BITS_PER_BYTE))
 #define BIT_BYTE(nr) ((nr) / BITS_PER_BYTE)
@@ -186,27 +185,25 @@ static int get_irq_bit(int linux_irq)
 	return i;
 }
 
-#ifndef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2016/09/30,
+#ifndef CONFIG_PRODUCT_REALME_SDM710
  *Delete for qcom patch to solve headset undetect issue
  */
 static int get_order_irq(int  i)
 {
 	return order[i];
 }
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 static irqreturn_t wcd9xxx_spmi_irq_handler(int linux_irq, void *data)
 {
-	#ifndef VENDOR_EDIT
-	/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2016/09/30,
+	#ifndef CONFIG_PRODUCT_REALME_SDM710
 	 *Modify for qcom patch to solve headset undetect issue
 	 */
 	int irq, i, j;
-	#else /* VENDOR_EDIT */
+	#else /* CONFIG_PRODUCT_REALME_SDM710 */
 	int irq = 0;
 	int i = 0;
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	unsigned long status[NUM_IRQ_REGS] = {0};
 
 	if (unlikely(wcd9xxx_spmi_lock_sleep() == false)) {
@@ -225,8 +222,7 @@ static irqreturn_t wcd9xxx_spmi_irq_handler(int linux_irq, void *data)
 			MSM89XX_PMIC_DIGITAL_INT_LATCHED_STS);
 		status[i] &= ~map.mask[i];
 	}
-	#ifndef VENDOR_EDIT
-	/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2016/09/30,
+	#ifndef CONFIG_PRODUCT_REALME_SDM710
 	 *Modify for qcom patch to solve headset undetect issue
 	 */
 	for (i = 0; i < MAX_NUM_IRQS; i++) {
@@ -239,9 +235,9 @@ static irqreturn_t wcd9xxx_spmi_irq_handler(int linux_irq, void *data)
 					BYTE_BIT_MASK(j);
 		}
 	}
-	#else /* VENDOR_EDIT */
+	#else /* CONFIG_PRODUCT_REALME_SDM710 */
 	map.handler[irq](irq, data);
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	map.handled[BIT_BYTE(irq)] &= ~BYTE_BIT_MASK(irq);
 	wcd9xxx_spmi_unlock_sleep();
 

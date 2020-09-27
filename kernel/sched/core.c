@@ -98,8 +98,7 @@
 #include <trace/events/sched.h>
 #include "walt.h"
 
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <linux/oppocfs/oppo_cfs_common.h>
 #endif
 
@@ -854,7 +853,7 @@ static void update_rq_clock_task(struct rq *rq, s64 delta)
 	rq->clock_task += delta;
 
 #if defined(CONFIG_IRQ_TIME_ACCOUNTING) || defined(CONFIG_PARAVIRT_TIME_ACCOUNTING)
-	if ((irq_delta + steal) && sched_feat(NONTASK_CAPACITY))
+	if ((irq_delta + steal) && !!sched_feat(NONTASK_CAPACITY))
 		sched_rt_avg_update(rq, irq_delta + steal);
 #endif
 }
@@ -3284,8 +3283,7 @@ void scheduler_tick(void)
 #endif
 	rq_last_tick_reset(rq);
 
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     if (sysctl_uifirst_enabled) {
         trigger_ux_balance(rq);
     }
@@ -3656,8 +3654,7 @@ static void __sched notrace __schedule(bool preempt)
 		raw_spin_unlock_irq(&rq->lock);
 	}
 
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     prev->enqueue_time = rq->clock;
 #endif
 
@@ -8319,8 +8316,7 @@ void __init sched_init(void)
 		init_cfs_rq(&rq->cfs);
 		init_rt_rq(&rq->rt);
 		init_dl_rq(&rq->dl);
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
         ux_init_rq_data(rq);
 #endif
 #ifdef CONFIG_FAIR_GROUP_SCHED
@@ -9106,10 +9102,10 @@ int sched_rr_handler(struct ctl_table *table, int write,
 }
 
 #ifdef CONFIG_PROC_SYSCTL
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //cuixiaogang@SRC.hypnus.2018.07.11. add for change up/down migrate
 static DEFINE_MUTEX(updown_migrate_mutex);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 int sched_updown_migrate_handler(struct ctl_table *table, int write,
 				 void __user *buffer, size_t *lenp,
 				 loff_t *ppos)
@@ -9118,10 +9114,10 @@ int sched_updown_migrate_handler(struct ctl_table *table, int write,
 	unsigned int *data = (unsigned int *)table->data;
 	unsigned int old_val;
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //cuixiaogang@SRC.hypnus.2018.07.11. add for change up/down migrate
 	mutex_lock(&updown_migrate_mutex);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	old_val = *data;
 
 	ret = proc_douintvec_capacity(table, write, buffer, lenp, ppos);
@@ -9131,15 +9127,15 @@ int sched_updown_migrate_handler(struct ctl_table *table, int write,
 		ret = -EINVAL;
 		*data = old_val;
 	}
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //cuixiaogang@SRC.hypnus.2018.07.11. add for change up/down migrate
 	mutex_unlock(&updown_migrate_mutex);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	return ret;
 }
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //cuixiaogang@SRC.hypnus.2018.07.11. add for change up/down migrate
 void sched_get_updown_migrate(unsigned int *up_pct, unsigned int *down_pct)
 {
@@ -9168,7 +9164,7 @@ int sched_set_updown_migrate(unsigned int *up_pct, unsigned int *down_pct)
         return 0;
 }
 EXPORT_SYMBOL(sched_set_updown_migrate);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 #endif
 
 #ifdef CONFIG_CGROUP_SCHED
@@ -9776,8 +9772,7 @@ find_first_cpu_bit(struct task_struct *p, const cpumask_t *search_cpus,
 }
 #endif
 
-#ifdef VENDOR_EDIT
-/*fanhui@PhoneSW.BSP, 2016-06-23, get current task on one cpu*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 struct task_struct *oppo_get_cpu_task(int cpu)
 {
 	return cpu_curr(cpu);

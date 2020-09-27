@@ -87,14 +87,12 @@ enum rq_cmd_type_bits {
  */
 struct request {
 	struct list_head queuelist;
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	struct list_head fg_list;
-/*Hank.liu@PSW.BSP Kernel IO Latency  2019-03-19,Add some info in each request*/
 	ktime_t		block_io_start;  //save block io start ktime
 	ktime_t     ufs_io_start; //save ufs io start ktime
 	u64         flash_io_latency; //save mmc host command latency
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 	union {
 		struct call_single_data csd;
 		u64 fifo_time;
@@ -314,8 +312,7 @@ struct request_queue {
 	 * Together with queue_head for cacheline sharing
 	 */
 	struct list_head	queue_head;
-#ifdef VENDOR_EDIT
-	/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	struct list_head	fg_head;
 	int fg_count;
 	int both_count;
@@ -604,8 +601,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
 	queue_lockdep_assert_held(q);
 	__clear_bit(flag, &q->queue_flags);
 }
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 extern unsigned int sysctl_fg_io_opt;
 static inline void queue_throtl_add_request(struct request_queue *q,
 					    struct request *rq, bool front)
@@ -621,7 +617,7 @@ static inline void queue_throtl_add_request(struct request_queue *q,
 			list_add_tail(&rq->fg_list, head);
 	}
 }
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 #define blk_queue_tagged(q)	test_bit(QUEUE_FLAG_QUEUED, &(q)->queue_flags)
 #define blk_queue_stopped(q)	test_bit(QUEUE_FLAG_STOPPED, &(q)->queue_flags)
 #define blk_queue_dying(q)	test_bit(QUEUE_FLAG_DYING, &(q)->queue_flags)
@@ -1803,8 +1799,7 @@ static const u_int64_t latency_x_axis_us[] = {
 	7000,
 	9000,
 	10000
-#ifdef VENDOR_EDIT
-//yh@BSP.Storage.UFS, 2019-02-19 add for ufs IO latency calc
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	,20000
 	,40000
 	,60000

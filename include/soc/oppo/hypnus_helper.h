@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016 OPPO, Inc.
- * VENDOR_EDIT :
+ * CONFIG_PRODUCT_REALME_SDM710 :
  * Author : Jie Cheng <jie.cheng@oppo.com>
  *
  * This software is licensed under the terms of the GNU General Public

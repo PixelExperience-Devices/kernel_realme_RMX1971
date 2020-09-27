@@ -40,15 +40,15 @@ static DEFINE_IDR(zram_index_idr);
 static DEFINE_MUTEX(zram_index_mutex);
 
 static int zram_major;
-#ifdef VENDOR_EDIT //YiXue.Ge@PSW.kernel.drv 20170703 modify for enable lz4 default
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #ifdef CONFIG_CRYPTO_LZ4
 static const char *default_compressor = "lz4";
 #else /*CONFIG_ZRAM_LZ4_COMPRESS*/
 static const char *default_compressor = "lzo";
 #endif /*CONFIG_ZRAM_LZ4_COMPRESS*/
-#else /*VENDOR_EDIT*/
+#else /*CONFIG_PRODUCT_REALME_SDM710*/
 static const char *default_compressor = "lzo";
-#endif/*VENDOR_EDIT*/
+#endif/*CONFIG_PRODUCT_REALME_SDM710*/
 
 /* Module params (documentation at end) */
 static unsigned int num_devices = 1;
@@ -78,7 +78,7 @@ static void zram_slot_unlock(struct zram *zram, u32 index)
 	bit_spin_unlock(ZRAM_LOCK, &zram->table[index].flags);
 }
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static struct zram *zram_default = NULL;
 unsigned long zram_comp_ratio(void)
 {
@@ -2016,7 +2016,7 @@ static int zram_add(void)
 
 	zram_debugfs_register(zram);
 	pr_info("Added device: %s\n", zram->disk->disk_name);
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     zram_default = zram;
 #endif
 	return device_id;

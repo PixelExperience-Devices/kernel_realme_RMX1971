@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2018, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -29,10 +29,9 @@
 #include "dsi_pwr.h"
 #include "msm_drv.h"
 
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stability,2018/9/26,add for save display panel power status at oppo display management*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <linux/dsi_oppo_support.h>
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 #define MAX_BL_LEVEL 4096
 #define MAX_BL_SCALE_LEVEL 1024
@@ -166,17 +165,6 @@ enum dsi_panel_type {
 	DSI_PANEL_TYPE_MAX,
 };
 
-/* Extended Panel config for panels with additional gpios */
-struct dsi_panel_exd_config {
-	int display_1p8_en;
-	int led_5v_en;
-	int switch_power;
-	int led_en1;
-	int led_en2;
-	int oenab;
-	int selab;
-};
-
 struct dsi_panel {
 	const char *name;
 	enum dsi_panel_type type;
@@ -220,13 +208,8 @@ struct dsi_panel {
 	enum dsi_dms_mode dms_mode;
 
 	bool sync_broadcast_en;
-
-struct dsi_panel_exd_config exd_config;
-
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Service.Feature,2018/9/26,for OnScreenFingerprint feature*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	bool is_hbm_enabled;
-/*liping-m@PSW.MM.Display.LCD.Stable,2018/9/26 fix aod flash problem */
 	bool need_power_on_backlight;
 #endif
 };
@@ -329,8 +312,7 @@ int dsi_panel_parse_esd_reg_read_configs(struct dsi_panel *panel,
 				struct device_node *of_node);
 
 void dsi_panel_ext_bridge_put(struct dsi_panel *panel);
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stability,2018/9/26,add for oppo display new structure*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 int dsi_panel_tx_cmd_set(struct dsi_panel *panel,
 			   enum dsi_cmd_set_type type);
 #endif

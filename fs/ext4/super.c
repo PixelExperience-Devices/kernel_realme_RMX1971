@@ -832,8 +832,7 @@ static void ext4_put_super(struct super_block *sb)
 	int aborted = 0;
 	int i, err;
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2018-11-26 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
 	destroy_discard_cmd_control(sbi);
 #endif
 	ext4_unregister_li_request(sb);
@@ -1303,8 +1302,7 @@ enum {
 	Opt_nomblk_io_submit, Opt_block_validity, Opt_noblock_validity,
 	Opt_inode_readahead_blks, Opt_journal_ioprio,
 	Opt_dioread_nolock, Opt_dioread_lock,
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2018-11-26 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
 	Opt_async_discard, Opt_noasync_discard,
 #endif
 	Opt_discard, Opt_nodiscard, Opt_init_itable, Opt_noinit_itable,
@@ -1385,8 +1383,7 @@ static const match_table_t tokens = {
 	{Opt_dioread_lock, "dioread_lock"},
 	{Opt_discard, "discard"},
 	{Opt_nodiscard, "nodiscard"},
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2018-11-26 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
 	{Opt_async_discard, "async_discard"},
 	{Opt_noasync_discard, "noasync_discard"},
 #endif
@@ -1528,8 +1525,7 @@ static const struct mount_opts {
 	 MOPT_EXT4_ONLY | MOPT_SET},
 	{Opt_dioread_lock, EXT4_MOUNT_DIOREAD_NOLOCK,
 	 MOPT_EXT4_ONLY | MOPT_CLEAR},
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2018-11-26 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
 	{Opt_async_discard, EXT4_MOUNT_ASYNC_DISCARD, MOPT_SET},
 	{Opt_noasync_discard, EXT4_MOUNT_ASYNC_DISCARD, MOPT_CLEAR},
 #endif
@@ -3639,8 +3635,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 	if (!parse_options((char *) data, sb, &journal_devnum,
 			   &journal_ioprio, 0))
 		goto failed_mount;
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2019-02-15 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
 	if (test_opt(sb, ASYNC_DISCARD)&&test_opt(sb,DISCARD)) {
         clear_opt(sb, DISCARD);
         ext4_msg(sb, KERN_WARNING, "mount option discard/async_discard conflict, use async_discard default");        
@@ -4331,8 +4326,7 @@ no_journal:
 		descr = "out journal";
 
 	if (test_opt(sb, DISCARD) 
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2019-02-16 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
         || test_opt(sb, ASYNC_DISCARD)
 #endif
     ) {
@@ -4359,8 +4353,7 @@ no_journal:
 	ratelimit_state_init(&sbi->s_msg_ratelimit_state, 5 * HZ, 10);
 
 	kfree(orig_data);
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2018-11-26 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
 	if (test_opt(sb, ASYNC_DISCARD)) {
 		sbi->interval_time = DEF_IDLE_INTERVAL;
 		err = create_discard_cmd_control(sbi);

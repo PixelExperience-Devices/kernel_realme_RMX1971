@@ -613,9 +613,8 @@ static void bcl_probe_soc(struct platform_device *pdev)
 	soc_data->ops.get_temp = bcl_read_soc;
 	soc_data->ops.set_trips = bcl_set_soc;
 	INIT_WORK(&bcl_perph->soc_eval_work, bcl_evaluate_soc);
-	
-	#ifndef VENDOR_EDIT
-	//Nanwei.Deng@BSP.Power.Basic, 2018/08/06, Modify for 1+ patch
+
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 	bcl_perph->psy_nb.notifier_call = battery_supply_callback;
 	ret = power_supply_reg_notifier(&bcl_perph->psy_nb);
 	if (ret < 0) {
@@ -630,7 +629,7 @@ static void bcl_probe_soc(struct platform_device *pdev)
 		return;
 	}
 	thermal_zone_device_update(soc_data->tz_dev, THERMAL_DEVICE_UP);
-	#else
+#else
 	soc_data->tz_dev = thermal_zone_of_sensor_register(&pdev->dev,
 				BCL_SOC_MONITOR, soc_data, &soc_data->ops);
 	if (IS_ERR(soc_data->tz_dev)) {
@@ -645,7 +644,7 @@ static void bcl_probe_soc(struct platform_device *pdev)
 		pr_err("Unable to register soc notifier. err:%d\n", ret);
 		return;
 	}
-	#endif
+#endif
 	schedule_work(&bcl_perph->soc_eval_work);
 }
 

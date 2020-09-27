@@ -1169,17 +1169,15 @@ static ssize_t name##_show					\
 show_one(min_freq);
 show_one(max_freq);
 
-#ifdef VENDOR_EDIT
-//cuixiaogang@SRC.hypnus.2019-06-12. add support for hypnusd devbw feature
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static DEVICE_ATTR(min_freq, 0664, min_freq_show, min_freq_store);
 static DEVICE_ATTR(max_freq, 0664, max_freq_show, max_freq_store);
 #else
 static DEVICE_ATTR_RW(min_freq);
 static DEVICE_ATTR_RW(max_freq);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
-#ifdef VENDOR_EDIT
-//cuixiaogang@SRC.hypnus.2018-04-05. add support to set devfreq limit
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 int devfreq_get_limit(struct devfreq *df, unsigned long *min, unsigned long *max)
 {
         unsigned long chipinfo_min = ~0, chipinfo_max = 0;
@@ -1248,7 +1246,7 @@ int devfreq_set_limit(struct devfreq *df, unsigned long min, unsigned long max)
         mutex_unlock(&df->lock);
         return 0;
 }
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 static ssize_t available_frequencies_show(struct device *d,
 					  struct device_attribute *attr,

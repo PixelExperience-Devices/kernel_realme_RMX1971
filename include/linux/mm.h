@@ -23,7 +23,7 @@
 #include <linux/page_ext.h>
 #include <linux/err.h>
 #include <linux/page_ref.h>
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /*Peifeng.Li@PSW.BSP.Kernel.MM 2019-09-28 account vma alloc failed*/
 #include <soc/oppo/oppo_healthinfo.h>
 extern int vma_alloc_order;
@@ -218,7 +218,7 @@ extern unsigned int kobjsize(const void *objp);
 #define VM_NOHUGEPAGE	0x40000000	/* MADV_NOHUGEPAGE marked this vma */
 #define VM_MERGEABLE	0x80000000	/* KSM may merge identical pages */
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 /* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
  * new vm flags of vma in reserved area
  */
@@ -2248,7 +2248,7 @@ extern unsigned long __must_check vm_mmap(struct file *, unsigned long,
 
 struct vm_unmapped_area_info {
 #define VM_UNMAPPED_AREA_TOPDOWN 1
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 /* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
  * new flags for get unmapped area from the reserved vma
  */
@@ -2277,7 +2277,7 @@ extern unsigned long unmapped_area_topdown(struct vm_unmapped_area_info *info);
 static inline unsigned long
 vm_unmapped_area(struct vm_unmapped_area_info *info)
 {
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /*Peifeng.Li@PSW.BSP.Kernel.MM 2019-09-28 account vma alloc failed*/
     unsigned long addr = 0;
     
@@ -2359,7 +2359,7 @@ extern struct vm_area_struct * find_vma(struct mm_struct * mm, unsigned long add
 extern struct vm_area_struct * find_vma_prev(struct mm_struct * mm, unsigned long addr,
 					     struct vm_area_struct **pprev);
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 /* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
  * reserved area control flag
  */
@@ -2451,7 +2451,7 @@ static inline unsigned long vm_start_gap(struct vm_area_struct *vma)
 {
 	unsigned long vm_start = vma->vm_start;
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 	/* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
 	 * reserved vma check
 	 */
@@ -2471,7 +2471,7 @@ static inline unsigned long vm_end_gap(struct vm_area_struct *vma)
 {
 	unsigned long vm_end = vma->vm_end;
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 	/* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
 	 * reserved vma check
 	 */
@@ -2799,7 +2799,7 @@ struct reclaim_param {
 	int nr_to_reclaim;
 	/* pages reclaimed */
 	int nr_reclaimed;
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #ifdef CONFIG_PROCESS_RECLAIM_ENHANCE
 	/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-11-07,
 	 * flag that relcaim inactive pages only */
@@ -2814,7 +2814,7 @@ struct reclaim_param {
 extern struct reclaim_param reclaim_task_anon(struct task_struct *task,
 		int nr_to_reclaim);
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /* Kui.Zhang@PSW.BSP.Kernel.Performance, 2019-01-01,
  * Extract the reclaim core code from task_mmu.c for /proc/process_reclaim*/
 extern ssize_t reclaim_task_write(struct task_struct* task,
@@ -2828,7 +2828,7 @@ extern ssize_t reclaim_task_write(struct task_struct* task,
 #define PR_FULL		5
 #define PR_TASK_RUN	6
 #define PR_TASK_DIE	7
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 #endif /* CONFIG_PROCESS_RECLAIM */
 
 #endif /* __KERNEL__ */

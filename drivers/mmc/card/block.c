@@ -51,10 +51,9 @@
 #include "queue.h"
 #include "block.h"
 
-#ifdef VENDOR_EDIT
-//chenhui.lai@RM.emmc,2018/10/15, Add for eMMC and DDR device information
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <soc/oppo/device_info.h>
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 MODULE_ALIAS("mmc:block");
 #ifdef MODULE_PARAM_PREFIX
 #undef MODULE_PARAM_PREFIX
@@ -1557,10 +1556,9 @@ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
 	unsigned long timeout = jiffies + msecs_to_jiffies(timeout_ms);
 	int err = 0;
 	u32 status;
-#ifdef VENDOR_EDIT
-//yh@PhoneSW.BSP, 2017-1-17, send card changing to RO mode uevent to android layer
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	char *envp[2] = {"sdcard_ro=1", NULL};
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	do {
 		err = get_card_status(card, &status, 5);
@@ -1589,14 +1587,12 @@ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
 			pr_err("%s: Card stuck in programming state! %s %s\n",
 				mmc_hostname(card->host),
 				req->rq_disk->disk_name, __func__);
-#ifdef VENDOR_EDIT
-//yh@bsp, 2015-10-21 Add for special card compatible
-//yh@PhoneSW.BSP, 2017-1-17, send card changing to RO mode uevent to android layer
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 			kobject_uevent_env(
 					&(card->dev.kobj),
 					KOBJ_CHANGE, envp);
 				card->host->card_stuck_in_programing_status = true;
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 			return -ETIMEDOUT;
 		}
 
@@ -4792,23 +4788,20 @@ static int mmc_blk_probe(struct mmc_card *card)
 {
 	struct mmc_blk_data *md, *part_md;
 	char cap_str[10];
-	#ifdef VENDOR_EDIT
-	//chenhui.lai@RM.emmc,2018/10/15, Add for eMMC and DDR device information
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	char * manufacturerid;
         static char temp_version[30] = {0};
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	/*
 	 * Check that the card supports the command class(es) we need.
 	 */
-#ifndef VENDOR_EDIT
-//yh@bsp, 2015/08/03, remove for can not initialize specific sdcard(CSD info mismatch card real capability)
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 	if (!(card->csd.cmdclass & CCC_BLOCK_READ))
 		return -ENODEV;
 #endif
 
-#ifdef VENDOR_EDIT
-//chenhui.lai@RM.emmc,2018/10/15, Add for eMMC and DDR device information
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	switch (card->cid.manfid) {
 		case  0x11:
 			manufacturerid = "TOSHIBA";
@@ -4889,8 +4882,7 @@ static int mmc_blk_probe(struct mmc_card *card)
 	return 0;
 }
 
-#ifdef VENDOR_EDIT
-//Chunyi.Mei@PSW.BSP.Storage.Sdcard, 2018-12-10, Add for SD Card device information
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 char *capacity_string(struct mmc_card *card){
 	static char cap_str[10] = "unknown";
 	struct mmc_blk_data *md = (struct mmc_blk_data *)card->dev.driver_data;

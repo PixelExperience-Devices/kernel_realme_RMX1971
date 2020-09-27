@@ -24,10 +24,7 @@
 #else
 # define MAP_UNINITIALIZED 0x0		/* Don't support this flag */
 #endif
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
-/* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
- * reserved vma mmap flag
- */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 #define MAP_BACKUP_CREATE 0x10000000	/* created backup vmap area */
 #endif
 

@@ -16,7 +16,7 @@
 #define CAM_RELEASE_DEV                         (CAM_COMMON_OPCODE_BASE + 0x6)
 #define CAM_SD_SHUTDOWN                         (CAM_COMMON_OPCODE_BASE + 0x7)
 #define CAM_FLUSH_REQ                           (CAM_COMMON_OPCODE_BASE + 0x8)
-#ifndef VENDOR_EDIT
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 /*Modified by Zhengrong.Zhang@Cam.Drv, 20180421, for [ois calibration]*/
 #define CAM_COMMON_OPCODE_MAX                   (CAM_COMMON_OPCODE_BASE + 0x9)
 #else
@@ -27,7 +27,6 @@
 #define CAM_VENDOR_DATA                         (CAM_COMMON_OPCODE_BASE + 0xC)
 /*Jindian.Guan@Camera.Drv, 20181207, add for imx471 DFCT info*/
 #define CAM_GET_DPC_DATA                        (CAM_COMMON_OPCODE_BASE + 0xD)
-/*add by yufeng@camera, 20190115 for write eeprom */
 #define CAM_WRITE_EEPROM_DATA                   (CAM_COMMON_OPCODE_BASE + 0xE)
 #define CAM_READ_EEPROM_DATA                    (CAM_COMMON_OPCODE_BASE + 0xF)
 #define CAM_READ_EEPROM_SN                      (CAM_COMMON_OPCODE_BASE + 0x10)
@@ -96,7 +95,7 @@ struct cam_control {
 #define VIDIOC_CAM_CONTROL \
 	_IOWR('V', BASE_VIDIOC_PRIVATE, struct cam_control)
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /*add by hongbo.dai@Camera,20180326 for AT test*/
 #define VIDIOC_CAM_FTM_POWNER_UP 0
 #define VIDIOC_CAM_FTM_POWNER_DOWN 1
@@ -351,7 +350,7 @@ struct cam_packet_header {
 	uint64_t                request_id;
 	uint32_t                flags;
 	uint32_t                padding;
-	#ifdef VENDOR_EDIT
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/*Jindian.Guan@Camera.Driver, 2019/01/04, add for [malloc imx586 qsc memory early]*/
 	uint64_t                vendor_mode;
 	#endif

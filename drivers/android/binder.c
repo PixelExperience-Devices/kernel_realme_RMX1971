@@ -73,13 +73,11 @@
 #include "binder_alloc.h"
 #include "binder_trace.h"
 
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <linux/oppocfs/oppo_cfs_binder.h>
 #endif
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HANS)
-// Kun.Zhou@ROM.Framework, 2019/09/23, add for hans freeze manager
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HANS)
 #include <linux/hans.h>
 #endif
 static HLIST_HEAD(binder_deferred_list);
@@ -2947,8 +2945,7 @@ static bool binder_proc_transaction(struct binder_transaction *t,
 		binder_transaction_priority(thread->task, t, node_prio,
 					    node->inherit_rt);
 		binder_enqueue_thread_work_ilocked(thread, &t->work);
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
         if (!oneway) {
             binder_thread_check_and_set_dynamic_ux(thread->task, t->from->task);
         }
@@ -3010,8 +3007,7 @@ static struct binder_node *binder_get_node_refs_for_txn(
 	return target_node;
 }
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_ELSA_STUB)
-//huangliang@Swdp2.shanghai, 2018/03/30, parse parcel data to get descriptor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_ELSA_STUB)
 #define STRICT_MODE_PENALTY_GATHER 				0x40
 #define STRICT_MODE_PENALTY_GATHER_OFFSET		2
 #define LENGTH_OFFSET							4
@@ -3088,13 +3084,11 @@ static void binder_transaction(struct binder_proc *proc,
 	int t_debug_id = atomic_inc_return(&binder_last_id);
 	char *secctx = NULL;
 	u32 secctx_sz = 0;
-#if defined(VENDOR_EDIT) && defined(CONFIG_ELSA_STUB)
-//zhoumingjun@Swdp.shanghai, 2017/07/10, notify user space when binder transaction starts
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_ELSA_STUB)
 	struct process_event_data pe_data;
 	struct process_event_binder pe_binder;
 #endif
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HANS)
-// Kun.Zhou@ROM.Framework, 2019/09/23, add for hans freeze manager
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HANS)
 	char buf_data[INTERFACETOKEN_BUFF_SIZE];
 	size_t buf_data_size;
 	char buf[INTERFACETOKEN_BUFF_SIZE] = {0};
@@ -3111,8 +3105,7 @@ static void binder_transaction(struct binder_proc *proc,
 	e->offsets_size = tr->offsets_size;
 	e->context_name = proc->context->name;
 
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     binder_thread_check_and_remove_dynamic_ux(thread->task);
 #endif
 
@@ -3221,8 +3214,7 @@ static void binder_transaction(struct binder_proc *proc,
 			goto err_dead_binder;
 		}
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HANS)
-// Kun.Zhou@ROM.Framework, 2019/09/23, add for hans freeze manager
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HANS)
 		if (!(tr->flags & TF_ONE_WAY) //report sync binder call
 			&& target_proc
 			&& (task_uid(target_proc->tsk).val > MIN_USERAPP_UID)
@@ -3446,8 +3438,7 @@ static void binder_transaction(struct binder_proc *proc,
 		return_error_line = __LINE__;
 		goto err_bad_offset;
 	}
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HANS)
-// Kun.Zhou@ROM.Framework, 2019/09/23, add for hans freeze manager
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HANS)
 	if ((tr->flags & TF_ONE_WAY) //report async binder call
 		&& target_proc
 		&& (task_uid(target_proc->tsk).val > MIN_USERAPP_UID)
@@ -3667,8 +3658,7 @@ static void binder_transaction(struct binder_proc *proc,
 	}
 	tcomplete->type = BINDER_WORK_TRANSACTION_COMPLETE;
 	t->work.type = BINDER_WORK_TRANSACTION;
-#if defined(VENDOR_EDIT) && defined(CONFIG_ELSA_STUB)
-//zhoumingjun@Swdp.shanghai, 2017/07/10, notify user space when binder transaction starts
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_ELSA_STUB)
 	if (target_proc->tsk != NULL) {
 		pe_binder.src = proc->tsk;
 		pe_binder.dst = target_proc->tsk;
@@ -4353,13 +4343,11 @@ static int binder_wait_for_work(struct binder_thread *thread,
 			list_add(&thread->waiting_thread_node,
 				 &proc->waiting_threads);
 		binder_inner_proc_unlock(proc);
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// Liujie.Xie@TECH.Kernel.Sched, 2019/08/29, add for stuck monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
         current->in_binder = 1;
 #endif
         schedule();
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// Liujie.Xie@TECH.Kernel.Sched, 2019/08/29, add for stuck monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
         current->in_binder = 0;
 #endif
 		binder_inner_proc_lock(proc);
@@ -4654,8 +4642,7 @@ retry:
 			trd->sender_pid =
 				task_tgid_nr_ns(sender,
 						task_active_pid_ns(current));
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
             binder_thread_check_and_set_dynamic_ux(thread->task, t_from->task);
 #endif
 		} else {
@@ -6119,8 +6106,7 @@ static int binder_state_show(struct seq_file *m, void *unused)
 	return 0;
 }
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_ELSA_STUB)
-//huangliang@Swdp.shanghai, 2018/08/14, chk pid whether going binder transaction
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_ELSA_STUB)
 static int is_proc_thread_in_transaction(struct binder_thread *thread)
 {
 	struct binder_transaction *t;
@@ -6169,8 +6155,7 @@ int chk_proc_binder_transaction(uid_t uid)
 EXPORT_SYMBOL(chk_proc_binder_transaction);
 #endif
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HANS)
-// Kun.Zhou@ROM.Framework, 2019/09/23, add for hans freeze manager
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HANS)
 static void hans_check_uid_proc_status(struct binder_proc *proc)
 {
 	struct rb_node *n = NULL;

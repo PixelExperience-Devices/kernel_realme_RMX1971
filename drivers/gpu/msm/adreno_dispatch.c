@@ -24,10 +24,9 @@
 #include "adreno_trace.h"
 #include "kgsl_sharedmem.h"
 
-#ifdef VENDOR_EDIT
-//Wenhua.Leng@PSW.MM.Display.GPU, 2019/03/06, Add for record gpu snapshot
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <soc/oppo/oppo_kevent_feedback.h>
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 #define DRAWQUEUE_NEXT(_i, _s) (((_i) + 1) % (_s))
 
@@ -2072,8 +2071,7 @@ replay:
 }
 
 
-#ifdef VENDOR_EDIT
-/*Wenhua.Leng@PSW.MM.Display.LCD.Machine, 2019/02/11,add for mm kevent gpu.*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static pid_t snapshotpid = -1;
 static int snapshotfault = -1;
 static void setfaulttype(int fault)
@@ -2097,13 +2095,12 @@ uint32_t GPUBKDRHash(char* str, uint32_t len)
 
     return hash;
 }
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 static void do_header_and_snapshot(struct kgsl_device *device, int fault,
 		struct adreno_ringbuffer *rb, struct kgsl_drawobj_cmd *cmdobj)
 {
-#ifdef VENDOR_EDIT
-/*Wenhua.Leng@PSW.MM.Display.LCD.Machine, 2019/02/11,add for mm kevent gpu.*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	uint8_t uuidsrc[100] = "";
 	uint32_t uuidsrcLength = 0;
 	uint32_t uuid          = 0;
@@ -2111,7 +2108,7 @@ static void do_header_and_snapshot(struct kgsl_device *device, int fault,
 	uint8_t payload[100] = "";
 	pid_t pid = -1;
 	char processname[32]={'\0'};
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 	struct kgsl_drawobj *drawobj = DRAWOBJ(cmdobj);
 
@@ -2129,8 +2126,7 @@ static void do_header_and_snapshot(struct kgsl_device *device, int fault,
 	/* Print the fault header */
 	adreno_fault_header(device, rb, cmdobj);
 
-#ifndef VENDOR_EDIT
-/*Wenhua.Leng@PSW.MM.Display.LCD.Machine, 2019/02/11,add for mm kevent gpu.*/
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 	if (!(drawobj->context->flags & KGSL_CONTEXT_NO_SNAPSHOT))
 		kgsl_device_snapshot(device, drawobj->context,
 					fault & ADRENO_GMU_FAULT);
@@ -2155,7 +2151,7 @@ static void do_header_and_snapshot(struct kgsl_device *device, int fault,
             snapshotpid = pid;
         }
     }
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 }
 
 static int dispatcher_do_fault(struct adreno_device *adreno_dev)
@@ -2284,8 +2280,7 @@ static int dispatcher_do_fault(struct adreno_device *adreno_dev)
 		adreno_readreg64(adreno_dev, ADRENO_REG_CP_IB1_BASE,
 			ADRENO_REG_CP_IB1_BASE_HI, &base);
 
-#ifdef VENDOR_EDIT
-/*Wenhua.Leng@PSW.MM.Display.LCD.Machine, 2019/02/11,add for mm kevent gpu.*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     setfaulttype(fault);
 #endif
 	do_header_and_snapshot(device, fault, hung_rb, cmdobj);

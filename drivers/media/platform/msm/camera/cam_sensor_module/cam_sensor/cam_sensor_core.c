@@ -17,7 +17,7 @@
 #include "cam_soc_util.h"
 #include "cam_trace.h"
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /*Jinshui.Liu@Camera.Driver, 2018/06/23, add for [tof watchdog]*/
 int tof_watchdog_goio = -1;
 struct hrtimer tof_watchdog_timer;
@@ -30,8 +30,7 @@ uint32_t vendor_size = 0;
 #endif
 
 
-/* add by likelong@camera 2017.12.12 for product information */
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //#include <linux/project_info.h>
 static struct cam_sensor_i2c_reg_array lotid_on_setting[2] = {
 	{
@@ -71,7 +70,6 @@ static struct cam_sensor_i2c_reg_setting lotid_off = {
 	.delay = 5,
 };
 
-/* wanghaoran@camera.driver. 2019/02/16, add for read sensor gc5035 of camera dpc and reg update */
 struct cam_sensor_dpc_reg_setting_array {
 	struct cam_sensor_i2c_reg_array reg_setting[25];
 	unsigned short size;
@@ -303,7 +301,6 @@ static int sensor_imx471_get_dpc_data(struct cam_sensor_ctrl_t *s_ctrl)
     return rc;
 }
 
-/* wanghaoran@camera.driver. 2019/02/16, add for read sensor gc5035 of camera dpc and reg update */
 static int sensor_gc5035_get_dpc_data(struct cam_sensor_ctrl_t * s_ctrl)
 {
 	int rc = 0;
@@ -860,7 +857,7 @@ static int32_t cam_sensor_i2c_pkt_parse(struct cam_sensor_ctrl_t *s_ctrl,
 	offset += csl_packet->cmd_buf_offset / 4;
 	cmd_desc = (struct cam_cmd_buf_desc *)(offset);
 
-	#ifdef VENDOR_EDIT
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/*Jindian.Guan@Camera.Driver, 2019/01/04, modify for [malloc imx586 qsc memory early]*/
 	rc = cam_sensor_i2c_command_parser_vendor(&s_ctrl->io_master_info,
 			i2c_reg_settings, cmd_desc, 1, csl_packet->header.vendor_mode);
@@ -985,8 +982,7 @@ int32_t cam_sensor_update_slave_info(struct cam_cmd_probe *probe_info,
 
 	s_ctrl->sensor_probe_addr_type =  probe_info->addr_type;
 	s_ctrl->sensor_probe_data_type =  probe_info->data_type;
-	#ifdef VENDOR_EDIT
-	/*add by hongbo.dai@camera 20180831, for support multi camera resource*/
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	s_ctrl->sensordata->slave_info.eeprom_slave_addr =
 		(probe_info->reserved >> 8) & (0xFF);
 	s_ctrl->sensordata->slave_info.vendor_id =
@@ -1159,7 +1155,7 @@ void cam_sensor_shutdown(struct cam_sensor_ctrl_t *s_ctrl)
 	if (s_ctrl->sensor_state == CAM_SENSOR_INIT)
 		return;
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
      CAM_INFO(CAM_SENSOR, "streamoff Sensor");
 	rc = cam_sensor_apply_settings(s_ctrl, 0,
 		CAM_SENSOR_PACKET_OPCODE_SENSOR_STREAMOFF);
@@ -1189,8 +1185,7 @@ void cam_sensor_shutdown(struct cam_sensor_ctrl_t *s_ctrl)
 }
 
 
-#ifdef VENDOR_EDIT
-/*add by yufeng@camera, 20181222 for get sensor version*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #define SONY_SENSOR_MP0 (0x02)  //imx586 cut0.9(0X00)\cut0.91(0X01\0x02)
 #define SONY_SENSOR_MP1 (0x03)  //imx586 cut1.0(0x03\0x04\0x10)\MP (0x1X)
 /* Huanyun.Tang@RM.Cam, 20190722, add for get sensor version */
@@ -1203,12 +1198,11 @@ int cam_sensor_match_id(struct cam_sensor_ctrl_t *s_ctrl)
 {
 	int rc = 0;
 	uint32_t chipid = 0;
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	uint32_t sensor_version = 0;
 	uint16_t sensor_version_reg = 0x0018;
 	uint32_t module_id =0;
 	uint16_t tmp_slave_addr;
-/* wanghaoran@camera.driver. 2018/11/2, add for read sensor gc5035 of camera */
     uint32_t gc5035_high = 0;
     uint32_t gc5035_low = 0;
     uint32_t chipid_high = 0;
@@ -1230,8 +1224,7 @@ int cam_sensor_match_id(struct cam_sensor_ctrl_t *s_ctrl)
 		slave_info->sensor_id_reg_addr,
 		&chipid, CAMERA_SENSOR_I2C_TYPE_WORD,
 		CAMERA_SENSOR_I2C_TYPE_WORD);
-#ifdef VENDOR_EDIT
-/* wanghaoran@camera.driver. 2018/11/2, add for read sensor gc5035 of camera */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     if (slave_info->sensor_id == 0x5035
          || slave_info->sensor_id == 0x2375
          || slave_info->sensor_id == 0x2509) {
@@ -1271,8 +1264,7 @@ int cam_sensor_match_id(struct cam_sensor_ctrl_t *s_ctrl)
 		return -ENODEV;
 	}
 
-#ifdef VENDOR_EDIT
-	/*add by yufeng@camera, 20181222 for multi sensor version*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (chipid == 0x586) {
 		rc = camera_io_dev_read(
 			&(s_ctrl->io_master_info),
@@ -1321,7 +1313,6 @@ int cam_sensor_match_id(struct cam_sensor_ctrl_t *s_ctrl)
 			CAM_INFO(CAM_SENSOR, "S5k5e9 sensor_version: 0x%x",
 				sensor_version >> 8);
 	}
-	/*add by hongbo.dai@camera 20180831, for support multi camera resource*/
 	if (chipid == 0x519 || chipid == 0x576 || chipid == 0x559B || chipid == 0x471) {
 		if (slave_info->eeprom_slave_addr != 0) {
 			//change to eeprom slave address for read vendor ID
@@ -1545,8 +1536,7 @@ int32_t cam_sensor_driver_cmd(struct cam_sensor_ctrl_t *s_ctrl,
 			kfree(pd);
 			goto release_mutex;
 		}
-		#ifdef VENDOR_EDIT
-		/*add by yufeng@camera, 20181222 for get sensor version*/
+		#ifdef CONFIG_PRODUCT_REALME_SDM710
 		cmd->reserved = s_ctrl->sensordata->slave_info.sensor_version;
 		#endif
 
@@ -1703,7 +1693,7 @@ int32_t cam_sensor_driver_cmd(struct cam_sensor_ctrl_t *s_ctrl,
 	}
 		break;
 	case CAM_STOP_DEV: {
-#ifndef VENDOR_EDIT
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 		/*Jinshui.Liu@Camera.Driver, 2019/02/22, modify for [allow stop in config state]*/
 		if (s_ctrl->sensor_state != CAM_SENSOR_START) {
 			rc = -EINVAL;
@@ -1786,7 +1776,7 @@ int32_t cam_sensor_driver_cmd(struct cam_sensor_ctrl_t *s_ctrl,
 		}
 	}
 		break;
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	case CAM_GET_FUSE_ID: {
 		CAM_ERR(CAM_SENSOR, "fuse_id:%s", fuse_id);
 		if (fuse_id[0] == '\0') {
@@ -1883,7 +1873,7 @@ int cam_sensor_power(struct v4l2_subdev *sd, int on)
 	return 0;
 }
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /*Jinshui.Liu@Camera.Driver, 2018/06/23, add for [tof watchdog]*/
 static int cam_sensor_wtd_trigger(int watchdog_gpio)
 {
@@ -1950,7 +1940,7 @@ int cam_sensor_power_up(struct cam_sensor_ctrl_t *s_ctrl)
 		return -EINVAL;
 	}
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/*Jinshui.Liu@Camera.Driver, 2018/06/23, add for [tof watchdog]*/
 	if (s_ctrl->sensordata->watchdog_gpio != -1) {
 		cam_sensor_hrtimer_init(s_ctrl->sensordata);
@@ -1989,7 +1979,7 @@ int cam_sensor_power_down(struct cam_sensor_ctrl_t *s_ctrl)
 		CAM_ERR(CAM_SENSOR, "failed: power_info %pK", power_info);
 		return -EINVAL;
 	}
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/*Jinshui.Liu@Camera.Driver, 2018/06/23, add for [tof watchdog]*/
 	if (s_ctrl->sensordata->watchdog_gpio != -1) {
 		hrtimer_cancel(&tof_watchdog_timer);
@@ -2040,8 +2030,7 @@ int cam_sensor_apply_settings(struct cam_sensor_ctrl_t *s_ctrl,
 		if (i2c_set->is_settings_valid == 1) {
 			list_for_each_entry(i2c_list,
 				&(i2c_set->list_head), list) {
-#ifdef VENDOR_EDIT
-                /* wanghaoran@camera.driver. 2018/11/2, add for read sensor gc5035 of camera */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
                 if (s_ctrl->sensordata->slave_info.sensor_id == 0x5035
                     || s_ctrl->sensordata->slave_info.sensor_id == 0x2375) {
                         i2c_list->i2c_settings.addr_type = CAMERA_SENSOR_I2C_TYPE_BYTE;
@@ -2060,8 +2049,7 @@ int cam_sensor_apply_settings(struct cam_sensor_ctrl_t *s_ctrl,
 						rc);
 					return rc;
 				}
-#ifdef VENDOR_EDIT
-/* wanghaoran@camera.driver. 2019/02/16, add for read sensor gc5035 of camera dpc and reg update */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 				if (s_ctrl->sensordata->slave_info.sensor_id == 0x5035
 				    && opcode ==  CAM_SENSOR_PACKET_OPCODE_SENSOR_INITIAL_CONFIG) {
 				    sensor_gc5035_write_dpc_data(s_ctrl);
@@ -2078,8 +2066,7 @@ int cam_sensor_apply_settings(struct cam_sensor_ctrl_t *s_ctrl,
 			i2c_set->request_id == req_id) {
 			list_for_each_entry(i2c_list,
 				&(i2c_set->list_head), list) {
-#ifdef VENDOR_EDIT
-                /* wanghaoran@camera.driver. 2018/11/2, add for read sensor gc5035 of camera */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
                 if (s_ctrl->sensordata->slave_info.sensor_id == 0x5035
                     || s_ctrl->sensordata->slave_info.sensor_id == 0x2375) {
                    i2c_list->i2c_settings.addr_type = CAMERA_SENSOR_I2C_TYPE_BYTE;
@@ -2165,13 +2152,13 @@ int32_t cam_sensor_apply_request(struct cam_req_mgr_apply_request *apply)
 	}
 	CAM_DBG(CAM_SENSOR, " Req Id: %lld", apply->request_id);
 	trace_cam_apply_req("Sensor", apply->request_id);
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/* Tengfeng.Wang@camera.driver. 2019/2/18, add for Qualcomm patch */
 	mutex_lock(&(s_ctrl->cam_sensor_mutex));
 #endif
 	rc = cam_sensor_apply_settings(s_ctrl, apply->request_id,
 		CAM_SENSOR_PACKET_OPCODE_SENSOR_UPDATE);
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/* Tengfeng.Wang@camera.driver. 2019/2/18, add for Qualcomm patch */
 	mutex_unlock(&(s_ctrl->cam_sensor_mutex));
 #endif

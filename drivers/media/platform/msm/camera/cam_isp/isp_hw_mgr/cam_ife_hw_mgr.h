@@ -160,12 +160,11 @@ struct cam_ife_hw_mgr_ctx {
 	atomic_t                        overflow_pending;
 	uint32_t                        is_rdi_only_context;
 	struct completion               config_done_complete;
-	#ifdef VENDOR_EDIT
-	/*add by hongbo.dai@camera, 20180627 for hwsync*/
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	int crm_sync_mode;
 	int frame_count;
 	#endif
-	#ifdef VENDOR_EDIT
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/*Xiaoyang.Huang@RM.Camera add to fix preview freeze issue,case:04181061,20191010*/
 	uint32_t                        dual_ife_irq_mismatch_cnt;
 	#endif

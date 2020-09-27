@@ -2373,8 +2373,7 @@ int task_cgroup_path(struct task_struct *task, char *buf, size_t buflen)
 }
 EXPORT_SYMBOL_GPL(task_cgroup_path);
 
-#ifdef VENDOR_EDIT
-//zhoumingjun@Swdp.shanghai, 2018/07/10, get task cgroup path by root name for elsa
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 int task_cgroup_path_by_root(struct task_struct *task, const char *rootname,  char *buf, size_t buflen)
 {
 	struct cgroup_root *root;

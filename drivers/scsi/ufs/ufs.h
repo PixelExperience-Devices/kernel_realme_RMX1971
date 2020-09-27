@@ -155,14 +155,12 @@ enum ufs_desc_def_size {
 	QUERY_DESC_INTERCONNECT_DEF_SIZE	= 0x06,
 	QUERY_DESC_GEOMETRY_DEF_SIZE		= 0x44,
 	QUERY_DESC_POWER_DEF_SIZE		= 0x62,
-#ifdef VENDOR_EDIT
-	//xiaofan.yang@PSW.TECH.Stability, 2019/03/15,Add for check storage endurance
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	QUERY_DESC_HEALTH_DEF_SIZE              = 0x25,
 #endif
 };
 
-#ifdef VENDOR_EDIT
-//xiaofan.yang@PSW.TECH.Stability, 2019/03/15,Add for check storage endurance
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /* Health descriptor parameters offsets in bytes*/
 enum health_desc_param {
        HEALTH_DESC_PARAM_LEN                   = 0x0,

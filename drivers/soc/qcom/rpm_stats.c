@@ -26,8 +26,7 @@
 #define RPM_STATS_NUM_REC	2
 #define MSM_ARCH_TIMER_FREQ	19200000
 
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.Power.Basic 2018/06/11 add for get rpm_stats
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 void __iomem *rpm_phys_addr = NULL;
 #endif
 
@@ -67,8 +66,7 @@ struct msm_rpm_stats_data {
 #endif
 
 };
-//yangmingjin@BSP.POWER.Basic 2019/05/30 add for RM_TAG_POWER_DEBUG
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static struct msm_rpmstats_private_data *gPrvdata;
 static bool init_flag = true;
 static bool force_format = false;
@@ -82,7 +80,7 @@ struct mt_rpmstats_cnt_data {
 static struct mt_rpmstats_cnt_data rpmstats_cnt_data;
 #define RPMSTATS_OVER_CNT_THRES 20
 #endif
-/*VENDOR_EDIT*/
+/*CONFIG_PRODUCT_REALME_SDM710*/
 
 struct msm_rpmstats_kobj_attr {
 	struct kobject *kobj;
@@ -112,12 +110,11 @@ static inline int msm_rpmstats_append_data_to_buf(char *buf,
 	u64 time_in_last_mode;
 	u64 time_since_last_mode;
 	u64 actual_last_sleep;
-//yangmingjin@BSP.POWER.Basic 2019/05/30 addfor RM_TAG_POWER_DEBUG
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	u32 pre_count;
 	u32 same_times;
 #endif
-/*VENDOR_EDIT*/
+/*CONFIG_PRODUCT_REALME_SDM710*/
 	stat_type[4] = 0;
 	memcpy(stat_type, &data->stat_type, sizeof(u32));
 
@@ -126,8 +123,7 @@ static inline int msm_rpmstats_append_data_to_buf(char *buf,
 	time_since_last_mode = arch_counter_get_cntvct() - data->last_exited_at;
 	time_since_last_mode = get_time_in_sec(time_since_last_mode);
 	actual_last_sleep = get_time_in_msec(data->accumulated);
-//yangmingjin@BSP.POWER.Basic 2019/05/30 add for RM_TAG_POWER_DEBUG
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if(!strcmp(stat_type, rpmstats_cnt_data.xo_stat_type)){
 		if(rpmstats_cnt_data.pre_xo_count == data->count)
 			rpmstats_cnt_data.xo_same_times++;
@@ -158,7 +154,7 @@ static inline int msm_rpmstats_append_data_to_buf(char *buf,
 #endif
 	else
 #endif
-/*VENDOR_EDIT*/
+/*CONFIG_PRODUCT_REALME_SDM710*/
 
 #if defined(CONFIG_MSM_RPM_SMD)
 	return snprintf(buf, buflength,
@@ -177,8 +173,7 @@ static inline int msm_rpmstats_append_data_to_buf(char *buf,
 #endif
 }
 
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.Power.Basic 2018/06/11 add for get rpm_stats
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static inline int oppo_rpmstats_append_data_to_buf(char *buf,
 		struct msm_rpm_stats_data *data, int buflength,int i)
 {
@@ -195,7 +190,7 @@ if(i == 0) {
 		data->count, actual_last_sleep);
 }
 }
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 static inline u32 msm_rpmstats_read_long_register(void __iomem *regbase,
 		int index, int offset)
@@ -253,8 +248,7 @@ static inline int msm_rpmstats_copy_stats(
 	return length;
 }
 
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.Power.Basic 2018/06/11 add for get rpm_stats
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static inline int oppo_rpmstats_copy_stats(
 			struct msm_rpmstats_private_data *prvdata)
 {
@@ -278,7 +272,7 @@ static inline int oppo_rpmstats_copy_stats(
 
 	return length;
 }
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 static ssize_t rpmstats_show(struct kobject *kobj,
 			struct kobj_attribute *attr, char *buf)
@@ -308,8 +302,7 @@ static ssize_t rpmstats_show(struct kobject *kobj,
 	iounmap(prvdata.reg_base);
 	return length;
 }
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.Power.Basic 2018/06/11 add for get rpm_stats
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static ssize_t oppo_rpmstats_show(struct kobject *kobj,
 			struct kobj_attribute *attr, char *buf)
 {
@@ -330,7 +323,7 @@ static ssize_t oppo_rpmstats_show(struct kobject *kobj,
 	return snprintf(buf, prvdata.len, "%s", prvdata.buf);
 }
 
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 static int msm_rpmstats_create_sysfs(struct platform_device *pdev,
 				struct msm_rpmstats_platform_data *pd)
@@ -338,8 +331,7 @@ static int msm_rpmstats_create_sysfs(struct platform_device *pdev,
 	struct kobject *rpmstats_kobj = NULL;
 	struct msm_rpmstats_kobj_attr *rpms_ka = NULL;
 	int ret = 0;
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.Power.Basic 2018/05/23 add for get /sys/power/system_sleep/oppo_rpmh_stats
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     struct msm_rpmstats_kobj_attr *oppo_rpms_ka = NULL;
 #endif
 
@@ -368,8 +360,7 @@ static int msm_rpmstats_create_sysfs(struct platform_device *pdev,
 
 	ret = sysfs_create_file(rpmstats_kobj, &rpms_ka->ka.attr);
 	platform_set_drvdata(pdev, rpms_ka);
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.Power.Basic 2018/05/23 add for get /sys/power/system_sleep/oppo_rpmh_stats
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     oppo_rpms_ka = kzalloc(sizeof(*oppo_rpms_ka), GFP_KERNEL);
 	if (!oppo_rpms_ka) {
 		kobject_put(rpmstats_kobj);
@@ -385,13 +376,12 @@ static int msm_rpmstats_create_sysfs(struct platform_device *pdev,
 	oppo_rpms_ka->ka.store = NULL;
 
 	ret = sysfs_create_file(rpmstats_kobj, &oppo_rpms_ka->ka.attr);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 fail:
 	return ret;
 }
-//yangmingjin@BSP.POWER.Basic 2019/05/30 add for RM_TAG_POWER_DEBUG
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static bool is_over_xo_thres(void){
 	return rpmstats_cnt_data.xo_same_times > RPMSTATS_OVER_CNT_THRES;
 }
@@ -455,7 +445,7 @@ void rpmstats_print(bool suspend){
 	force_format = false;
 }
 #endif
-/*VENDOR_EDIT*/
+/*CONFIG_PRODUCT_REALME_SDM710*/
 
 static int msm_rpmstats_probe(struct platform_device *pdev)
 {
@@ -496,8 +486,7 @@ static int msm_rpmstats_probe(struct platform_device *pdev)
 
 	msm_rpmstats_create_sysfs(pdev, pdata);
 
-#ifdef VENDOR_EDIT
-	//Nanwei.Deng@BSP.Power.Basic 2018/05/23 add for get /sys/power/system_sleep/oppo_rpmh_stats
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	rpm_phys_addr= ioremap_nocache(pdata->phys_addr_base,
 							pdata->phys_size);
 	if (!rpm_phys_addr) {
@@ -507,13 +496,12 @@ static int msm_rpmstats_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 #endif
-//yangmingjin@BSP.POWER.Basic 2019/05/30 add for RM_TAG_POWER_DEBUG
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
         if(private_data_init(&pdev->dev, &gPrvdata, pdata))
             init_flag = false;
         strcpy(rpmstats_cnt_data.xo_stat_type, "cxsd");
 #endif
-/*VENDOR_EDIT*/
+/*CONFIG_PRODUCT_REALME_SDM710*/
 	return 0;
 }
 

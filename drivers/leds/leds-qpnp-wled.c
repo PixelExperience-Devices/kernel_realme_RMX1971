@@ -2657,13 +2657,12 @@ static int qpnp_wled_parse_dt(struct qpnp_wled *wled)
 	} else {
 		wled->num_strings = temp_val;
 		strings = prop->value;
-		#ifdef VENDOR_EDIT
-		//caiwutang@MM.Display.LCD.Feature, 2019-01-24, Add for 2string bl
+		#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (strstr(saved_command_line,"2str")){
 			pr_info("bl is 2str");
 			wled->num_strings = 2;
 		}
-		#endif /* VENDOR_EDIT */
+		#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 		for (i = 0; i < wled->num_strings; ++i)
 			wled->strings[i] = strings[i];
 	}

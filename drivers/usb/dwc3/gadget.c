@@ -1940,8 +1940,7 @@ static int dwc3_gadget_run_stop(struct dwc3 *dwc, int is_on, int suspend)
 	u32			reg, reg1;
 	u32			timeout = 1500;
 
-#ifdef VENDOR_EDIT
-    /* Yichun.Chen	PSW.BSP.CHG  2019-08-07  for detect CDP */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     ktime_t start, diff;
 #endif
 
@@ -1956,8 +1955,7 @@ static int dwc3_gadget_run_stop(struct dwc3 *dwc, int is_on, int suspend)
 		if (dwc->revision >= DWC3_REVISION_194A)
 			reg &= ~DWC3_DCTL_KEEP_CONNECT;
 
-#ifdef VENDOR_EDIT
-        /* Yichun.Chen	PSW.BSP.CHG  2019-08-07  for detect CDP */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
         reg1 = dwc3_readl(dwc->regs, DWC3_DCTL);
         if (reg1 & DWC3_DCTL_RUN_STOP) /*only restart core if run bit already been set*/
         {
@@ -3075,9 +3073,11 @@ static void dwc3_stop_active_transfers(struct dwc3 *dwc)
 		if (!(dep->flags & DWC3_EP_ENABLED))
 			continue;
 
+		if (dep->endpoint.ep_type == EP_TYPE_GSI && dep->direction)
+			dwc3_notify_event(dwc,
+					DWC3_CONTROLLER_NOTIFY_CLEAR_DB, 0);
 		dwc3_remove_requests(dwc, dep);
 	}
-	dwc3_notify_event(dwc, DWC3_CONTROLLER_NOTIFY_CLEAR_DB, 0);
 	dbg_log_string("DONE");
 }
 

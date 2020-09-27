@@ -326,8 +326,7 @@ extern char ___assert_task_state[1 - 2*!!(
 
 #endif
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// Liujie.Xie@TECH.Kernel.Sched, 2019/08/29, add for stuck monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
 struct uifirst_d_state {
     u64 iowait_ns;
     u64 downread_ns;
@@ -354,8 +353,7 @@ struct oppo_uifirst_monitor_info {
 };
 #endif
 
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 enum DYNAMIC_UX_TYPE
 {
     DYNAMIC_UX_BINDER = 0,
@@ -371,7 +369,7 @@ enum DYNAMIC_UX_TYPE
 
 extern int sysctl_uifirst_enabled;
 extern int sysctl_launcher_boost_enabled;
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 /* Task command name length */
 #define TASK_COMM_LEN 16
@@ -1724,10 +1722,7 @@ struct tlbflush_unmap_batch {
 	bool writable;
 };
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_PROCESS_RECLAIM)
-/* Kui.Zhang@TEC.Kernel.Performance, 2019/03/04
- * Record process reclaim infor
- */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_PROCESS_RECLAIM)
 union reclaim_limit {
 	unsigned long stop_jiffies;
 	unsigned long stop_scan_addr;
@@ -2255,8 +2250,7 @@ struct task_struct {
 	/* A live task holds one reference. */
 	atomic_t stack_refcount;
 #endif
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// Liujie.Xie@TECH.Kernel.Sched, 2019/08/29, add for stuck monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
     int stuck_trace;
     struct oppo_uifirst_monitor_info oppo_stuck_info;
     unsigned in_mutex:1;
@@ -2266,19 +2260,15 @@ struct task_struct {
     unsigned in_binder:1;
     unsigned in_epoll:1;
 #endif
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     int static_ux;
     atomic64_t dynamic_ux;
     struct list_head ux_entry;
     int ux_depth;
     u64 enqueue_time;
     u64 dynamic_ux_start;
-#endif /* VENDOR_EDIT */
-#if defined(VENDOR_EDIT) && defined(CONFIG_PROCESS_RECLAIM)
-	/* Kui.Zhang@TEC.Kernel.Performance, 2019/03/04
-	 * Record process reclaim infor
-	 */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_PROCESS_RECLAIM)
 	union reclaim_limit reclaim;
 #endif
 /* CPU-specific state of this task */
@@ -2583,8 +2573,7 @@ extern void thread_group_cputime_adjusted(struct task_struct *p, cputime_t *ut, 
 /*
  * Per process flags
  */
-#ifdef VENDOR_EDIT
-/* fanhui@PhoneSW.BSP, 2016/02/02, DeathHealer, set the task to be killed */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #define PF_OPPO_KILLING	0x00000001
 #endif
 #define PF_WAKE_UP_IDLE 0x00000002	/* try to wake up on an idle CPU */
@@ -2616,8 +2605,7 @@ extern void thread_group_cputime_adjusted(struct task_struct *p, cputime_t *ut, 
 #define PF_MUTEX_TESTER	0x20000000	/* Thread belongs to the rt mutex tester */
 #define PF_FREEZER_SKIP	0x40000000	/* Freezer should not count it as freezable */
 #define PF_SUSPEND_TASK 0x80000000      /* this thread called freeze_processes and should not be frozen */
-#if defined(VENDOR_EDIT) && defined(CONFIG_PROCESS_RECLAIM)
-/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25, flag that current task is process reclaimer */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_PROCESS_RECLAIM)
 #define PF_RECLAIM_SHRINK	0x10000000
 
 #define current_is_reclaimer() (current->flags & PF_RECLAIM_SHRINK)
@@ -2825,14 +2813,12 @@ static inline int sched_update_freq_max_load(const cpumask_t *cpumask)
 }
 
 #ifdef CONFIG_SMP
-#ifdef VENDOR_EDIT
-//wangmengmeng@swdp.shanghai, 2019/6/20, export some symbol
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 extern unsigned long sched_get_capacity_orig(int cpu);
 extern unsigned int sched_get_cpu_util(int cpu);
 #endif
 #else
-#ifdef VENDOR_EDIT
-//wangmengmeng@swdp.shanghai, 2019/6/20, export some symbol
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static inline unsigned long sched_get_capacity_orig(int cpu)
 {
 	return 0;
@@ -3135,12 +3121,11 @@ extern void sched_exit(struct task_struct *p);
 static inline void sched_exit(struct task_struct *p) { }
 #endif
 
-#ifdef VENDOR_EDIT
-//cuixiaogang@swdp.shanghai, 2018/3/18, export some symbol
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 extern int sched_boost(void);
 extern int sched_set_updown_migrate(unsigned int *up_pct, unsigned int *down_pct);
 extern void sched_get_updown_migrate(unsigned int *up_pct, unsigned int *down_pct);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 extern void proc_caches_init(void);
 extern void flush_signals(struct task_struct *);
@@ -3406,8 +3391,7 @@ static inline void exit_thread(struct task_struct *tsk)
 }
 #endif
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_ELSA_STUB)
-//zhoumingjun@Swdp.shanghai, 2017/04/19, add process_event_notifier support
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_ELSA_STUB)
 #define PROCESS_EVENT_CREATE 1
 #define PROCESS_EVENT_EXIT 2
 #define PROCESS_EVENT_UID 3
@@ -3784,8 +3768,7 @@ static inline int fatal_signal_pending(struct task_struct *p)
 	return signal_pending(p) && __fatal_signal_pending(p);
 }
 
-#ifdef VENDOR_EDIT 
-/*fangpan@Swdp.shanghai,2015/11/12*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static inline int hung_long_and_fatal_signal_pending(struct task_struct *p)
 {
 #ifdef CONFIG_DETECT_HUNG_TASK

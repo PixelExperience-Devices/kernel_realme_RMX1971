@@ -943,11 +943,8 @@ static const struct file_operations mmc_dbg_bkops_stats_fops = {
 	.read		= seq_read,
 	.write		= mmc_bkops_stats_write,
 };
-#ifdef VENDOR_EDIT 
-//rendong.shi@Bsp.drv,2016/02/17,porting from 8939 for emmc life&size display
-//Fanhong.Kong@ProDrv.CHG,add 2016/6/24 for kernel 3.18 
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #define SECTOR_COUNT_BUF_LEN 16
-//yh@PhoneSW.drv,2017/03/14,modify for api mmc_send_ext_csd changed to mmc_get_ext_csd in kernel 4.4 
 static int mmc_sector_count_open(struct inode *inode, struct file *filp)
 {
 	struct mmc_card *card = inode->i_private;
@@ -1063,7 +1060,6 @@ static char* life_time_table[]={
 	"Reserved",
 	"Reserved",
 };
-//yh@PhoneSW.drv,2017/03/14,modify for api mmc_send_ext_csd changed to mmc_get_ext_csd in kernel 4.4 
 static int mmc_life_time_open(struct inode *inode, struct file *filp)
 {
 	struct mmc_card *card = inode->i_private;
@@ -1207,8 +1203,7 @@ void mmc_add_card_debugfs(struct mmc_card *card)
 		if (!debugfs_create_file("bkops_stats", S_IRUSR, root, card,
 					 &mmc_dbg_bkops_stats_fops))
 			goto err;
-#ifdef VENDOR_EDIT 
-//rendong.shi@Bsp.drv,2016/02/17,porting from 8939 for emmc life&size display	
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (mmc_card_mmc(card))
 		if (!debugfs_create_file("sector_count", S_IRUSR, root, card,
 						&mmc_dbg_sector_count_fops))

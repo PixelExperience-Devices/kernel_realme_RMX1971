@@ -1,6 +1,5 @@
 /***************************************************************
 ** Copyright (C),  2018,  OPPO Mobile Comm Corp.,  Ltd
-** VENDOR_EDIT
 ** File : oppo_display_private_api.h
 ** Description : oppo display private api implement
 ** Version : 1.0
@@ -1943,7 +1942,23 @@ static ssize_t oppo_display_set_dimlayer_hbm(struct device *dev,
                                struct device_attribute *attr,
                                const char *buf, size_t count)
 {
-	sscanf(buf, "%d", &oppo_dimlayer_hbm);
+        struct dsi_display *display = get_main_display();
+	int dim_hbm_mode = 0;
+	sscanf(buf, "%d", &dim_hbm_mode);
+
+        if((get_oppo_display_power_status() == 1) || (get_oppo_display_power_status() == 3)) {
+                if(dim_hbm_mode == 0) {
+                        dsi_panel_hbm_off(display->panel);
+		}
+	}
+
+        sscanf(buf, "%d", &oppo_dimlayer_hbm);
+
+	if((get_oppo_display_power_status() == 1) || (get_oppo_display_power_status() == 3)) {
+		if(dim_hbm_mode == 1) {
+			dsi_panel_hbm_on(display->panel);
+		}
+	}
 
 	return count;
 }
@@ -2251,15 +2266,6 @@ static ssize_t oppo_display_notify_fp_press(struct device *dev,
 		pr_err("failed to get crtc vblank %d\n", vblank_get);
 	}
 	oppo_onscreenfp_status = onscreenfp_status;
-	if (onscreenfp_status &&
-	    OPPO_DISPLAY_AOD_SCENE == get_oppo_display_scene()) {
-		mutex_lock(&display->panel->panel_lock);
-		if (display->panel->panel_initialized)
-			err = dsi_panel_tx_cmd_set(display->panel, DSI_CMD_AOD_HBM_ON);
-		mutex_unlock(&display->panel->panel_lock);
-		if (err)
-			pr_err("failed to setting aod hbm on mode %d\n", err);
-	}
 	oppo_onscreenfp_vblank_count = drm_crtc_vblank_count(dsi_connector->state->crtc);
 	oppo_onscreenfp_pressed_time = ktime_get();
 	drm_modeset_lock_all(drm_dev);

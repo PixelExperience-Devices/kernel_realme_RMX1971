@@ -1,12 +1,11 @@
 /***********************************************************
 ** Copyright (C), 2008-2019, OPPO Mobile Comm Corp., Ltd.
-** VENDOR_EDIT
+** CONFIG_PRODUCT_REALME_SDM710
 ** File: - panic_flush.c
 ** Description:  code to flush device cache in panic
 **
 ** Version: 1.0
 ** Date : 2019/08/27
-** Author: yanwu@TECH.Storage.FS, add code to flush device cache in panic
 **
 ** ------------------ Revision History:------------------------
 ** <author> <data> <version > <desc>

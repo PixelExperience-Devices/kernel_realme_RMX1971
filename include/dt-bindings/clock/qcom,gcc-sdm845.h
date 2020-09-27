@@ -19,15 +19,15 @@
 #define MEASURE_ONLY_CNOC_CLK					1
 #define MEASURE_ONLY_BIMC_CLK					2
 #define MEASURE_ONLY_IPA_2X_CLK					3
-//#ifdef VENDOR_EDIT
-//PengNan@BSP.Power.Basic,remove ufs and emmc compatibility for standby current, 2019/07/30
-//#define UFS_PHY_AXI_EMMC_VOTE_CLK				4
-//#define UFS_PHY_AXI_UFS_VOTE_CLK				5
-//#endif
+/* #ifndef CONFIG_PRODUCT_REALME_SDM710 */
+/*
+#define UFS_PHY_AXI_EMMC_VOTE_CLK				4
+#define UFS_PHY_AXI_UFS_VOTE_CLK				5
+*/
+/* #endif*/
 
 /* GCC clock registers */
-//#ifndef VENDOR_EDIT
-//PengNan@BSP.Power.Basic,remove ufs and emmc compatibility for standby current, 2019/07/30
+/* #ifndef CONFIG_PRODUCT_REALME_SDM710 */
 /*
 #define GCC_AGGRE_NOC_PCIE_TBU_CLK				6
 #define GCC_AGGRE_UFS_CARD_AXI_CLK				7
@@ -228,7 +228,7 @@
 #define GPLL4							202
 #define GPLL6							203
 */
-//#else
+/* #else */
 #define GCC_AGGRE_NOC_PCIE_TBU_CLK				0
 #define GCC_AGGRE_UFS_CARD_AXI_CLK				1
 #define GCC_AGGRE_UFS_PHY_AXI_CLK				2
@@ -427,7 +427,7 @@
 #define GCC_VSENSOR_CLK_SRC					195
 #define GPLL4							196
 #define GPLL6							197
-//#endif
+/* #endif */
 /* GCC reset clocks */
 #define GCC_MMSS_BCR						0
 #define GCC_PCIE_0_BCR						1

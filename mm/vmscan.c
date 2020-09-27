@@ -60,7 +60,7 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/vmscan.h>
 
-#ifdef VENDOR_EDIT //lipeifeng@psw.bsp.kernel 2019-6-24 add for mmscan_balance
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <linux/mmscan_balance.h>
 #define DEF_KSWAPD_THREADS_PER_NODE  (1)
 int kswapd_threads_current = DEF_KSWAPD_THREADS_PER_NODE;
@@ -125,10 +125,7 @@ struct scan_control {
 	 */
 	struct vm_area_struct *target_vma;
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_PROCESS_RECLAIM)
-	/* robin.ren@PSW.BSP.Kernel.Performance, 2019-03-13,
-	 * use mm_walk to regonize the behaviour of process reclaim.
-	 */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_PROCESS_RECLAIM)
 	struct mm_walk *walk;
 #endif
 };
@@ -166,7 +163,7 @@ struct scan_control {
  */
 int vm_swappiness = 60;
 
-#ifdef VENDOR_EDIT //yixue.ge@psw.bsp.kernel 20170720 add for add direct_vm_swappiness
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /*
  * Direct reclaim swappiness, exptct 0 - 60. Higher means more swappy and slower.
  */
@@ -182,7 +179,7 @@ unsigned long vm_total_pages;
 static LIST_HEAD(shrinker_list);
 static DECLARE_RWSEM(shrinker_rwsem);
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //gaolong@SRC.shanghai, 2018/09/04, add pages swap callback for hypnus
 static ATOMIC_NOTIFIER_HEAD(balance_pg_notifier);
 
@@ -1014,9 +1011,7 @@ static unsigned long shrink_page_list(struct list_head *page_list,
 		bool lazyfree = false;
 		int ret = SWAP_SUCCESS;
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_PROCESS_RECLAIM)
-		/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25, check whether the
-		 * reclaim process should cancel*/
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_PROCESS_RECLAIM)
 		if (sc->walk && is_reclaim_should_cancel(sc->walk))
 			break;
 #endif
@@ -1413,8 +1408,7 @@ unsigned long reclaim_clean_pages_from_list(struct zone *zone,
 }
 
 #ifdef CONFIG_PROCESS_RECLAIM
-#ifdef VENDOR_EDIT
-/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25, record the scaned task*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 unsigned long reclaim_pages_from_list(struct list_head *page_list,
 			struct vm_area_struct *vma, struct mm_walk *walk)
 #else
@@ -1429,8 +1423,7 @@ unsigned long reclaim_pages_from_list(struct list_head *page_list,
 		.may_unmap = 1,
 		.may_swap = 1,
 		.target_vma = vma,
-#ifdef VENDOR_EDIT
-		/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25, record the scaned task*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		.walk = walk,
 #endif
 	};
@@ -1689,9 +1682,7 @@ int isolate_lru_page(struct page *page)
 	int ret = -EBUSY;
 
 	VM_BUG_ON_PAGE(!page_count(page), page);
-#if defined(VENDOR_EDIT) && defined(CONFIG_PROCESS_RECLAIM)
-	/* Kui.Zhang@PSW.TEC.Kernel.Performance, 2019-01-08, Because process reclaim is doing page by
-	 * page, so there many compound pages are relcaimed, so too many warning msg on this case. */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_PROCESS_RECLAIM)
 	WARN_RATELIMIT((!current_is_reclaimer() && PageTail(page)), "trying to isolate tail page");
 #else
 	WARN_RATELIMIT(PageTail(page), "trying to isolate tail page");
@@ -1870,8 +1861,7 @@ static bool inactive_reclaimable_pages(struct lruvec *lruvec,
 
 	return false;
 }
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.MM, 2018-04-28, fix direct reclaim slow issue*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 extern bool is_fg(int uid);
 static inline int get_current_adj(void)
 {
@@ -2032,8 +2022,7 @@ shrink_inactive_list(unsigned long nr_to_scan, struct lruvec *lruvec,
 	 * is congested. Allow kswapd to continue until it starts encountering
 	 * unqueued dirty pages or cycling through the LRU too quickly.
 	 */
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.MM, 2018-04-28, fix direct reclaim slow issue*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (!sc->hibernation_mode && !current_is_kswapd() &&
 	    current_may_throttle() && get_current_adj())
 #else
@@ -2250,14 +2239,13 @@ static bool inactive_list_is_low(struct lruvec *lruvec, bool file,
 	active = lruvec_lru_size(lruvec, active_lru, sc->reclaim_idx);
 
 	gb = (inactive + active) >> (30 - PAGE_SHIFT);
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.MM, 2018-04-28, fix direct reclaim slow issue*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (gb && file)
 		inactive_ratio = min(2UL, int_sqrt(10 * gb));
 #else
 	if (gb)
 		inactive_ratio = int_sqrt(10 * gb);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 	else
 		inactive_ratio = 1;
 
@@ -2307,7 +2295,7 @@ static void get_scan_count(struct lruvec *lruvec, struct mem_cgroup *memcg,
 	unsigned long ap, fp;
 	enum lru_list lru;
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //yixue.ge@psw.bsp.kernel.driver 20170810 modify for reserver some zram disk size
 	if (!current_is_kswapd()) {
 		swappiness = direct_vm_swappiness;
@@ -2489,13 +2477,12 @@ out:
 		nr[lru] = scan;
 	}
 }
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.MM 20171227 modify for filelru first */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #define for_each_evictable_lru_file(lru) for (lru = LRU_INACTIVE_FILE; lru <= LRU_ACTIVE_FILE; lru++)
 #define for_each_evictable_lru_anon(lru) for (lru = LRU_INACTIVE_ANON; lru <= LRU_ACTIVE_ANON; lru++)
 static unsigned  int swap_max_ratio = 1;
 module_param_named(swap_max_ratio, swap_max_ratio, uint, S_IRUGO | S_IWUSR);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 /*
  * This is a basic per-node page freer.  Used by both kswapd and direct reclaim.
@@ -2537,8 +2524,7 @@ static void shrink_node_memcg(struct pglist_data *pgdat, struct mem_cgroup *memc
 					nr[LRU_INACTIVE_FILE]) {
 		unsigned long nr_anon, nr_file, percentage;
 		unsigned long nr_scanned;
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.MM 20171227 modify for filelru first */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		for_each_evictable_lru_file(lru) {
 			if (nr[lru]) {
 				nr_to_scan = min(nr[lru], SWAP_CLUSTER_MAX);
@@ -2567,7 +2553,7 @@ static void shrink_node_memcg(struct pglist_data *pgdat, struct mem_cgroup *memc
 							    lruvec, sc);
 			}
 		}
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 		cond_resched();
 
 		if (nr_reclaimed < nr_to_reclaim || scan_adjusted)
@@ -3164,10 +3150,9 @@ unsigned long try_to_free_pages(struct zonelist *zonelist, int order,
 		.may_unmap = 1,
 		.may_swap = 1,
 	};
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.MM 2018-08-30 increase nr_to_reclaim*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	sc.nr_to_reclaim = SWAP_CLUSTER_MAX  <<  swap_max_ratio;
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 	/*
 	 * Do not enter reclaim if fatal signal was delivered while throttled.
 	 * 1 is returned so that the page allocator does not OOM kill at this
@@ -3598,7 +3583,7 @@ static void kswapd_try_to_sleep(pg_data_t *pgdat, int alloc_order, int reclaim_o
 		 */
 		wakeup_kcompactd(pgdat, alloc_order, classzone_idx);
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		atomic_notifier_call_chain(&balance_pg_notifier, BALANCE_PG_END, NULL);
 #endif
 		remaining = schedule_timeout(HZ/10);
@@ -3706,7 +3691,7 @@ kswapd_try_sleep:
 		kswapd_try_to_sleep(pgdat, alloc_order, reclaim_order,
 					classzone_idx);
 
-#ifdef VENDOR_EDIT //lipeifeng@psw.bsp.kernel 2019-6-24 add for mmscan_balance
+#ifdef CONFIG_PRODUCT_REALME_SDM710
         _update_kswapd_load();
 #endif
 		/* Read the new order and classzone_idx */
@@ -3736,7 +3721,7 @@ kswapd_try_sleep:
 		 */
 		trace_mm_vmscan_kswapd_wake(pgdat->node_id, classzone_idx,
 						alloc_order);
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (alloc_order > MIN_ORDER_NOTIFY_HYPNUS)
 			atomic_notifier_call_chain(&balance_pg_notifier, BALANCE_PG_BEGIN, NULL);
 #endif

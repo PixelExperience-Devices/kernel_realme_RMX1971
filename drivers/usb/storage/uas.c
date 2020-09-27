@@ -824,11 +824,12 @@ static int uas_slave_alloc(struct scsi_device *sdev)
 {
 	struct uas_dev_info *devinfo =
 		(struct uas_dev_info *)sdev->host->hostdata;
-#ifndef VENDOR_EDIT
-/*LIZHIJIE@BSP.BASTCI.CHG  2019/10/18 add for asking the block layer to respect the maxpacket limitation*/
+
+	sdev->hostdata = devinfo;
+
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 	int maxp;
 #endif
-	sdev->hostdata = devinfo;
 
 	/*
 	 * We have two requirements here. We must satisfy the requirements
@@ -845,8 +846,7 @@ static int uas_slave_alloc(struct scsi_device *sdev)
 	 * about the capabilities off the HC, so we use the most
 	 * pessimistic requirement.
 	 */
-#ifndef VENDOR_EDIT
-/*LIZHIJIE@BSP.BASTCI.CHG  2019/10/18 add for asking the block layer to respect the maxpacket limitation*/
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 	maxp = usb_maxpacket(devinfo->udev, devinfo->data_in_pipe, 0);
 	blk_queue_virt_boundary(sdev->request_queue, maxp - 1);
 #endif

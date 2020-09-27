@@ -33,8 +33,7 @@
 #include <soc/qcom/watchdog.h>
 #include <linux/dma-mapping.h>
 
-#ifdef VENDOR_EDIT
-/*fanhui@PhoneSW.BSP, 2016-06-22, use self-defined utils*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include "oppo_watchdog_util.h"
 #endif
 #define MODULE_NAME "msm_watchdog"
@@ -58,8 +57,7 @@
 #define MAX_CPU_SCANDUMP_SIZE	0x10100
 
 static struct msm_watchdog_data *wdog_data;
-#ifndef VENDOR_EDIT
-/*fanhui@PhoneSW.BSP, 2016-06-22, use self-defined utils*/
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 static int cpu_idle_pc_state[NR_CPUS];
 #else
 int cpu_idle_pc_state[NR_CPUS];
@@ -394,28 +392,24 @@ static void keep_alive_response(void *info)
  * If this function does not return, it implies one of the
  * other cpu's is not responsive.
  */
-#ifdef VENDOR_EDIT
-/* Fuchun.Liao@BSP.CHG.Basic 2018/09/26 add for debug cpu hang */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static int wdog_cpu = 0;
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 static void ping_other_cpus(struct msm_watchdog_data *wdog_dd)
 {
-#ifndef VENDOR_EDIT
-/* Fuchun.Liao@BSP.CHG.Basic 2018/09/26 add for debug cpu hang */
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 	int cpu;
-#endif /* VENDOR_EDIT */
-#ifdef VENDOR_EDIT
-/* fanhui@PhoneSW.BSP, 2016/05/26, print more info on pet watchdog */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	cpumask_t mask;
 	get_cpu_ping_mask(&mask);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 	cpumask_clear(&wdog_dd->alive_mask);
 	/* Make sure alive mask is cleared and set in order */
 	smp_mb();
 
 
-#ifdef VENDOR_EDIT
-/* fanhui@PhoneSW.BSP, 2016/05/26, only ping cpu need ping */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	for_each_cpu(wdog_cpu, &mask) {
 		smp_call_function_single(wdog_cpu, keep_alive_response,
 						 wdog_dd, 1);
@@ -428,7 +422,7 @@ static void ping_other_cpus(struct msm_watchdog_data *wdog_dd)
 			smp_call_function_single(cpu, keep_alive_response,
 						 wdog_dd, 1);
 	}
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 }
 
 static void pet_task_wakeup(unsigned long data)
@@ -468,8 +462,7 @@ static __ref int watchdog_kthread(void *arg)
 			delay_time = msecs_to_jiffies(wdog_dd->pet_time);
 			pet_watchdog(wdog_dd);
 		}
-#ifdef VENDOR_EDIT
-/*fanhui@PhoneSW.BSP, 2016-06-23, reset reocery_tried*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		reset_recovery_tried();
 #endif
 		/* Check again before scheduling
@@ -562,13 +555,11 @@ static irqreturn_t wdog_bark_handler(int irq, void *dev_id)
 			(unsigned long) wdog_dd->last_pet, nanosec_rem / 1000);
 	if (wdog_dd->do_ipi_ping) {
 		dump_cpu_alive_mask(wdog_dd);
-#ifdef VENDOR_EDIT
-/* fanhui@PhoneSW.BSP, 2016/04/22, print online cpu */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		dump_cpu_online_mask();
 #endif
 	}
-#ifdef VENDOR_EDIT
-/* fanhui@PhoneSW.BSP, 2016/01/20, print more info about cpu the wdog on */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (try_to_recover_pending(wdog_dd->watchdog_task)) {
 		pet_watchdog(wdog_dd);
 		return IRQ_HANDLED;
@@ -577,8 +568,7 @@ static irqreturn_t wdog_bark_handler(int irq, void *dev_id)
 	print_smp_call_cpu();
 	dump_wdog_cpu(wdog_dd->watchdog_task);
 #endif
-#ifdef VENDOR_EDIT
-/* fanhui@PhoneSW.BSP, 2016/01/20, delete trigger wdog bite, panic will trigger wdog if in dload mode*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	panic("Handle a watchdog bite! - Falling back to kernel panic!");
 #else
 	msm_trigger_wdog_bite();
@@ -943,8 +933,7 @@ static int msm_watchdog_probe(struct platform_device *pdev)
 	if (msm_minidump_add_region(&md_entry) < 0)
 		pr_info("Failed to add Watchdog data in Minidump\n");
 
-#ifdef VENDOR_EDIT
-        /*zhye@BSP.Kernel.Debug, 2019/06/19, Add for init oppo watch dog log, checklist 64*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
         ret = init_oppo_watchlog();
         if (ret < 0) {
                 pr_info("Failed to init oppo watchlog");

@@ -1,5 +1,5 @@
 /*copyright (C), 2004-2019, OPPO Mobile Comm Corp., Ltd.
-** VENDOR_EDIT
+** CONFIG_PRODUCT_REALME_SDM710
 ** File: - oppo_nims.c
 ** Description: Network interaction monitoring system.
 **

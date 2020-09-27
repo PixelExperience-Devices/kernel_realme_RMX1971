@@ -1,5 +1,5 @@
 /*opyright (C), 2004-2019, OPPO Mobile Comm Corp., Ltd.
-** VENDOR_EDIT
+** CONFIG_PRODUCT_REALME_SDM710
 ** File: - oppo_apps_power_monitor.h
 ** Description: Network interaction monitoring system.
 **

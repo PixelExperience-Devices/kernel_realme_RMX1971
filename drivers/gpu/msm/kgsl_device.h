@@ -338,10 +338,9 @@ struct kgsl_device {
 	struct clk *l3_clk;
 	unsigned int l3_freq[MAX_L3_LEVELS];
 	unsigned int num_l3_pwrlevels;
-#ifdef VENDOR_EDIT
-//wenhua.Leng@PSW.MM.Display.GPU.minidump,2019-04-21
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	bool snapshot_control;
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 };
 
 #define KGSL_MMU_DEVICE(_mmu) \
@@ -543,10 +542,9 @@ struct kgsl_snapshot {
 	bool first_read;
 	bool gmu_fault;
 	bool recovered;
-#ifdef VENDOR_EDIT
-//wenhua.Leng@PSW.MM.Display.GPU.minidump,2019-04-21
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	uint32_t snapshot_hashid;
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 };
 
 /**

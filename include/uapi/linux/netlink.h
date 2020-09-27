@@ -30,32 +30,18 @@
 #define NETLINK_SOCKEV          22      /* Socket Administrative Events */
 #define NETLINK_INET_DIAG	NETLINK_SOCK_DIAG
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HANS)
-// Kun.Zhou@ROM.Framework, 2019/09/23, add for hans freeze manager
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HANS)
 #define NETLINK_OPPO_HANS 28 /* Socket for freezing solution*/
 #endif
 
-#ifndef VENDOR_EDIT
-//Yuan.Huang@PSW.CN.WiFi.Network.internet.1461349, 2018/06/18,
-//Add for WeChat lucky money recognition
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 #define MAX_LINKS 33
-#else /* VENDOR_EDIT */
+#else /* CONFIG_PRODUCT_REALME_SDM710 */
 #define NETLINK_OPPO_NF_HOOKS	32	/*OPPO netfilter hooks*/
-
-//#ifdef VENDOR_EDIT
-//Junyuan.Huang@PSW.CN.WiFi.Network.internet.1197891, 2018/04/10,
-//Add code for appo sla function
 #define NETLINK_OPPO_SLA  33      /*SLA NETLINK SOCK*/
-//#endif /* VENDOR_EDIT */
-
-//#ifdef VENDOR_EDIT
-//Xiong.Li@TECH.CN.WiFi.Network.2022890,2019/06/14
-//Add for apps network monitors
 #define NETLINK_OPPO_APPS_MONITOR  35      /* Apps monitor NETLINK SOCK */
-//#endif /* VENDOR_EDIT */
-
 #define MAX_LINKS 37
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 
 struct sockaddr_nl {

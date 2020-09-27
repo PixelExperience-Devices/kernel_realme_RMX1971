@@ -304,7 +304,6 @@ CONFIG_DP_LFR := y
 CONFIG_HTT_PADDR64 := y
 CONFIG_RX_OL := y
 CONFIG_TX_TID_OVERRIDE := y
-CONFIG_WLAN_CLD_PM_QOS := y
 endif
 
 # As per target team, build is done as follows:
@@ -442,10 +441,6 @@ CONFIG_ATH_SUPPORT_SPECTRAL := n
 ifeq ($(CONFIG_HELIUMPLUS), y)
 CONFIG_WLAN_CUSTOM_DSCP_UP_MAP := y
 CONFIG_WLAN_SEND_DSCP_UP_MAP_TO_FW := y
-endif
-
-ifeq ($(CONFIG_ARCH_BENGAL), y)
-CONFIG_SMMU_S1_UNMAP := y
 endif
 
 #Enable WDI Event support
@@ -682,5 +677,3 @@ endif
 ifeq ($(CONFIG_ARCH_SDM660), y)
 CONFIG_WLAN_FEATURE_PKT_CAPTURE := y
 endif
-
-CONFIG_WLAN_HANG_EVENT := y

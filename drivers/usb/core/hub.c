@@ -36,8 +36,6 @@
 #define USB_VENDOR_GENESYS_LOGIC		0x05e3
 #define HUB_QUIRK_CHECK_PORT_AUTOSUSPEND	0x01
 
-extern int deny_new_usb;
-
 /* Protect struct usb_device->state and ->children members
  * Note: Both are also protected by ->dev.sem, except that ->state can
  * change to USB_STATE_NOTATTACHED even when the semaphore isn't held. */
@@ -4363,8 +4361,7 @@ static int hub_set_address(struct usb_device *udev, int devnum)
  * device says it supports the new USB 2.0 Link PM errata by setting the BESL
  * support bit in the BOS descriptor.
  */
-#ifdef VENDOR_EDIT
-//ZhenXi.Wei@RM.BSP.Driver, 2019-11-12, add for otg can not recognize Vfat usb*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #if 0
 static void hub_set_initial_usb2_lpm_policy(struct usb_device *udev)
 {
@@ -4384,7 +4381,7 @@ static void hub_set_initial_usb2_lpm_policy(struct usb_device *udev)
 	}
 }
 #endif
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 static int hub_enable_device(struct usb_device *udev)
 {
 	struct usb_hcd *hcd = bus_to_hcd(udev->bus);
@@ -4717,8 +4714,7 @@ hub_port_init(struct usb_hub *hub, struct usb_device *udev, int port1,
 	/* notify HCD that we have a device connected and addressed */
 	if (hcd->driver->update_device)
 		hcd->driver->update_device(hcd, udev);
-	#ifdef VENDOR_EDIT
-	//ZhenXi.Wei@RM.BSP.Driver, 2019-11-12, add for otg can not recognize Vfat usb*/
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	//hub_set_initial_usb2_lpm_policy(udev);
 	#endif
 fail:
@@ -4866,12 +4862,6 @@ static void hub_port_connect(struct usb_hub *hub, int port1, u16 portstatus,
 			goto done;
 		return;
 	}
-
-	if (deny_new_usb) {
-		dev_err(&port_dev->dev, "denied insert of USB device on port %d\n", port1);
-		goto done;
-	}
-
 	if (hub_is_superspeed(hub->hdev))
 		unit_load = 150;
 	else

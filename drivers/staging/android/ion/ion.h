@@ -100,8 +100,7 @@ void ion_reserve(struct ion_platform_data *data);
 struct ion_client *ion_client_create(struct ion_device *dev,
 				     const char *name);
 
-#ifdef VENDOR_EDIT
-//fangpan@Swdp.shanghai, 2016/02/02, add ion memory status interface
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /**
  *ion_system_heap_cached_memory() -  get the system heap free memory
  * @heap:	system heap point
@@ -109,10 +108,9 @@ struct ion_client *ion_client_create(struct ion_device *dev,
 extern long ion_system_heap_cached_memory(struct ion_heap *heap);
 #endif
 
-#ifdef VENDOR_EDIT
-/* Huacai.Zhou@PSW.BSP.Kernel.MM, 2018-06-26, add ion total used account*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 unsigned long ion_total(void);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 /**
  * ion_client_destroy() -  free's a client and all it's handles
@@ -246,8 +244,7 @@ static inline struct ion_client *ion_client_create(
 	return ERR_PTR(-ENODEV);
 }
 
-#ifdef VENDOR_EDIT
-//fangpan@Swdp.shanghai, 2016/02/02, add ion memory status interface
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /**
  *ion_system_heap_cached_memory() -  get the system heap free memory
  * @heap:	system heap point

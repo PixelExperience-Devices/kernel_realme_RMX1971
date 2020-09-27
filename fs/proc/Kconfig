@@ -89,14 +89,13 @@ config PROC_UID
 	help
 	Provides aggregated per-uid information under /proc/uid.
 
-#ifdef VENDOR_EDIT
-#//Huacai.Zhou@PSW.BSP.kernel.Peformance, 2018/06/18, add foreground process opt support
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 config OPPO_FG_OPT
 	bool "Enable /proc/fg_info/ if EXPERT"
 	default y
 	help
 	  Add foreground process optimize support to promote performance .
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 #ifdef COLOROS_EDIT
 #Honghui.Sun@Plf.Framework, 2019/8/9, Add for enable PSI and get pid name by frameworks

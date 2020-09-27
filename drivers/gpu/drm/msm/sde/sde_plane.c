@@ -2844,8 +2844,7 @@ void sde_plane_clear_multirect(const struct drm_plane_state *drm_state)
 	pstate->multirect_mode = SDE_SSPP_MULTIRECT_NONE;
 }
 
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Service.Feature,2018/9/26,for OnScreenFingerprint feature temp modify*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 int sde_plane_check_fingerprint_layer(const struct drm_plane_state *drm_state)
 {
 	struct sde_plane_state *pstate;
@@ -3852,10 +3851,9 @@ static int sde_plane_sspp_atomic_update(struct drm_plane *plane,
 		case PLANE_PROP_ALPHA:
 		case PLANE_PROP_INPUT_FENCE:
 		case PLANE_PROP_BLEND_OP:
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Feature,2018/9/26 support custom property */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		case PLANE_PROP_CUSTOM:
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 			/* no special action required */
 			break;
 		case PLANE_PROP_FB_TRANSLATION_MODE:
@@ -3938,8 +3936,7 @@ static int sde_plane_sspp_atomic_update(struct drm_plane *plane,
 				(char *)&fmt->base.pixel_format,
 				SDE_FORMAT_IS_UBWC(fmt));
 
-#ifndef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Service.Feature,2018/9/26,for OnScreenFingerprint feature, temp modify*/
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 		if (sde_plane_get_property(pstate, PLANE_PROP_SRC_CONFIG) &
 			BIT(SDE_DRM_DEINTERLACE)) {
 			SDE_DEBUG_PLANE(psde, "deinterlace\n");
@@ -4313,8 +4310,7 @@ static void _sde_plane_install_properties(struct drm_plane *plane,
 	msm_property_install_range(&psde->property_info, "zpos",
 		0x0, 0, zpos_max, zpos_def, PLANE_PROP_ZPOS);
 
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Feature,2018/9/26 support custom propertys */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	msm_property_install_range(&psde->property_info,"PLANE_CUST",
 		0x0, 0, INT_MAX, 0, PLANE_PROP_CUSTOM);
 #endif

@@ -12,7 +12,7 @@
  */
 
 #include <linux/module.h>
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /*Add by Zhengrong.Zhang@Camera 20160630 for flash*/
 #include <linux/proc_fs.h>
 #include <linux/time.h>
@@ -23,7 +23,7 @@ static struct cam_flash_ctrl *vendor_flash_ctrl[2] = {NULL,NULL};
 #include "cam_flash_dev.h"
 #include "cam_flash_soc.h"
 #include "cam_flash_core.h"
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /*Add by hongbo.dai@Camera 20180319 for flash*/
 #include "cam_res_mgr_api.h"
 #endif
@@ -65,7 +65,7 @@ static int32_t cam_flash_driver_cmd(struct cam_flash_ctrl *fctrl,
 
 		if (fctrl->bridge_intf.device_hdl != -1) {
 			CAM_ERR(CAM_FLASH, "Device is already acquired");
-			#ifdef VENDOR_EDIT
+			#ifdef CONFIG_PRODUCT_REALME_SDM710
 			/*Modified by Zhengrong.Zhang@Cam.Drv, 2018/10/18, for not release flash*/
 			rc = cam_flash_release_dev(fctrl);
 			if (rc)
@@ -223,8 +223,7 @@ release_mutex:
 	return rc;
 }
 
-#ifdef VENDOR_EDIT
-/*add by hongbo.dai@camera 20180319, suitable proc dev for flash as same as SDM660*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 volatile static int flash_mode;
 volatile static int pre_flash_mode;
 static ssize_t flash_on_off(int is_back_flash)
@@ -287,7 +286,6 @@ static ssize_t flash_on_off(int is_back_flash)
 			vendor_flash_ctrl[flash_index]->flash_state = CAM_FLASH_STATE_INIT;
 			break;
 		case 1:
-			/* Kaizhu.Liang@camera 20180531, modify for 18081: FactoryMode flashtest item, dual flash, 50mA for each flash */
 			if (vendor_flash_ctrl[flash_index]->flash_num_sources >= 2){
 			    flash_data.led_current_ma[0] = 60;
 			    flash_data.led_current_ma[1] = 60;
@@ -295,7 +293,6 @@ static ssize_t flash_on_off(int is_back_flash)
 			    flash_data.led_current_ma[0] = 100;
 			    flash_data.led_current_ma[1] = 100;
 			}
-			/* Kaizhu.Liang@camera 20180531, modify for 18081: FactoryMode flashtest item, dual flash, 50mA for each flash */
 			cam_flash_on(vendor_flash_ctrl[flash_index], &flash_data, 0);
 			break;
 		case 2:
@@ -564,7 +561,7 @@ static int32_t cam_flash_platform_probe(struct platform_device *pdev)
 	mutex_init(&(flash_ctrl->flash_wq_mutex));
 
 	flash_ctrl->flash_state = CAM_FLASH_STATE_INIT;
-	#ifdef VENDOR_EDIT
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/*Add by Zhengrong.Zhang@Camera 20160630 for flash*/
 	flash_proc_init(flash_ctrl);
 	#endif

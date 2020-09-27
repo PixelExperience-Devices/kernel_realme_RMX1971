@@ -62,7 +62,7 @@ enum pon_restart_reason {
 
 	/* 32 ~ 63 for OEMs/ODMs secific features */
 	PON_RESTART_REASON_OEM_MIN		= 0x20,
-#ifdef VENDOR_EDIT 
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //yixue.ge@bsp.drv modify all the reboot mode as hardware reboot
 	PON_RESTART_REASON_SILENCE			= 0x21,
 	PON_RESTART_REASON_SAU				= 0x22,

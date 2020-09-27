@@ -140,8 +140,7 @@ static int cam_flash_ops(struct cam_flash_ctrl *flash_ctrl,
 	soc_private = (struct cam_flash_private_soc *)
 		flash_ctrl->soc_info.soc_private;
 
-/* add by likelong@camera 2017.11.20 force to turn on dual LED */
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (op == CAMERA_SENSOR_FLASH_OP_FIRELOW) {
 		for (i = 0; i < flash_ctrl->torch_num_sources; i++) {
 			if (flash_data->led_current_ma[i]) {
@@ -215,7 +214,7 @@ static int cam_flash_ops(struct cam_flash_ctrl *flash_ctrl,
 	if (flash_ctrl->switch_trigger)
 		cam_res_mgr_led_trigger_event(
 			flash_ctrl->switch_trigger,
-			LED_ON);
+			LED_SWITCH_ON);
 
 	return 0;
 }
@@ -243,7 +242,7 @@ int cam_flash_off(struct cam_flash_ctrl *flash_ctrl)
 
 	if (flash_ctrl->switch_trigger)
 		cam_res_mgr_led_trigger_event(flash_ctrl->switch_trigger,
-			LED_OFF);
+			LED_SWITCH_OFF);
 
 	flash_ctrl->flash_state = CAM_FLASH_STATE_START;
 	return 0;
@@ -299,7 +298,7 @@ static int cam_flash_high(
 	return rc;
 }
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /*Add by hongbo.dai@Camera 20180319 for flash*/
 int cam_flash_on(struct cam_flash_ctrl *flash_ctrl,
 	struct cam_flash_frame_setting *flash_data,

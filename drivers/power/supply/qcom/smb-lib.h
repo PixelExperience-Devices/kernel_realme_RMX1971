@@ -28,9 +28,9 @@ enum print_reason {
 	PR_OTG		= BIT(4),
 };
 
-#ifdef VENDOR_EDIT//Fanhong.Kong@ProDrv.CHG,add 2018/06/02 for SVOOC OTG
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #define SVOOC_OTG_VOTER		"SVOOC_OTG_VOTER"
-#endif/*VENDOR_EDIT*/
+#endif/*CONFIG_PRODUCT_REALME_SDM710*/
 
 #define DEFAULT_VOTER			"DEFAULT_VOTER"
 #define USER_VOTER			"USER_VOTER"
@@ -75,8 +75,7 @@ enum print_reason {
 #define MOISTURE_VOTER			"MOISTURE_VOTER"
 #define HVDCP2_ICL_VOTER		"HVDCP2_ICL_VOTER"
 #define OV_VOTER			"OV_VOTER"
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2018/01/30, sjc Add for using gpio as CC detect */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #define CCDETECT_VOTER			"CCDETECT_VOTER"
 #endif
 #define FG_ESR_VOTER			"FG_ESR_VOTER"
@@ -276,8 +275,7 @@ struct smb_charger {
 	struct power_supply		*bms_psy;
 	struct power_supply_desc	usb_psy_desc;
 	struct power_supply		*usb_main_psy;
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/03/07, sjc Add for charging*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	struct power_supply		*ac_psy;
 #endif
 	struct power_supply		*usb_port_psy;
@@ -329,12 +327,10 @@ struct smb_charger {
 	struct work_struct	legacy_detection_work;
 	struct delayed_work	uusb_otg_work;
 	struct delayed_work	bb_removal_work;
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/03/25, sjc Add for charging */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	struct delayed_work chg_monitor_work;
 #endif
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2018/04/13, sjc Add for charging */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	struct delayed_work typec_disable_cmd_work;
 #endif
 
@@ -379,6 +375,7 @@ struct smb_charger {
 	bool			disable_stat_sw_override;
 	bool			in_chg_lock;
 	bool			fcc_stepper_enable;
+	bool			ufp_only_mode;
 
 	/* workaround flag */
 	u32			wa_flags;
@@ -390,8 +387,7 @@ struct smb_charger {
 	int			qc2_max_pulses;
 	bool			non_compliant_chg_detected;
 	bool			fake_usb_insertion;
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2018/07/13, sjc Add for fake typec */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	bool			fake_typec_insertion;
 #endif
 	bool			reddragon_ipc_wa;
@@ -408,14 +404,12 @@ struct smb_charger {
 	int			pulse_cnt;
 
 	int			die_health;
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/08/10, sjc Add for charging */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	int			pre_current_ma;
     bool		is_dpdm_on_usb;
 	struct work_struct	dpdm_set_work;
 #endif
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2018/01/30, sjc Add for using gpio as CC detect */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	int			ccdetect_gpio;
 	int			ccdetect_irq;
 	struct pinctrl		*ccdetect_pinctrl;
@@ -424,12 +418,10 @@ struct smb_charger {
 	struct delayed_work	ccdetect_work;
     struct delayed_work	divider_set_work;
 #endif
-#ifdef VENDOR_EDIT
-/* Qiao.Hu@BSP.CHG.basic, 2018/11/02, add for chargerid */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     int        charger_id_num;
 #endif
-#ifdef VENDOR_EDIT
-/* tongfeng.Huang@BSP.CHG.Basic, 2018/09/27, sjc Add for set uart pinctrl to read chargerID */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	struct pinctrl		*chg_2uart_pinctrl;
 	struct pinctrl_state	*chg_2uart_default;
 	struct pinctrl_state	*chg_2uart_sleep;
@@ -652,8 +644,9 @@ int smblib_set_prop_pr_swap_in_progress(struct smb_charger *chg,
 int smblib_stat_sw_override_cfg(struct smb_charger *chg, bool override);
 void smblib_usb_typec_change(struct smb_charger *chg);
 int smblib_toggle_stat(struct smb_charger *chg, int reset);
-#ifdef VENDOR_EDIT
-/* tongfeng.huang@BSP.CHG.Basic, 2018/04/23,  Add for using gpio as CC  detect */
+int smblib_force_ufp(struct smb_charger *chg);
+
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 const struct apsd_result *smblib_update_usb_type(struct smb_charger *chg);
 irqreturn_t oppo_ccdetect_change_handler(int irq, void *data);
 #endif

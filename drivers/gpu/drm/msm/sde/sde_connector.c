@@ -1,4 +1,4 @@
-/* Copyright (c) 2016-2020, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2016-2019, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -512,10 +512,9 @@ static int _sde_connector_update_bl_scale(struct sde_connector *c_conn)
 {
 	struct dsi_display *dsi_display;
 	struct dsi_backlight_config *bl_config;
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stable,2018/9/26 fix backlight race problem */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	struct backlight_device *bd;
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	int rc = 0;
 
 	if (!c_conn) {
@@ -531,8 +530,7 @@ static int _sde_connector_update_bl_scale(struct sde_connector *c_conn)
 		return -EINVAL;
 	}
 
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stable,2018/9/26 fix backlight race problem */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	bd = c_conn->bl_device;
 	if (!bd) {
 		SDE_ERROR("Invalid params backlight_device null\n");
@@ -540,7 +538,7 @@ static int _sde_connector_update_bl_scale(struct sde_connector *c_conn)
 	}
 
 	mutex_lock(&bd->update_lock);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	bl_config = &dsi_display->panel->bl_config;
 
@@ -569,16 +567,14 @@ static int _sde_connector_update_bl_scale(struct sde_connector *c_conn)
 	rc = c_conn->ops.set_backlight(dsi_display, bl_config->bl_level);
 	c_conn->unset_bl_level = 0;
 
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stable,2018/9/26 fix backlight race problem */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	mutex_unlock(&bd->update_lock);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	return rc;
 }
 
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Service.Feature,2018/9/26,for OnScreenFingerprint feature*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 extern bool sde_crtc_get_fingerprint_mode(struct drm_crtc_state *crtc_state);
 extern bool sde_crtc_get_fingerprint_pressed(struct drm_crtc_state *crtc_state);
 extern int oppo_display_get_hbm_mode(void);
@@ -656,12 +652,12 @@ static int _sde_connector_update_hbm(struct sde_connector *c_conn)
 			if (OPPO_DISPLAY_AOD_SCENE != get_oppo_display_scene() &&
 			    dsi_display->panel->bl_config.bl_level) {
 				sde_encoder_poll_line_counts(drm_enc);
-				rc = dsi_panel_tx_cmd_set(dsi_display->panel, DSI_CMD_HBM_ON);
-			} else {
-				rc = dsi_panel_tx_cmd_set(dsi_display->panel, DSI_CMD_AOD_HBM_ON);
 			}
 
+                        rc = dsi_panel_tx_cmd_set(dsi_display->panel, DSI_CMD_HBM_ON);
+
 			mutex_unlock(&dsi_display->panel->panel_lock);
+
 			if (rc) {
 				pr_err("failed to send DSI_CMD_HBM_ON cmds, rc=%d\n", rc);
 				return rc;
@@ -675,19 +671,15 @@ static int _sde_connector_update_hbm(struct sde_connector *c_conn)
 			if(OPPO_DISPLAY_AOD_HBM_SCENE == get_oppo_display_scene()) {
 				if (OPPO_DISPLAY_POWER_DOZE_SUSPEND == get_oppo_display_power_status() ||
 				    OPPO_DISPLAY_POWER_DOZE == get_oppo_display_power_status()) {
-					rc = dsi_panel_tx_cmd_set(dsi_display->panel, DSI_CMD_AOD_HBM_OFF);
 					set_oppo_display_scene(OPPO_DISPLAY_AOD_SCENE);
 				} else {
 					rc = dsi_panel_tx_cmd_set(dsi_display->panel, DSI_CMD_SET_NOLP);
-					/* set nolp would exit hbm, restore when panel status on hbm */
-					if (oppo_display_get_hbm_mode())
-						rc = dsi_panel_tx_cmd_set(dsi_display->panel, DSI_CMD_AOD_HBM_ON);
 					set_oppo_display_scene(OPPO_DISPLAY_NORMAL_SCENE);
 				}
 			} else if (oppo_display_get_hbm_mode()) {
 				/* Do nothing to skip hbm off */
 			} else if(OPPO_DISPLAY_AOD_SCENE == get_oppo_display_scene()) {
-				rc = dsi_panel_tx_cmd_set(dsi_display->panel, DSI_CMD_AOD_HBM_OFF);
+                                /* Do nothing */
 			} else {
 				rc = dsi_panel_tx_cmd_set(dsi_display->panel, DSI_CMD_HBM_OFF);
 			}
@@ -776,8 +768,7 @@ int sde_connector_pre_kickoff(struct drm_connector *connector)
 		goto end;
 	}
 
-#ifdef VENDOR_EDIT
-/*Mark.Yao@PSW.MM.Display.Service.Feature,2018/06/05,for OnScreenFingerprint feature*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	rc = _sde_connector_update_hbm(c_conn);
 	if (rc) {
 		SDE_EVT32(connector->base.id, SDE_EVTLOG_ERROR);
@@ -878,72 +869,6 @@ int sde_connector_clk_ctrl(struct drm_connector *connector, bool enable)
 				DSI_ALL_CLKS, state);
 
 	return rc;
-}
-
-enum sde_csc_type sde_connector_get_csc_type(struct drm_connector *conn)
-{
-	struct sde_connector *c_conn;
-
-	if (!conn) {
-		SDE_ERROR("invalid argument\n");
-		return -EINVAL;
-	}
-
-	c_conn = to_sde_connector(conn);
-
-	if (!c_conn->display) {
-		SDE_ERROR("invalid argument\n");
-		return -EINVAL;
-	}
-
-	if (!c_conn->ops.get_csc_type)
-		return SDE_CSC_RGB2YUV_601L;
-
-	return c_conn->ops.get_csc_type(conn, c_conn->display);
-}
-
-bool sde_connector_mode_needs_full_range(struct drm_connector *connector)
-{
-	struct sde_connector *c_conn;
-
-	if (!connector) {
-		SDE_ERROR("invalid argument\n");
-		return false;
-	}
-
-	c_conn = to_sde_connector(connector);
-
-	if (!c_conn->display) {
-		SDE_ERROR("invalid argument\n");
-		return false;
-	}
-
-	if (!c_conn->ops.mode_needs_full_range)
-		return false;
-
-	return c_conn->ops.mode_needs_full_range(c_conn->display);
-}
-
-bool sde_connector_mode_is_cea_mode(struct drm_connector *connector)
-{
-	struct sde_connector *c_conn;
-
-	if (!connector) {
-		SDE_ERROR("invalid argument\n");
-		return false;
-	}
-
-	c_conn = to_sde_connector(connector);
-
-	if (!c_conn->display) {
-		SDE_ERROR("invalid argument\n");
-		return false;
-	}
-
-	if (!c_conn->ops.mode_is_cea_mode)
-		return false;
-
-	return c_conn->ops.mode_is_cea_mode(c_conn->display);
 }
 
 static void sde_connector_destroy(struct drm_connector *connector)
@@ -2177,9 +2102,6 @@ static int sde_connector_populate_mode_info(struct drm_connector *conn,
 
 		sde_kms_info_add_keystr(info, "mode_name", mode->name);
 
-		sde_kms_info_add_keyint(info, "VIC",
-					mode->vic_id);
-
 		sde_kms_info_add_keyint(info, "bit_clk_rate",
 					mode_info.clk_rate);
 
@@ -2495,8 +2417,7 @@ struct drm_connector *sde_connector_init(struct drm_device *dev,
 	msm_property_install_range(&c_conn->property_info, "ad_bl_scale",
 		0x0, 0, MAX_AD_BL_SCALE_LEVEL, MAX_AD_BL_SCALE_LEVEL,
 		CONNECTOR_PROP_AD_BL_SCALE);
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Feature,2018/9/26 support custom propertys */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	msm_property_install_range(&c_conn->property_info,"CONNECTOR_CUST",
 		0x0, 0, INT_MAX, 0, CONNECTOR_PROP_CUSTOM);
 #endif

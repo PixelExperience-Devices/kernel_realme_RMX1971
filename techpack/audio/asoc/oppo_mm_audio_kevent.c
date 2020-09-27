@@ -1,11 +1,10 @@
 /***************************************************************
 ** Copyright (C),  2019,  OPPO Mobile Comm Corp.,  Ltd
-** VENDOR_EDIT
+** CONFIG_PRODUCT_REALME_SDM710
 ** File : oppo_mm_audio_kevent.c
 ** Description : MM audio kevent data
 ** Version : 1.0
 ** Date : 2019/02/03
-** Author : Jianfeng.Qiu@PSW.MM.AudioDriver.Stability
 **
 ** ------------------------------- Revision History: -----------
 **  <author>        <data>        <version >        <desc>

@@ -32,10 +32,9 @@ proc-$(CONFIG_PROC_KCORE)	+= kcore.o
 proc-$(CONFIG_PROC_VMCORE)	+= vmcore.o
 proc-$(CONFIG_PRINTK)	+= kmsg.o
 proc-$(CONFIG_PROC_PAGE_MONITOR)	+= page.o
-#ifdef VENDOR_EDIT
-#Huacai.Zhou@PSW.BSP.kernel.Peformance, 2018/06/18, add foreground process opt support
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 proc-$(CONFIG_OPPO_FG_OPT)	+= fg_uid.o
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 #ifdef COLOROS_EDIT
 #Honghui.Sun@Plf.Framework, 2019/8/9, Add for enable PSI and get pid name by frameworks
 proc-$(CONFIG_OPPO_COLOR_EM)	+= color_em.o

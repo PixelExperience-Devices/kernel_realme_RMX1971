@@ -19,9 +19,8 @@
 
 #include "cred.h"
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #ifdef CONFIG_OPPO_FG_OPT
-/* Huacai.Zhou@PSW.BSP.Kernel.MM, 2018-07-07, add fg process opt*/
 extern bool is_fg(int uid);
 static inline int current_is_fg(void)
 {
@@ -52,6 +51,6 @@ static inline int task_is_fg(struct task_struct *tsk)
 	return 0;
 }
 #endif /*CONFIG_OPPO_FG_OPT*/
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 #endif /* _OPPO_CRED_H */

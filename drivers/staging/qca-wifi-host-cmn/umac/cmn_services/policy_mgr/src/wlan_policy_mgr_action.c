@@ -785,28 +785,41 @@ void policy_mgr_update_user_config_sap_chan(
 }
 
 /**
- * policy_mgr_is_sap_go_existed() - Check if restart SAP/Go exist
+ * policy_mgr_is_restart_sap_allowed() - Check if restart SAP
+ * allowed during SCC -> MCC switch
  * @psoc: PSOC object data
+ * @mcc_to_scc_switch: MCC to SCC switch enabled user config
  *
- * To simplify, if SAP/P2P Go exist, they may need switch channel for
- * forcing scc with sta or band capability change.
+ * Check if restart SAP allowed during SCC->MCC switch
+ *
  * Restart: true or false
  */
-static bool policy_mgr_is_sap_go_existed(struct wlan_objmgr_psoc *psoc)
+static bool policy_mgr_is_restart_sap_allowed(
+	struct wlan_objmgr_psoc *psoc,
+	uint32_t mcc_to_scc_switch)
 {
+	uint32_t sta_ap_bit_mask = QDF_STA_MASK | QDF_SAP_MASK;
+	uint32_t sta_go_bit_mask = QDF_STA_MASK | QDF_P2P_GO_MASK;
 	uint32_t ap_present, go_present;
 
 	ap_present = policy_mgr_mode_specific_connection_count(
 				psoc, PM_SAP_MODE, NULL);
-	if (ap_present)
-		return true;
-
 	go_present = policy_mgr_mode_specific_connection_count(
 				psoc, PM_P2P_GO_MODE, NULL);
-	if (go_present)
-		return true;
 
-	return false;
+	if ((mcc_to_scc_switch == QDF_MCC_TO_SCC_SWITCH_DISABLE) ||
+		!policy_mgr_concurrent_open_sessions_running(psoc) ||
+		!((ap_present && ((policy_mgr_get_concurrency_mode(psoc) &
+		     sta_ap_bit_mask) == sta_ap_bit_mask)) ||
+		((mcc_to_scc_switch ==
+		  QDF_MCC_TO_SCC_SWITCH_FORCE_PREFERRED_WITHOUT_DISCONNECTION)
+		  && go_present && ((policy_mgr_get_concurrency_mode(psoc) &
+		  sta_go_bit_mask) == sta_go_bit_mask)))) {
+		policy_mgr_debug("MCC switch disabled or not concurrent STA/SAP, STA/GO");
+		return false;
+	}
+
+	return true;
 }
 
 bool policy_mgr_is_safe_channel(struct wlan_objmgr_psoc *psoc,
@@ -879,7 +892,7 @@ static void __policy_mgr_check_sta_ap_concurrent_ch_intf(void *data)
 	struct policy_mgr_psoc_priv_obj *pm_ctx = NULL;
 	struct sta_ap_intf_check_work_ctx *work_info = NULL;
 	uint32_t mcc_to_scc_switch, cc_count = 0, i;
-	QDF_STATUS status = QDF_STATUS_SUCCESS;
+	QDF_STATUS status;
 	uint8_t channel, sec_ch;
 	uint8_t operating_channel[MAX_NUMBER_OF_CONC_CONNECTIONS];
 	uint8_t vdev_id[MAX_NUMBER_OF_CONC_CONNECTIONS];
@@ -912,7 +925,7 @@ static void __policy_mgr_check_sta_ap_concurrent_ch_intf(void *data)
 	policy_mgr_debug("Concurrent open sessions running: %d",
 			 policy_mgr_concurrent_open_sessions_running(psoc));
 
-	if (!policy_mgr_is_sap_go_existed(psoc))
+	if (!policy_mgr_is_restart_sap_allowed(psoc, mcc_to_scc_switch))
 		goto end;
 
 	cc_count = policy_mgr_get_mode_specific_conn_info(psoc,
@@ -959,9 +972,14 @@ static void __policy_mgr_check_sta_ap_concurrent_ch_intf(void *data)
 				break;
 			}
 		}
-end:
 	if (status != QDF_STATUS_SUCCESS)
 		policy_mgr_err("Failed to switch SAP channel");
+end:
+	if (work_info) {
+		qdf_mem_free(work_info);
+		if (pm_ctx)
+			pm_ctx->sta_ap_intf_check_work_info = NULL;
+	}
 }
 
 void policy_mgr_check_sta_ap_concurrent_ch_intf(void *data)
@@ -1110,20 +1128,10 @@ void policy_mgr_check_concurrent_intf_and_restart_sap(
 	uint32_t cc_count = 0;
 	bool restart_sap = false;
 	uint8_t sap_ch;
-	/*
-	 * if no sta, sap/p2p go may need switch channel for band
-	 * capability change.
-	 * If sta exist, sap/p2p go may need switch channel to force scc
-	 */
-	bool sta_check;
 
 	pm_ctx = policy_mgr_get_context(psoc);
 	if (!pm_ctx) {
 		policy_mgr_err("Invalid context");
-		return;
-	}
-	if (!pm_ctx->sta_ap_intf_check_work_info) {
-		policy_mgr_err("Invalid sta_ap_intf_check_work_info");
 		return;
 	}
 	if (policy_mgr_get_connection_count(psoc) == 1) {
@@ -1152,17 +1160,15 @@ void policy_mgr_check_concurrent_intf_and_restart_sap(
 					&vdev_id[cc_count], PM_STA_MODE);
 	if (!cc_count) {
 		policy_mgr_debug("Could not get STA operating channel&vdevid");
+		return;
 	}
-
-	sta_check = !cc_count ||
-		    policy_mgr_valid_sta_channel_check(psoc, operating_channel[0]);
 
 	mcc_to_scc_switch =
 		policy_mgr_mcc_to_scc_switch_mode_in_user_cfg(psoc);
 	policy_mgr_debug("MCC to SCC switch: %d chan: %d",
 			 mcc_to_scc_switch, operating_channel[0]);
 
-	if (!policy_mgr_is_sap_go_existed(psoc)) {
+	if (!policy_mgr_is_restart_sap_allowed(psoc, mcc_to_scc_switch)) {
 		policy_mgr_debug(
 			"No action taken at check_concurrent_intf_and_restart_sap");
 		return;
@@ -1180,8 +1186,17 @@ sap_restart:
 	 */
 	if (restart_sap ||
 	    ((mcc_to_scc_switch != QDF_MCC_TO_SCC_SWITCH_DISABLE) &&
-	     sta_check)) {
-		if (pm_ctx->sta_ap_intf_check_work_info) {
+	    policy_mgr_valid_sta_channel_check(psoc, operating_channel[0]) &&
+	    !pm_ctx->sta_ap_intf_check_work_info)) {
+		struct sta_ap_intf_check_work_ctx *work_info;
+		work_info = qdf_mem_malloc(
+			sizeof(struct sta_ap_intf_check_work_ctx));
+		pm_ctx->sta_ap_intf_check_work_info = work_info;
+		if (work_info) {
+			work_info->psoc = psoc;
+			qdf_create_work(0, &pm_ctx->sta_ap_intf_check_work,
+				policy_mgr_check_sta_ap_concurrent_ch_intf,
+				work_info);
 			qdf_sched_work(0, &pm_ctx->sta_ap_intf_check_work);
 			policy_mgr_debug("Checking for Concurrent Change interference");
 		}

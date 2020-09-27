@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2020, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2019, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -47,8 +47,7 @@
 #include <linux/extcon.h>
 #include <linux/reset.h>
 #include <linux/clk/qcom.h>
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Add for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <soc/oppo/oppo_project.h>
 #endif
 #include "power.h"
@@ -57,13 +56,6 @@
 #include "dbm.h"
 #include "debug.h"
 #include "xhci.h"
-#ifdef CONFIG_TUSB1064_XR_MISC
-#include "../../misc/tusb1064.h"
-#endif
-#ifdef CONFIG_VXR200_XR_MISC
-#include "../../misc/vxr7200.h"
-#endif
-
 
 #define SDP_CONNETION_CHECK_TIME 10000 /* in ms */
 
@@ -102,8 +94,7 @@ MODULE_PARM_DESC(dwc3_gadget_imod_val,
 #define CGCTL_REG		(QSCRATCH_REG_OFFSET + 0x28)
 #define PWR_EVNT_IRQ_STAT_REG    (QSCRATCH_REG_OFFSET + 0x58)
 #define PWR_EVNT_IRQ_MASK_REG    (QSCRATCH_REG_OFFSET + 0x5C)
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@PSW.BSP.CHG.Basic, 2018/05/25, sjc Add for USB(1+) */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #define QSCRATCH_USB30_STS_REG	(QSCRATCH_REG_OFFSET + 0xF8)
 #endif
 
@@ -296,12 +287,11 @@ struct dwc3_msm {
 	bool			disable_host_mode_pm;
 	bool			use_pdc_interrupts;
 	enum dwc3_id_state	id_state;
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Add for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	bool			otg_switch;
 	bool			otg_online;
 	bool			otg_is_in;
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 	unsigned long		lpm_flags;
 #define MDWC3_SS_PHY_SUSPEND		BIT(0)
 #define MDWC3_ASYNC_IRQ_WAKE_CAPABILITY	BIT(1)
@@ -369,13 +359,11 @@ static void dwc3_msm_notify_event(struct dwc3 *dwc, unsigned int event,
 						unsigned int value);
 static int dwc3_restart_usb_host_mode(struct notifier_block *nb,
 					unsigned long event, void *ptr);
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/04/24, sjc Add for otg id value change support */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 extern void otg_enable_id_value(void);
 extern void otg_disable_id_value(void);
 #endif
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Add for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static struct dwc3_msm *oppodwc = NULL;
 #if 0
 static inline int oppo_test_id(struct dwc3_msm *mdwc)
@@ -387,7 +375,7 @@ static inline int oppo_test_id(struct dwc3_msm *mdwc)
 	}
 }
 #endif
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 /**
  *
@@ -2385,8 +2373,7 @@ static void dwc3_msm_power_collapse_por(struct dwc3_msm *mdwc)
 
 static int dwc3_msm_prepare_suspend(struct dwc3_msm *mdwc)
 {
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@PSW.BSP.CHG.Basic, 2018/05/25, sjc Add for USB(1+) */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	struct dwc3 *dwc = platform_get_drvdata(mdwc->dwc3);
 #endif
 	unsigned long timeout;
@@ -2417,8 +2404,7 @@ static int dwc3_msm_prepare_suspend(struct dwc3_msm *mdwc)
 			break;
 		usleep_range(20, 30);
 	}
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@PSW.BSP.CHG.Basic, 2018/05/25, sjc Modify for USB(1+) */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (!(reg & PWR_EVNT_LPM_IN_L2_MASK)) {
 		dbg_event(0xFF, "PWR_EVNT_LPM",
 			dwc3_msm_read_reg(mdwc->base, PWR_EVNT_IRQ_STAT_REG));
@@ -3014,17 +3000,9 @@ static void dwc3_resume_work(struct work_struct *w)
 				EXTCON_PROP_USB_TYPEC_POLARITY, &val);
 		if (ret)
 			mdwc->typec_orientation = ORIENTATION_NONE;
-		else {
+		else
 			mdwc->typec_orientation = val.intval ?
 					ORIENTATION_CC2 : ORIENTATION_CC1;
-#ifdef CONFIG_TUSB1064_XR_MISC
-			tusb1064_usb_event(val.intval ? true : false);
-#endif
-#ifdef CONFIG_VXR200_XR_MISC
-			vxr7200_usb_event(true);
-#endif
-
-		}
 
 		dbg_event(0xFF, "cc_state", mdwc->typec_orientation);
 
@@ -3170,7 +3148,6 @@ static int dwc3_cpu_notifier_cb(struct notifier_block *nfb,
 }
 
 static void dwc3_otg_sm_work(struct work_struct *w);
-static int get_psy_type(struct dwc3_msm *mdwc);
 
 static int dwc3_msm_get_clk_gdsc(struct dwc3_msm *mdwc)
 {
@@ -3288,8 +3265,7 @@ static int dwc3_msm_id_notifier(struct notifier_block *nb,
 
 	id = event ? DWC3_ID_GROUND : DWC3_ID_FLOAT;
 
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Add for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	mdwc->otg_is_in = !id;
 #endif
 	printk(KERN_ERR "[OPPO_CHG][%s] notifier otg_is_in = %d\n",
@@ -3297,8 +3273,7 @@ static int dwc3_msm_id_notifier(struct notifier_block *nb,
 	dev_dbg(mdwc->dev, "host:%ld (id:%d) event received\n", event, id);
 
 	if (mdwc->id_state != id) {
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Modify for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /* Let OTG know about ID detection */
 		if (mdwc->otg_switch)
 			mdwc->id_state = id;
@@ -3340,8 +3315,6 @@ static void check_for_sdp_connection(struct work_struct *w)
 	}
 }
 
-#define DP_PULSE_WIDTH_MSEC 200
-
 static int dwc3_msm_vbus_notifier(struct notifier_block *nb,
 	unsigned long event, void *ptr)
 {
@@ -3354,14 +3327,6 @@ static int dwc3_msm_vbus_notifier(struct notifier_block *nb,
 		return NOTIFY_DONE;
 
 	mdwc->vbus_active = event;
-
-	if (get_psy_type(mdwc) == POWER_SUPPLY_TYPE_USB_CDP &&
-			mdwc->vbus_active) {
-		dev_dbg(mdwc->dev, "Connected to CDP, pull DP up\n");
-		usb_phy_drive_dp_pulse(mdwc->hs_phy, DP_PULSE_WIDTH_MSEC);
-	}
-
-
 	if (dwc->is_drd && !mdwc->in_restart)
 		queue_work(mdwc->dwc3_wq, &mdwc->resume_work);
 
@@ -3638,8 +3603,7 @@ static ssize_t speed_store(struct device *dev, struct device_attribute *attr,
 }
 static DEVICE_ATTR_RW(speed);
 
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Add for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 bool oppo_get_otg_switch_status_dwc3(void)
 {
 	if (oppodwc) {
@@ -3679,16 +3643,16 @@ void oppo_set_otg_switch_status_dwc3(bool value)
         printk("oppo_set_otg_switch_status_dwc3 4\n");
 		if (oppodwc->otg_is_in) {
 			oppodwc->id_state = DWC3_ID_GROUND;
-			#ifdef VENDOR_EDIT/* OuYangBaiLi@BSP.CHG.Basic, 2019/01/17,Add for otg */
+			#ifdef CONFIG_PRODUCT_REALME_SDM710
 			oppodwc->otg_online = true;
-			#endif /* VENDOR_EDIT */
+			#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 			if (dwc->is_drd)
 				queue_work(oppodwc->dwc3_wq, &oppodwc->resume_work);
             printk("oppo_set_otg_switch_status_dwc3 5\n");
-		#ifdef VENDOR_EDIT/* OuYangBaiLi@BSP.CHG.Basic, 2019/01/21,Add for otg */
+		#ifdef CONFIG_PRODUCT_REALME_SDM710
 		}else{
 			oppodwc->otg_online = false;
-		#endif /* VENDOR_EDIT */
+		#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 		}
 	} else {
 		otg_disable_id_value();
@@ -3704,7 +3668,7 @@ void oppo_set_otg_switch_status_dwc3(bool value)
 			__func__, oppodwc->otg_is_in, oppodwc->id_state, oppodwc->otg_switch, oppodwc->otg_online, dwc->is_drd);
 }
 EXPORT_SYMBOL(oppo_set_otg_switch_status_dwc3);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 static ssize_t usb_compliance_mode_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
@@ -3804,8 +3768,7 @@ static int dwc3_msm_probe(struct platform_device *pdev)
 	}
 
 	mdwc->id_state = DWC3_ID_FLOAT;
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Add for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	mdwc->otg_is_in = false;
 		if(oppo_ccdetect_support_check() != 0) {
 			mdwc->otg_switch = true;
@@ -4100,8 +4063,7 @@ static int dwc3_msm_probe(struct platform_device *pdev)
 			POWER_SUPPLY_PROP_PRESENT, &pval);
 	}
 
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Add for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	oppodwc = mdwc;
 #endif
 	/*
@@ -4350,6 +4312,9 @@ static void msm_dwc3_perf_vote_work(struct work_struct *w)
 	if (dwc->irq_cnt - last_irq_cnt >= PM_QOS_THRESHOLD)
 		in_perf_mode = true;
 
+	pr_debug("%s: in_perf_mode:%u, interrupts in last sample:%lu\n",
+		 __func__, in_perf_mode, (dwc->irq_cnt - last_irq_cnt));
+
 	last_irq_cnt = dwc->irq_cnt;
 	msm_dwc3_perf_vote_update(mdwc, in_perf_mode);
 	schedule_delayed_work(&mdwc->perf_vote_work,
@@ -4416,8 +4381,7 @@ static int dwc3_otg_start_host(struct dwc3_msm *mdwc, int on)
 			return ret;
 		}
 		
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Add for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		mdwc->otg_online = true;
 		pr_err("[OPPO_CHG][%s] regulator_enable\n",__func__);
         power_supply_changed(mdwc->usb_psy);
@@ -4502,8 +4466,7 @@ static int dwc3_otg_start_host(struct dwc3_msm *mdwc, int on)
 			return ret;
 		}
 		
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Add for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		mdwc->otg_online = false;
 		pr_err("[OPPO_CHG][%s] disable_regulator\n",__func__);
         power_supply_changed(mdwc->usb_psy);
@@ -4724,8 +4687,7 @@ static int dwc3_msm_gadget_vbus_draw(struct dwc3_msm *mdwc, unsigned int mA)
 
 	if (mdwc->max_power == mA || psy_type != POWER_SUPPLY_TYPE_USB)
 		return 0;
-#ifdef VENDOR_EDIT
-	/* Jianchao.Shi@BSP.CHG.Basic, 2017/05/04, sjc Add for charging */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	dev_info(mdwc->dev, "Avail curr from USB = %u, pre max_power = %u\n", mA, mdwc->max_power);
 	if ((mdwc->max_power > 2) && (mA == 0 || mA == 2))
 		return 0;
@@ -4763,8 +4725,7 @@ static void dwc3_otg_sm_work(struct work_struct *w)
 	int ret = 0;
 	unsigned long delay = 0;
 	const char *state;
-#ifdef VENDOR_EDIT
-	/* Yichun.Chen	PSW.BSP.CHG  2019-08-07  for detect CDP */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		u32 reg; 
 #endif
 	if (mdwc->dwc3)
@@ -4783,8 +4744,7 @@ static void dwc3_otg_sm_work(struct work_struct *w)
 	switch (mdwc->drd_state) {
 	case DRD_STATE_UNDEFINED:
 		/* put controller and phy in suspend if no cable connected */
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Modify for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (test_bit(ID, &mdwc->inputs) &&
 #else
 		if (oppo_test_id(mdwc) &&
@@ -4813,8 +4773,7 @@ static void dwc3_otg_sm_work(struct work_struct *w)
 			break;
 		}
 
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Modify for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (!test_bit(ID, &mdwc->inputs)) {
 #else
 		if (!oppo_test_id(mdwc)) {
@@ -4838,8 +4797,7 @@ static void dwc3_otg_sm_work(struct work_struct *w)
 				atomic_read(&mdwc->dev->power.usage_count));
 			dwc3_otg_start_peripheral(mdwc, 1);
 			mdwc->drd_state = DRD_STATE_PERIPHERAL;
-#ifdef VENDOR_EDIT
-/* Yichun.Chen  PSW.BSP.CHG  2019-08-07  for detect CDP */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 			if (!dwc->softconnect && get_psy_type(mdwc) == POWER_SUPPLY_TYPE_USB_CDP) { 
 				dbg_event(0xFF, "cdp pullup dp", 0); 
 				reg = dwc3_readl(dwc->regs, DWC3_DCTL); 
@@ -4852,16 +4810,11 @@ static void dwc3_otg_sm_work(struct work_struct *w)
 		} else {
 			dwc3_msm_gadget_vbus_draw(mdwc, 0);
 			dev_dbg(mdwc->dev, "Cable disconnected\n");
-#ifdef CONFIG_VXR200_XR_MISC
-			vxr7200_usb_event(false);
-#endif
-
 		}
 		break;
 
 	case DRD_STATE_PERIPHERAL:
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Modify for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (!test_bit(B_SESS_VLD, &mdwc->inputs) ||
 				!test_bit(ID, &mdwc->inputs)) {
 #else
@@ -4922,8 +4875,7 @@ static void dwc3_otg_sm_work(struct work_struct *w)
 
 	case DRD_STATE_HOST_IDLE:
 		/* Switch to A-Device*/
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Modify for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (test_bit(ID, &mdwc->inputs)) {
 #else
 		if (oppo_test_id(mdwc)) {
@@ -4955,8 +4907,7 @@ static void dwc3_otg_sm_work(struct work_struct *w)
 		break;
 
 	case DRD_STATE_HOST:
-#ifdef VENDOR_EDIT
-/* Jianchao.Shi@BSP.CHG.Basic, 2017/02/18, sjc Modify for OTG sw */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (test_bit(ID, &mdwc->inputs) || mdwc->hc_died) {
 #else
 		if (oppo_test_id(mdwc) || mdwc->hc_died) {

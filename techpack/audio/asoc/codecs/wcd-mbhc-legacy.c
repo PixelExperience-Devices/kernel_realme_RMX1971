@@ -128,13 +128,10 @@ static bool wcd_is_special_headset(struct wcd_mbhc *mbhc)
 	u16 hs_comp_res;
 	bool is_spl_hs = false;
 
-#ifdef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2016/09/26,
- *Add for necessary log.
- */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #undef pr_debug
 #define pr_debug pr_info
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	/*
 	 * Increase micbias to 2.7V to detect headsets with
@@ -271,14 +268,13 @@ static void wcd_enable_mbhc_supply(struct wcd_mbhc *mbhc,
 				wcd_enable_curr_micbias(mbhc,
 						WCD_MBHC_EN_PULLUP);
 			} else {
-				#ifndef VENDOR_EDIT
-				/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2017/03/22,
+				#ifndef CONFIG_PRODUCT_REALME_SDM710
 				 *Modify for hook key.
 				 */
 				wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_CS);
-				#else /* VENDOR_EDIT */
+				#else /* CONFIG_PRODUCT_REALME_SDM710 */
 				wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
-				#endif /* VENDOR_EDIT */
+				#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 			}
 		} else if (plug_type == MBHC_PLUG_TYPE_HEADPHONE) {
 			wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_CS);
@@ -370,13 +366,10 @@ static void wcd_mbhc_detect_plug_type(struct wcd_mbhc *mbhc)
 {
 	struct snd_soc_codec *codec = mbhc->codec;
 	bool micbias1 = false;
-#ifdef VENDOR_EDIT
-/* Le.Li@PSW.MM.AudioDriver.HeadsetDet, 2018/03/22,
- * Add for necessary log.
- */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #undef pr_debug
 #define pr_debug pr_info
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	pr_debug("%s: enter\n", __func__);
 	WCD_MBHC_RSC_ASSERT_LOCKED(mbhc);
@@ -395,14 +388,13 @@ static void wcd_mbhc_detect_plug_type(struct wcd_mbhc *mbhc)
 		mbhc->mbhc_cb->mbhc_micbias_control(codec, MIC_BIAS_2,
 						    MICB_ENABLE);
 	else
-		#ifndef VENDOR_EDIT
-		/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2017/03/26,
+		#ifndef CONFIG_PRODUCT_REALME_SDM710
 		 *Modify for pop noise.
 		 */
 		wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
-		#else /* VENDOR_EDIT */
+		#else /* CONFIG_PRODUCT_REALME_SDM710 */
 		wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_CS);
-		#endif /* VENDOR_EDIT */
+		#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	/* Re-initialize button press completion object */
 	reinit_completion(&mbhc->btn_press_compl);
@@ -410,8 +402,7 @@ static void wcd_mbhc_detect_plug_type(struct wcd_mbhc *mbhc)
 	pr_debug("%s: leave\n", __func__);
 }
 
-#ifdef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2017/04/15, Add for headset detect*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static void wcd_mbhc_detect_plug_type_legacy(struct work_struct *work)
 {
 	struct delayed_work *dwork;
@@ -452,7 +443,7 @@ static void wcd_mbhc_detect_plug_type_legacy(struct work_struct *work)
 
 	pr_info("%s: leave\n", __func__);
 }
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 static void wcd_correct_swch_plug(struct work_struct *work)
 {
@@ -467,20 +458,16 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 	bool micbias1 = false;
 	int rc, spl_hs_count = 0;
 
-	#ifdef VENDOR_EDIT
-	/*xiang.fei@PSW.MM.AudioDriver.HeadsetDet, 2017/03/03,
-	 *Add for headset detect.
-	 */
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	int headset_count = 0;
 	int headphone_count = 0;
 	int high_hph_count = 0;
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
-#ifdef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2016/09/26, Add for log*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #undef pr_debug
 #define pr_debug pr_info
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	pr_debug("%s: enter\n", __func__);
 
@@ -494,12 +481,11 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 	 * is handled with ref-counts by individual codec drivers, there is
 	 * no need to enabale micbias/pullup here
 	 */
-	#ifndef VENDOR_EDIT
-	/*xiang.fei@PSW.MM.AudioDriver.HeadsetDet, 2017/03/26,
+	#ifndef CONFIG_PRODUCT_REALME_SDM710
 	 *Delete for pop noise.
 	 */
 	wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	/* Enable HW FSM */
 	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_FSM_EN, 1);
@@ -513,11 +499,10 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 	WCD_MBHC_REG_READ(WCD_MBHC_BTN_RESULT, btn_result);
 	WCD_MBHC_REG_READ(WCD_MBHC_HS_COMP_RESULT, hs_comp_res);
 
-	#ifdef VENDOR_EDIT
-	/*xiang.fei@PSW.MM.AudioDriver.HeadsetDet, 2017/03/03, Add for log*/
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	pr_info("%s: btn_result=%d hs_comp_res=%d\n", __func__,
 			btn_result, hs_comp_res);
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	if (!rc) {
 		pr_debug("%s No btn press interrupt\n", __func__);
@@ -534,8 +519,7 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 			plug_type = MBHC_PLUG_TYPE_INVALID;
 	}
 
-	#ifndef VENDOR_EDIT
-	/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2018/04/026,
+	#ifndef CONFIG_PRODUCT_REALME_SDM710
 	 *Modify for headset/headphone detect.
 	 */
 	if ((plug_type == MBHC_PLUG_TYPE_HEADSET ||
@@ -548,7 +532,7 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 		wcd_mbhc_find_plug_and_report(mbhc, plug_type);
 		WCD_MBHC_RSC_UNLOCK(mbhc);
 	}
-	#else /* VENDOR_EDIT */
+	#else /* CONFIG_PRODUCT_REALME_SDM710 */
 	if ((plug_type == MBHC_PLUG_TYPE_HEADSET)
 			&& (!wcd_swch_level_remove(mbhc))) {
 		WCD_MBHC_RSC_LOCK(mbhc);
@@ -574,7 +558,7 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 		high_hph_count ++;
 		pr_info("%s: MBHC_PLUG_TYPE_HIGH_HPH type\n", __func__);
 	}
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	timeout = jiffies + msecs_to_jiffies(HS_DETECT_PLUG_TIME_MS);
 	while (!time_after(jiffies, timeout)) {
@@ -626,10 +610,9 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 		if (mbhc->mbhc_cb->hph_pa_on_status)
 			is_pa_on = mbhc->mbhc_cb->hph_pa_on_status(codec);
 
-		#ifdef VENDOR_EDIT
-		/*xiang.fei@PSW.MM.AudioDriver.HeadsetDet, 2017/03/03, Add for log*/
+		#ifdef CONFIG_PRODUCT_REALME_SDM710
 		pr_info("%s:  is_pa_on: %x\n", __func__, is_pa_on);
-		#endif /* VENDOR_EDIT */
+		#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 		/*
 		 * instead of hogging system by contineous polling, wait for
 		 * sometime and re-check stop request again.
@@ -638,12 +621,9 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 		if (hs_comp_res && (spl_hs_count < WCD_MBHC_SPL_HS_CNT)) {
 			spl_hs = wcd_mbhc_check_for_spl_headset(mbhc,
 								&spl_hs_count);
-			#ifdef VENDOR_EDIT
-			/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2017/09/25,
-			 *Add for log.
-			 */
+			#ifdef CONFIG_PRODUCT_REALME_SDM710
 			pr_info("%s:  spl_hs_count: %d\n", __func__, spl_hs_count);
-			#endif /* VENDOR_EDIT */
+			#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 			if (spl_hs_count == WCD_MBHC_SPL_HS_CNT) {
 				hs_comp_res = 0;
@@ -655,32 +635,25 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 		WCD_MBHC_REG_READ(WCD_MBHC_HPHL_SCHMT_RESULT, hphl_sch);
 		WCD_MBHC_REG_READ(WCD_MBHC_MIC_SCHMT_RESULT, mic_sch);
 
-		#ifdef VENDOR_EDIT
-		/*xiang.fei@PSW.MM.AudioDriver.HeadsetDet, 2017/03/03, Add for log*/
+		#ifdef CONFIG_PRODUCT_REALME_SDM710
 		pr_info("%s: hs_comp_res=%d hphl_sch=%d mic_sch=%d\n", __func__,
 					hs_comp_res, hphl_sch, mic_sch);
-		#endif /* VENDOR_EDIT */
+		#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 		if (hs_comp_res && !(hphl_sch || mic_sch)) {
 			pr_debug("%s: cable is extension cable\n", __func__);
 			plug_type = MBHC_PLUG_TYPE_HIGH_HPH;
 			wrk_complete = true;
-			#ifdef VENDOR_EDIT
-			/*xiang.fei@PSW.MM.AudioDriver.HeadsetDet, 2017/03/06,
-			 *Add for HIGH_HPH detect.
-			 */
+			#ifdef CONFIG_PRODUCT_REALME_SDM710
 			high_hph_count ++;
 
-			/* Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet.1033864,
-			 * 2017/07/13, Add for some high impedance headset detect quickly.
-			 */
 			if ((high_hph_count == 5) && !headset_count && !headphone_count) {
 				pr_info("%s: HIGH_HPH type, break loop detect\n", __func__);
 				break;
 			}
 
 			continue;
-			#endif /* VENDOR_EDIT */
+			#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 		} else {
 			pr_debug("%s: cable might be headset: %d\n", __func__,
 					plug_type);
@@ -701,19 +674,16 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 				 * and if there is not button press without
 				 * release
 				 */
-				#ifndef VENDOR_EDIT
-				/*xiang.fei@PSW.MM.AudioDriver.HeadsetDet, 2017/04/10,
-				 *Add for headset detect.
-				 */
+				#ifndef CONFIG_PRODUCT_REALME_SDM710
 				if (((mbhc->current_plug !=
 				      MBHC_PLUG_TYPE_HEADSET) &&
 				     (mbhc->current_plug !=
 				      MBHC_PLUG_TYPE_ANC_HEADPHONE)) &&
 				    !wcd_swch_level_remove(mbhc) &&
 				    !mbhc->btn_press_intr) {
-				#else /* VENDOR_EDIT */
+				#else /* CONFIG_PRODUCT_REALME_SDM710 */
 				if ((!wcd_swch_level_remove(mbhc)) && (!mbhc->btn_press_intr)) {
-				#endif /* VENDOR_EDIT */
+				#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 					pr_debug("%s: cable is %sheadset\n",
 						__func__,
 						((spl_hs_count ==
@@ -721,12 +691,11 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 							"special ":""));
 					pr_info("%s: high_hph_count=%d mbhc->current_plug=%d headset_count=%d spl_hs_count=%d spl_hs_reported=%d\n", __func__,
 						high_hph_count, mbhc->current_plug, headset_count,spl_hs_count,spl_hs_reported);
-					#ifndef VENDOR_EDIT
-					/*xiang.fei@PSW.MM.AudioDriver.HeadsetDet, 2017/03/10,
+					#ifndef CONFIG_PRODUCT_REALME_SDM710
 					 *Modify for headset detect.
 					 */
 					goto report;
-					#else /* VENDOR_EDIT */
+					#else /* CONFIG_PRODUCT_REALME_SDM710 */
 					if (((high_hph_count > 0)
 							|| (mbhc->current_plug == MBHC_PLUG_TYPE_HEADPHONE))
 							&& (headset_count == 1)) {
@@ -736,12 +705,9 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 					    goto report;
 					}
 					headset_count ++;
-					#endif /* VENDOR_EDIT */
+					#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 				}
-				#ifdef VENDOR_EDIT
-				/*xiang.fei@PSW.MM.AudioDriver.HeadsetDet, 2017/03/10,
-				 *Add for headphone detect.
-				 */
+				#ifdef CONFIG_PRODUCT_REALME_SDM710
 				else {
 					plug_type = MBHC_PLUG_TYPE_HEADPHONE;
 					if ((mbhc->current_plug == MBHC_PLUG_TYPE_HEADPHONE)
@@ -764,7 +730,7 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 					}
 					headphone_count ++;
 				}
-				#endif /* VENDOR_EDIT */
+				#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 			}
 			wrk_complete = false;
 		}
@@ -786,14 +752,13 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 	    (plug_type == MBHC_PLUG_TYPE_ANC_HEADPHONE))) {
 		pr_debug("%s: plug_type:0x%x already reported\n",
 			 __func__, mbhc->current_plug);
-		#ifndef VENDOR_EDIT
-		/*xiang.fei@PSW.MM.AudioDriver.HeadsetDet, 2017/03/06,
+		#ifndef CONFIG_PRODUCT_REALME_SDM710
 		 *Modify for headphone change to headset detect.
 		 */
 		goto enable_supply;
-		#else /* VENDOR_EDIT */
+		#else /* CONFIG_PRODUCT_REALME_SDM710 */
 		goto report;
-		#endif /* VENDOR_EDIT */
+		#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	}
 
 	if (plug_type == MBHC_PLUG_TYPE_HIGH_HPH &&
@@ -816,17 +781,14 @@ report:
 		wcd_cancel_btn_work(mbhc);
 		plug_type = MBHC_PLUG_TYPE_HEADPHONE;
 	}
-	#ifndef VENDOR_EDIT
-	/*xiang.fei@PSW.MM.AudioDriver.HeadsetDet, 2017/03/06, Modify for hp report*/
-	/* Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2017/07/11,
-	 * Add for report headphone remove bug[1042404] */
+	#ifndef CONFIG_PRODUCT_REALME_SDM710
 	pr_debug("%s: Valid plug found, plug type %d wrk_cmpt %d btn_intr %d\n",
 			__func__, plug_type, wrk_complete,
 			mbhc->btn_press_intr);
 	WCD_MBHC_RSC_LOCK(mbhc);
 	wcd_mbhc_find_plug_and_report(mbhc, plug_type);
 	WCD_MBHC_RSC_UNLOCK(mbhc);
-	#else /* VENDOR_EDIT */
+	#else /* CONFIG_PRODUCT_REALME_SDM710 */
 	pr_info("%s: Valid plug found, plug type %d wrk_cmpt %d btn_intr %d\n",
 			__func__, plug_type, wrk_complete,
 			mbhc->btn_press_intr);
@@ -852,7 +814,7 @@ report:
 		wcd_mbhc_find_plug_and_report(mbhc, plug_type);
 	}
 	WCD_MBHC_RSC_UNLOCK(mbhc);
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 enable_supply:
 	if (mbhc->mbhc_cb->mbhc_micbias_control)
@@ -1154,11 +1116,8 @@ void wcd_mbhc_legacy_init(struct wcd_mbhc *mbhc)
 	}
 	mbhc->mbhc_fn = &mbhc_fn;
 	INIT_WORK(&mbhc->correct_plug_swch, wcd_correct_swch_plug);
-	#ifdef VENDOR_EDIT
-	/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2017/04/15,
-	 *Add for headset detect.
-	 */
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	INIT_DELAYED_WORK(&mbhc->hp_detect_work, wcd_mbhc_detect_plug_type_legacy);
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 }
 EXPORT_SYMBOL(wcd_mbhc_legacy_init);

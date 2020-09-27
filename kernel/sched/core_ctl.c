@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2018, 2020 The Linux Foundation. All rights reserved.
+/* Copyright (c) 2014-2018, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -75,8 +75,8 @@ static struct cluster_data cluster_state[MAX_CLUSTERS];
 static unsigned int num_clusters;
 
 #define for_each_cluster(cluster, idx) \
-	for (; (idx) < num_clusters && ((cluster) = &cluster_state[idx]);\
-		(idx)++)
+	for ((cluster) = &cluster_state[idx]; (idx) < num_clusters;\
+		(idx)++, (cluster) = &cluster_state[idx])
 
 static DEFINE_SPINLOCK(state_lock);
 static void apply_need(struct cluster_data *state);
@@ -108,7 +108,7 @@ static ssize_t show_min_cpus(const struct cluster_data *state, char *buf)
 	return snprintf(buf, PAGE_SIZE, "%u\n", state->min_cpus);
 }
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //cuixiaogang@SRC.hypnus, 2019.05.20 add for hypnus-daemon
 int hypnus_set_min_max_cpus(unsigned int index, unsigned int min, unsigned int max)
 {
@@ -125,7 +125,7 @@ int hypnus_set_min_max_cpus(unsigned int index, unsigned int min, unsigned int m
         wake_up_core_ctl_thread(state);
         return 0;
 }
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 static ssize_t store_max_cpus(struct cluster_data *state,
 				const char *buf, size_t count)
@@ -1084,7 +1084,7 @@ early_param("core_ctl_disable_cpumask", core_ctl_disable_setup);
 
 static bool should_skip(const struct cpumask *mask)
 {
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //gaolong@SRC.hypnus, 2019.08.30 add for hypnus-daemon
 	return false;
 #else

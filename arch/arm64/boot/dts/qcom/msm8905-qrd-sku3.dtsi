@@ -218,9 +218,6 @@
 	qcom,platform-te-gpio = <&msm_gpio 24 0>;
 	qcom,platform-reset-gpio = <&msm_gpio 25 0>;
 	qcom,platform-spi-dc-gpio = <&msm_gpio 110 0>;
-
-	vdd-supply = <&pm8909_l17>;
-	vddio-supply = <&pm8909_l6>;
 };
 
 &qnand_1 {
@@ -282,13 +279,4 @@
 	pinctrl-names = "active", "sleep";
 	pinctrl-0 = <&sdc2_clk_on &sdc2_cmd_on &sdc2_data_on>;
 	pinctrl-1 = <&sdc2_clk_off &sdc2_cmd_off &sdc2_data_off>;
-};
-
-&mdss_dsi {
-	vdda-supply = <&pm8909_l2>;
-	vddio-supply = <&pm8909_l6>;
-	qcom,mdss_dsi_ctrl0@1ac8000 {
-		vdd-supply = <&pm8909_l17>;
-		vddio-supply = <&pm8909_l6>;
-	};
 };

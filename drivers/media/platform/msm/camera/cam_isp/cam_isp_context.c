@@ -1246,7 +1246,7 @@ static int __cam_isp_ctx_apply_req_in_activated_state(
 	cfg.hw_update_entries = req_isp->cfg;
 	cfg.num_hw_update_entries = req_isp->num_cfg;
 	cfg.priv  = &req_isp->hw_update_data;
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/*Xinlan.He@Camera case 03543839 for issue config done completion timeout*/
 	cfg.init_packet = 0;
 #endif
@@ -2380,7 +2380,7 @@ static int __cam_isp_ctx_start_dev_in_ready(struct cam_context *ctx,
 	arg.hw_update_entries = req_isp->cfg;
 	arg.num_hw_update_entries = req_isp->num_cfg;
 	arg.priv  = &req_isp->hw_update_data;
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/*Xinlan.He@Camera case 03543839 for issue config done completion timeout*/
 	arg.init_packet = 1;
 #endif
@@ -2545,8 +2545,7 @@ static int __cam_isp_ctx_link_resume(struct cam_context *ctx)
 	return rc;
 }
 
-#ifdef VENDOR_EDIT
-/*add by hongbo.dai@camera, 20180627 for camera hwsync*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static int set_sync_mode(struct cam_context *ctx)
 {
 	int rc = -1;
@@ -2579,8 +2578,7 @@ static int __cam_isp_ctx_process_evt(struct cam_context *ctx,
 	case CAM_REQ_MGR_LINK_EVT_RESUME:
 		__cam_isp_ctx_link_resume(ctx);
 		break;
-	#ifdef VENDOR_EDIT
-	/*add by hongbo.dai@camera, 20180627 for camera hwsync*/
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	case CAM_REQ_MGR_SYNC_SKIP_REQ:
 		CAM_INFO(CAM_ISP,"SKIP req received");
 		set_sync_mode(ctx);
@@ -2713,8 +2711,7 @@ static struct cam_ctx_ops
 		.crm_ops = {
 			.unlink = __cam_isp_ctx_unlink_in_ready,
 			.flush_req = __cam_isp_ctx_flush_req_in_ready,
-			#ifdef VENDOR_EDIT
-			/*add by hongbo.dai@camera, 20180627 for camera hwsync*/
+			#ifdef CONFIG_PRODUCT_REALME_SDM710
 			.process_evt = __cam_isp_ctx_process_evt,
 			#endif
 		},

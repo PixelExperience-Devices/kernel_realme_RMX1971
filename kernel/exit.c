@@ -338,8 +338,7 @@ static bool has_stopped_jobs(struct pid *pgrp)
 	return false;
 }
 
-#ifdef VENDOR_EDIT
-//Shu.Liu@PSW.AD.Stability.Crash.1052210, 2014/01/20, Add for not kill zygote
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static bool oppo_is_android_core_group(struct pid *pgrp)
 {
     struct task_struct *p;
@@ -353,7 +352,7 @@ static bool oppo_is_android_core_group(struct pid *pgrp)
 
     return false;
 }
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 /*
  * Check to see if any process groups have become orphaned as
@@ -381,13 +380,12 @@ kill_orphaned_pgrp(struct task_struct *tsk, struct task_struct *parent)
 	    task_session(parent) == task_session(tsk) &&
 	    will_become_orphaned_pgrp(pgrp, ignored_task) &&
 	    has_stopped_jobs(pgrp)) {
-#ifdef VENDOR_EDIT
-//Shu.Liu@PSW.AD.Stability.Crash.1052210, 2014/01/10, Add for clean backstage
+#ifdef CONFIG_PRODUCT_REALME_SDM710
             if (oppo_is_android_core_group(pgrp)) {
                 printk("kill_orphaned_pgrp: find android core process will be hungup, ignored it, only hungup itself:%s:%d , current=%d \n",tsk->comm,tsk->pid,current->pid);
                 return;
             }
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 		__kill_pgrp_info(SIGHUP, SEND_SIG_PRIV, pgrp);
 		__kill_pgrp_info(SIGCONT, SEND_SIG_PRIV, pgrp);
 	}
@@ -769,8 +767,7 @@ static void check_stack_usage(void)
 static inline void check_stack_usage(void) {}
 #endif
 
-//#ifdef VENDOR_EDIT
-//Haoran.Zhang@PSW.AD.Stability.Crash.1052210, 2016/05/24, Add for debug critical svc crash
+//#ifdef CONFIG_PRODUCT_REALME_SDM710
 static bool is_zygote_process(struct task_struct *t)
 {
 	const struct cred *tcred = __task_cred(t);
@@ -801,24 +798,22 @@ static bool is_critial_process(struct task_struct *t) {
     }
 
 }
-//#endif /*VENDOR_EDIT*/
+//#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 void __noreturn do_exit(long code)
 {
 	struct task_struct *tsk = current;
 	int group_dead;
-#if defined(VENDOR_EDIT) && defined(CONFIG_ELSA_STUB)
-//zhoumingjun@Swdp.shanghai, 2017/04/19, add process_event_notifier support
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_ELSA_STUB)
 	struct process_event_data pe_data;
 #endif
 	TASKS_RCU(int tasks_rcu_i);
 
-//#ifdef VENDOR_EDIT
-//Haoran.Zhang@PSW.AD.Stability.Crash.1052210, 2016/05/24, Add for debug critical svc crash
+//#ifdef CONFIG_PRODUCT_REALME_SDM710
     if (is_critial_process(tsk)) {
         printk("critical svc %d:%s exit with %ld !\n", tsk->pid, tsk->comm,code);
     }
-//#endif /*VENDOR_EDIT*/
+//#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 	/*
 	 * We can get here from a kernel oops, sometimes with preemption off.
@@ -857,8 +852,7 @@ void __noreturn do_exit(long code)
 
 	validate_creds_for_do_exit(tsk);
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_ELSA_STUB)
-//zhoumingjun@Swdp.shanghai, 2017/04/19, add process_event_notifier support
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_ELSA_STUB)
 	pe_data.pid = tsk->pid;
 	pe_data.uid = tsk->real_cred->uid;
 	pe_data.reason = code;

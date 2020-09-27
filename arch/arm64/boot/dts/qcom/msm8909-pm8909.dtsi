@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  */
 
-#include "pm8909-rpm-regulator.dtsi"
+#include "msm-pm8909-rpm-regulator.dtsi"
 #include "msm-pm8909.dtsi"
 #include "msm8909-regulator.dtsi"
 
@@ -20,7 +20,6 @@
 };
 
 &pm8909_vadc {
-	#thermal-sensor-cells = <1>;
 	chan@0 {
 		label = "usb_in";
 		reg = <0>;

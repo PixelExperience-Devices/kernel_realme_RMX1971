@@ -3842,8 +3842,7 @@ s32 exfat_find_dir_entry(struct super_block *sb, CHAIN_T *p_dir, UNI_NAME_T *p_u
 
 						if ((++order) == 2)
 							uniname = p_uniname->name;
-#ifndef VENDOR_EDIT
-/* Fuchun.Liao@BSP.CHG.Basic 2018/06/11 modify for uniname null pointer */
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 						else
 							uniname += 15;
 #else
@@ -3851,7 +3850,7 @@ s32 exfat_find_dir_entry(struct super_block *sb, CHAIN_T *p_dir, UNI_NAME_T *p_u
 							return -2;
 						else
 							uniname += 15;
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 						len = extract_uni_name_from_name_entry(name_ep, entry_uniname, order);
 

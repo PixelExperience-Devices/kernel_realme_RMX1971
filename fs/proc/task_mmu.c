@@ -251,10 +251,7 @@ static void *m_start(struct seq_file *m, loff_t *ppos)
 	return NULL;
 }
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
-/* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
- * interfaces for reading the reserved mmaps
- */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 static void *reserve_vma_m_start(struct seq_file *m, loff_t *ppos)
 {
 	struct proc_maps_private *priv = m->private;
@@ -500,10 +497,7 @@ static const struct seq_operations proc_tid_maps_op = {
 	.show	= show_tid_map
 };
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
-/* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
- * interfaces for reading the reserved mmaps
- */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 static const struct seq_operations proc_pid_rmaps_op = {
 	.start	= reserve_vma_m_start,
 	.next	= reserve_vma_m_next,
@@ -522,10 +516,7 @@ static int tid_maps_open(struct inode *inode, struct file *file)
 	return do_maps_open(inode, file, &proc_tid_maps_op);
 }
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
-/* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
- * interface for reading the reserved mmaps
- */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 static int pid_rmaps_open(struct inode *inode, struct file *file)
 {
 	return do_maps_open(inode, file, &proc_pid_rmaps_op);
@@ -546,10 +537,7 @@ const struct file_operations proc_tid_maps_operations = {
 	.release	= proc_map_release,
 };
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
-/* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
- * interfaces for reading the reserved mmaps
- */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 const struct file_operations proc_pid_rmaps_operations = {
 	.open		= pid_rmaps_open,
 	.read		= seq_read,
@@ -935,7 +923,7 @@ static int show_smap(struct seq_file *m, void *v, int is_pid)
 	/* mmap_sem is held in m_start */
 	walk_page_vma(vma, &smaps_walk);
 
-    #ifdef VENDOR_EDIT //yixue.ge@bsp.drv modify for android.bg get pss too slow
+    #ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (strcmp(current->comm, "android.bg") == 0) {
 		if ((unsigned long)(mss->pss >> (10 + PSS_SHIFT)) > 0) {
 			seq_printf(m,
@@ -955,7 +943,7 @@ static int show_smap(struct seq_file *m, void *v, int is_pid)
 		m_cache_vma(m, vma);
 		return 0;
 	}
-    #endif /*VENDOR_EDIT*/
+    #endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 	if (!rollup_mode) {
 		show_map_vma(m, vma, is_pid);
@@ -1736,7 +1724,7 @@ const struct file_operations proc_pagemap_operations = {
 #endif /* CONFIG_PROC_PAGE_MONITOR */
 
 #ifdef CONFIG_PROCESS_RECLAIM
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /* Kui.Zhang@TEC.Kernel.Performance, 2019/03/04
  * Each reclaim lasts up to 333ms, will stop immediately if overtime.
  */
@@ -1755,9 +1743,7 @@ static int reclaim_pte_range(pmd_t *pmd, unsigned long addr,
 	LIST_HEAD(page_list);
 	int isolated;
 	int reclaimed;
-#ifdef VENDOR_EDIT
-	/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25, if want to cancel,
-	 * return nonzero will junp out of the loop*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	int ret = 0;
 #endif
 
@@ -1768,9 +1754,7 @@ cont:
 	isolated = 0;
 	pte = pte_offset_map_lock(vma->vm_mm, pmd, addr, &ptl);
 	for (; addr != end; pte++, addr += PAGE_SIZE) {
-#ifdef VENDOR_EDIT
-		/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25, check whether the
-		 * reclaim process should cancel*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (rp->reclaimed_task &&
 			(ret = is_reclaim_addr_over(walk, addr))) {
 			ret = -ret;
@@ -1785,9 +1769,7 @@ cont:
 		if (!page)
 			continue;
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_PROCESS_RECLAIM_ENHANCE)
-		/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-11-07,
-		 * we don't reclaim page in active lru list */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_PROCESS_RECLAIM_ENHANCE)
 		if (rp->inactive_lru && (PageActive(page) ||
 			PageUnevictable(page)))
 			continue;
@@ -1805,9 +1787,7 @@ cont:
 			break;
 	}
 	pte_unmap_unlock(pte - 1, ptl);
-#ifdef VENDOR_EDIT
-	/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25, check whether the
-	 * reclaim process should cancel*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	reclaimed = reclaim_pages_from_list(&page_list, vma, walk);
 #else
 	reclaimed = reclaim_pages_from_list(&page_list, vma);
@@ -1818,10 +1798,7 @@ cont:
 	if (rp->nr_to_reclaim < 0)
 		rp->nr_to_reclaim = 0;
 
-#ifdef VENDOR_EDIT
-	/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25, if want to cancel,
-	 * if ret <0 means need jump out of the loop immediately
-	 */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (ret < 0)
 		return ret;
 	if (!rp->nr_to_reclaim)
@@ -1841,9 +1818,7 @@ enum reclaim_type {
 	RECLAIM_ANON,
 	RECLAIM_ALL,
 	RECLAIM_RANGE,
-#if defined(VENDOR_EDIT) && defined(CONFIG_PROCESS_RECLAIM_ENHANCE)
-	/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-11-07,
-	 * add three reclaim_type that only reclaim inactive pages */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_PROCESS_RECLAIM_ENHANCE)
 	RECLAIM_INACTIVE_FILE,
 	RECLAIM_INACTIVE_ANON,
 	RECLAIM_INACTIVE,
@@ -1860,9 +1835,7 @@ struct reclaim_param reclaim_task_anon(struct task_struct *task,
 
 	rp.nr_reclaimed = 0;
 	rp.nr_scanned = 0;
-#if defined(VENDOR_EDIT) && defined(CONFIG_PROCESS_RECLAIM_ENHANCE)
-	/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-11-07,
-	 * reclaim all active and inactive pages here */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_PROCESS_RECLAIM_ENHANCE)
 	rp.inactive_lru = false;
 	rp.reclaimed_task = NULL;
 #endif
@@ -1904,9 +1877,7 @@ out:
 	return rp;
 }
 
-#ifdef VENDOR_EDIT
-/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2019-01-01,
- * Extract the reclaim core code for /proc/process_reclaim use*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 ssize_t reclaim_task_write(struct task_struct* task, char *buffer)
 {
 	struct mm_struct *mm;
@@ -1933,9 +1904,6 @@ ssize_t reclaim_task_write(struct task_struct* task, char *buffer)
 	else if (!strcmp(type_buf, "all"))
 		type = RECLAIM_ALL;
 #ifdef CONFIG_PROCESS_RECLAIM_ENHANCE
-	/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-11-07,
-	 * Check the input reclaim option is inactive
-	 */
 	else if (!strcmp(type_buf, "inactive"))
 		type = RECLAIM_INACTIVE;
 	else if (!strcmp(type_buf, "inactive_file"))
@@ -1983,9 +1951,6 @@ ssize_t reclaim_task_write(struct task_struct* task, char *buffer)
 		goto out;
 
 #ifdef CONFIG_PROCESS_RECLAIM_ENHANCE
-	/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-11-07,
-	 * Flag that relcaim inactive pages only in reclaim_pte_range
-	 */
 	if ((type == RECLAIM_INACTIVE) ||
 		(type == RECLAIM_INACTIVE_FILE) ||
 		(type == RECLAIM_INACTIVE_ANON))
@@ -1998,9 +1963,6 @@ ssize_t reclaim_task_write(struct task_struct* task, char *buffer)
 	reclaim_walk.pmd_entry = reclaim_pte_range;
 	reclaim_walk.private = &rp;
 
-	/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25,
-	 * record the reclaimed task
-	 */
 	current->flags |= PF_RECLAIM_SHRINK;
 	rp.reclaimed_task = task;
 	current->reclaim.stop_jiffies = jiffies + RECLAIM_TIMEOUT_JIFFIES;
@@ -2033,9 +1995,6 @@ cont:
 			if (is_vm_hugetlb_page(vma))
 				continue;
 
-			/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-11-07,
-			 * Jump out of the reclaim flow immediately
-			 */
 			err = is_reclaim_addr_over(&reclaim_walk, vma->vm_start);
 			if (err) {
 				err = -err;
@@ -2043,9 +2002,6 @@ cont:
 			}
 
 #ifdef CONFIG_PROCESS_RECLAIM_ENHANCE
-			/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-11-07,
-			 * filter only reclaim anon pages
-			 */
 			if ((type == RECLAIM_ANON ||
 				type == RECLAIM_INACTIVE_ANON) && vma->vm_file)
 #else
@@ -2054,9 +2010,6 @@ cont:
 				continue;
 
 #ifdef CONFIG_PROCESS_RECLAIM_ENHANCE
-			/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-11-07,
-			 * filter only reclaim file-backed pages
-			 */
 			if ((type == RECLAIM_FILE ||
 				type == RECLAIM_INACTIVE_FILE) && !vma->vm_file)
 #else
@@ -2090,7 +2043,6 @@ cont:
 			(err == -PR_FULL)) && vma)
 		goto cont;
 
-	/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25, clear the flags*/
 	current->flags &= ~PF_RECLAIM_SHRINK;
 	mmput(mm);
 out:
@@ -2246,7 +2198,7 @@ out:
 out_err:
 	return -EINVAL;
 }
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 const struct file_operations proc_reclaim_operations = {
 	.write		= reclaim_write,

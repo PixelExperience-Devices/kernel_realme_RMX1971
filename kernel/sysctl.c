@@ -64,11 +64,11 @@
 #include <linux/binfmts.h>
 #include <linux/sched/sysctl.h>
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //Ming.Liu@PSW.CN.WiFi.Network.quality.1065762, 2016/10/09
 //add for: [monitor tcp info]
 #include <net/tcp.h>
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 #include <linux/kexec.h>
 #include <linux/bpf.h>
@@ -102,17 +102,13 @@
 #include <linux/nmi.h>
 #endif
 
-#ifdef VENDOR_EDIT //Cong.Dai@BSP.TP.Function, 2019/07/03, modified for replace daily build macro
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <soc/oppo/oppo_project.h>
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 #if defined(CONFIG_SYSCTL)
 
 /* External variables not in a header file. */
-#ifdef CONFIG_USB
-int deny_new_usb __read_mostly = 0;
-EXPORT_SYMBOL(deny_new_usb);
-#endif
 extern int suid_dumpable;
 #ifdef CONFIG_COREDUMP
 extern int core_uses_pid;
@@ -145,7 +141,7 @@ static unsigned long one_ul = 1;
 static unsigned long long_max = LONG_MAX;
 static int one_hundred = 100;
 
-#ifdef VENDOR_EDIT //yixue.ge@PSW.BSP.Kernel.Driver 20170720 add for add direct_vm_swappiness
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 extern int direct_vm_swappiness;
 static int two_hundred = 200;
 #endif
@@ -154,19 +150,16 @@ static int __maybe_unused one_thousand = 1000;
 #ifdef CONFIG_SCHED_WALT
 static int two_million = 2000000;
 #endif
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 unsigned int sysctl_fg_io_opt = 1;
-#endif /*VENDOR_EDIT*/
-#ifdef VENDOR_EDIT
-/*jason.tang@TECH.BSP.Kernel.Storage, 2019-05-20, add control ext4 fsync*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 unsigned int sysctl_ext4_fsync_enable = 1;
 unsigned int ext4_fsync_enable_status = 0;
-#endif /*VENDOR_EDIT*/
-#ifdef VENDOR_EDIT
-/*jason.tang@TECH.BSP.Kernel.Storage, 2019-05-20, add to count flush*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 unsigned long sysctl_blkdev_issue_flush_count = 0;
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 #ifdef CONFIG_PRINTK
 static int ten_thousand = 10000;
@@ -188,8 +181,7 @@ static const int cap_last_cap = CAP_LAST_CAP;
 /*this is needed for proc_doulongvec_minmax of sysctl_hung_task_timeout_secs */
 #ifdef CONFIG_DETECT_HUNG_TASK
 static unsigned long hung_task_timeout_max = (LONG_MAX/HZ);
-#if defined(VENDOR_EDIT) && defined(CONFIG_DEATH_HEALER)
-/* Wen.Luo@BSP.Kernel.Stability, 2019/01/12, DeathHealer , Foreground background optimization,change max io count */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_DEATH_HEALER)
 static int five = 5;
 #endif
 #endif
@@ -320,11 +312,11 @@ static int max_sched_tunable_scaling = SCHED_TUNABLESCALING_END-1;
 #endif /* CONFIG_SMP */
 #endif /* CONFIG_SCHED_DEBUG */
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 // Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
 int sysctl_uifirst_enabled = 1;
 int sysctl_launcher_boost_enabled = 0;
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 #ifdef CONFIG_COMPACTION
 static int min_extfrag_threshold;
@@ -438,8 +430,7 @@ static struct ctl_table kern_table[] = {
 		.mode		= 0644,
 		.proc_handler	= sched_updown_migrate_handler,
 	},
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 {
 		.procname	= "fg_io_opt",
 		.data		= &sysctl_fg_io_opt,
@@ -448,8 +439,7 @@ static struct ctl_table kern_table[] = {
 		.proc_handler	= proc_dointvec,
 },
 #endif
-#ifdef VENDOR_EDIT
-/*jason.tang@TECH.BSP.Kernel.Storage, 2019-05-20, add control ext4 fsync*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 {
 		.procname	= "ext4_fsync_enable",
 		.data		= &sysctl_ext4_fsync_enable,
@@ -458,8 +448,7 @@ static struct ctl_table kern_table[] = {
 		.proc_handler	= proc_dointvec,
 },
 #endif
-#ifdef VENDOR_EDIT
-/*jason.tang@TECH.BSP.Kernel.Storage, 2019-05-20, add to count flush*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 {
 		.procname	= "blkdev_issue_flush_count",
 		.data		= &sysctl_blkdev_issue_flush_count,
@@ -1050,17 +1039,6 @@ static struct ctl_table kern_table[] = {
 		.extra2		= &two,
 	},
 #endif
-#ifdef CONFIG_USB
-	{
-		.procname	= "deny_new_usb",
-		.data		= &deny_new_usb,
-		.maxlen		= sizeof(int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec_minmax_sysadmin,
-		.extra1		= &zero,
-		.extra2		= &one,
-	},
-#endif
 	{
 		.procname	= "ngroups_max",
 		.data		= &ngroups_max,
@@ -1305,8 +1283,7 @@ static struct ctl_table kern_table[] = {
 		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= &neg_one,
 	},
-#if defined(VENDOR_EDIT) && defined(CONFIG_DEATH_HEALER)
-/* fanhui@PhoneSW.BSP, 2016/02/02, DeathHealer, record the hung task killing */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_DEATH_HEALER)
 	{
 		.procname	= "hung_task_oppo_kill",
 		.data		= &sysctl_hung_task_oppo_kill,
@@ -1315,8 +1292,7 @@ static struct ctl_table kern_table[] = {
 		.proc_handler	= proc_dostring,
 	},
 #endif
-#if defined(VENDOR_EDIT) && defined(CONFIG_DEATH_HEALER)
-/* Wen.Luo@BSP.Kernel.Stability, 2019/01/12, DeathHealer , Foreground background optimization,change max io count */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_DEATH_HEALER)
 	{
 		.procname	= "hung_task_maxiowait_count",
 		.data		= &sysctl_hung_task_maxiowait_count,
@@ -1486,7 +1462,7 @@ static struct ctl_table kern_table[] = {
 		.proc_handler	= proc_dointvec,
 	},
 #endif
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 // Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
     {
         .procname   = "uifirst_enabled",
@@ -1502,7 +1478,7 @@ static struct ctl_table kern_table[] = {
         .mode       = 0666,
         .proc_handler = proc_dointvec,
     },
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	{ }
 };
 
@@ -1637,13 +1613,13 @@ static struct ctl_table vm_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= &zero,
-#ifdef VENDOR_EDIT //yixue.ge@PSW.BSP.Kernel.Driver 20170720 add for add direct_vm_swappiness
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		.extra2		= &two_hundred,
 #else
 		.extra2		= &one_hundred,
 #endif
 	},
-#ifdef VENDOR_EDIT //yixue.ge@PSW.BSP.Kernel.Driver 20170720 add for add direct_vm_swappiness
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	{
 		.procname	= "direct_swappiness",
 		.data		= &direct_vm_swappiness,
@@ -1723,13 +1699,13 @@ static struct ctl_table vm_table[] = {
 		.procname	= "compact_memory",
 		.data		= &sysctl_compact_memory,
 		.maxlen		= sizeof(int),
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /*Huacai.Zhou@PSW.kernel.mm, 2018-08-20, modify permission for coloros.athena*/
 		.mode		= 0222,
 #else
 		.mode		= 0200,
 
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 		.proc_handler	= sysctl_compaction_handler,
 	},
 	{
@@ -2544,9 +2520,8 @@ static int __do_proc_dointvec(void *tbl_data, struct ctl_table *table,
 		*lenp = 0;
 		return 0;
 	}
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /*Nanwei.Deng@bsp.drv, 2017/04/19,  Add for disable user to write proc printk*/
-/*Cong.Dai@BSP.TP.Function, 2019/07/03, modified for replace daily build macro*/
 	if (!oppo_daily_build()) {
 		if((oem_get_uartlog_status() == true) && (table->procname != NULL)) {
 			if((write == 1) && (strncmp(table->procname, "printk", 6) == 0)) {
@@ -2554,7 +2529,7 @@ static int __do_proc_dointvec(void *tbl_data, struct ctl_table *table,
 			}
 		}
 	}
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 	i = (int *) tbl_data;
 	vleft = table->maxlen / sizeof(*i);
 	left = *lenp;
@@ -2659,7 +2634,7 @@ int proc_dointvec(struct ctl_table *table, int write,
 	return do_proc_dointvec(table, write, buffer, lenp, ppos, NULL, NULL);
 }
 
-//#ifdef VENDOR_EDIT
+//#ifdef CONFIG_PRODUCT_REALME_SDM710
 //Ming.Liu@PSW.CN.WiFi.Network.quality.1065762, 2016/10/09,
 //add for: [monitor tcp info]
 static int proc_put_string(void __user **dst_buf, size_t *buf_size, char * src_str, int str_len)
@@ -2804,7 +2779,7 @@ put_return:
 
 	return 0;
 }
-//#endif /* VENDOR_EDIT */
+//#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 /**
  * proc_douintvec - read a vector of unsigned integers
  * @table: the sysctl table

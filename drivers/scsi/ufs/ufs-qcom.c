@@ -1521,6 +1521,7 @@ static void ufs_qcom_set_caps(struct ufs_hba *hba)
 	if (!host->disable_lpm) {
 		hba->caps |= UFSHCD_CAP_CLK_GATING;
 		hba->caps |= UFSHCD_CAP_HIBERN8_WITH_CLK_GATING;
+		hba->caps |= UFSHCD_CAP_CLK_SCALING;
 	}
 	hba->caps |= UFSHCD_CAP_AUTO_BKOPS_SUSPEND;
 
@@ -2756,8 +2757,7 @@ static int ufs_qcom_probe(struct platform_device *pdev)
 	 * Hence, check for the connected device early-on & don't turn-off
 	 * the regulators.
 	 */
-	//#ifndef VENDOR_EDIT
-	//PengNan@BSP.Power.Basic,remove ufs and emmc compatibility for standby current, 2019/07/30
+	//#ifndef CONFIG_PRODUCT_REALME_SDM710
 	//if (of_property_read_bool(np, "non-removable") &&
 	//    !of_property_read_bool(np, "force-ufshc-probe") &&
 	//   strcmp(android_boot_dev, dev_name(dev)))

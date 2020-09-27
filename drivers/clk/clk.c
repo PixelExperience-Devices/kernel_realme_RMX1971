@@ -30,9 +30,9 @@
 #include <linux/pm_opp.h>
 #include <linux/regulator/consumer.h>
 
-#ifdef VENDOR_EDIT //Cong.Dai@BSP.TP.Function, 2019/07/03, modified for replace daily build macro
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <soc/oppo/oppo_project.h>
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 #include "clk.h"
 
@@ -3053,15 +3053,13 @@ EXPORT_SYMBOL_GPL(clk_debugfs_add_file);
  * Otherwise if print_parent set to 0, print only enabled clocks
  *
  */
-//yangmingjin@BSP.POWER.Basic 2019/05/30 add for RM_TAG_POWER_DEBUG
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 extern bool is_not_in_xo_mode(void);
 #endif
-/* VENDOR_EDIT */
+/* CONFIG_PRODUCT_REALME_SDM710 */
 void clock_debug_print_enabled(bool print_parent)
 {
-//yangmingjin@BSP.POWER.Basic 2019/05/30 add for RM_TAG_POWER_DEBUG
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     if (likely(!debug_suspend) && !is_not_in_xo_mode())
         return;
     if(is_not_in_xo_mode())
@@ -3070,7 +3068,7 @@ void clock_debug_print_enabled(bool print_parent)
 	if (likely(!debug_suspend))
 		return;
 #endif
-/* VENDOR_EDIT */
+/* CONFIG_PRODUCT_REALME_SDM710 */
 	if (print_parent)
 		clock_debug_print_enabled_clocks(NULL);
 	else
@@ -3139,10 +3137,10 @@ static int __init clk_debug_init(void)
 	inited = 1;
 	mutex_unlock(&clk_debug_lock);
 
-	#ifdef VENDOR_EDIT /*Cong.Dai@BSP.TP.Function, 2019/07/03, modified for replace daily build macro*/
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (oppo_daily_build())
 		debug_suspend = 1;
-	#endif/*VENDOR_EDIT*/
+	#endif/*CONFIG_PRODUCT_REALME_SDM710*/
 
 	return 0;
 }

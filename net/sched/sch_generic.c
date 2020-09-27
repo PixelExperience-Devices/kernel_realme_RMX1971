@@ -154,9 +154,7 @@ bulk:
 	return skb;
 }
 
-#ifdef VENDOR_EDIT
-//Junyuan.Huang@PSW.CN.WiFi.Network.1471780, 2018/06/26,
-//Add for limit speed function
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 struct sk_buff *qdisc_dequeue_skb(struct Qdisc *q, bool *validate)
 {
 	int packets;
@@ -164,7 +162,7 @@ struct sk_buff *qdisc_dequeue_skb(struct Qdisc *q, bool *validate)
 	return dequeue_skb(q, validate, &packets);
 }
 EXPORT_SYMBOL(qdisc_dequeue_skb);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 /*
  * Transmit possibly several skbs, and handle the return status as

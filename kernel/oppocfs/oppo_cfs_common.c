@@ -1,5 +1,4 @@
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <linux/version.h>
 #include <linux/sched.h>
 #include <linux/list.h>
@@ -431,4 +430,4 @@ void ux_init_rq_data(struct rq *rq)
 	rq->active_ux_balance = 0;
 	INIT_LIST_HEAD(&rq->ux_thread_list);
 }
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */

@@ -37,14 +37,12 @@
 #include "walt.h"
 #include <trace/events/sched.h>
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// wenbin.liu@PSW.BSP.MM, 2018/05/02
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
 // Add for get cpu load
 #include <soc/oppo/oppo_healthinfo.h>
 #include <linux/cred_oppo.h>
-#endif /*VENDOR_EDIT*/
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <linux/oppocfs/oppo_cfs_common.h>
 #endif
 
@@ -889,8 +887,7 @@ static void update_tg_load_avg(struct cfs_rq *cfs_rq, int force)
 }
 #endif /* CONFIG_SMP */
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// Liujie.Xie@TECH.Kernel.Sched, 2019/08/29, add for stuck monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
 extern void  update_stuck_trace_info(struct task_struct *tsk, int trace_type, unsigned int cpu, u64 delta);
 #endif
 /*
@@ -926,8 +923,7 @@ static void update_curr(struct cfs_rq *cfs_rq)
 		trace_sched_stat_runtime(curtask, delta_exec, curr->vruntime);
 		cpuacct_charge(curtask, delta_exec);
 		account_group_exec_runtime(curtask, delta_exec);
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// Liujie.Xie@TECH.Kernel.Sched, 2019/08/29, add for stuck monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
         update_stuck_trace_info(curtask, UIFIRST_TRACE_RUNNING, cpu_of(rq_of(cfs_rq)), delta_exec);
 #endif
 	}
@@ -958,11 +954,10 @@ update_stats_wait_start(struct cfs_rq *cfs_rq, struct sched_entity *se)
 	schedstat_set(se->statistics.wait_start, wait_start);
 }
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// wenbin.liu@PSW.BSP.MM, 2018/05/09
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
 // Add for cat io_wait stats
 extern void ohm_schedstats_record(int sched_type, int fg, u64 delta);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 static inline void
 update_stats_wait_end(struct cfs_rq *cfs_rq, struct sched_entity *se)
@@ -986,13 +981,11 @@ update_stats_wait_end(struct cfs_rq *cfs_rq, struct sched_entity *se)
 			schedstat_set(se->statistics.wait_start, delta);
 			return;
 		}
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// wenbin.liu@PSW.BSP.MM, 2018/05/26
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
 // Add for get sched latency stat
 		ohm_schedstats_record(OHM_SCHED_SCHEDLATENCY, task_is_fg(p), (delta >> 20));
-#endif /*VENDOR_EDIT*/
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// Liujie.Xie@TECH.Kernel.Sched, 2019/08/29, add for stuck monitor
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
         update_stuck_trace_info(p, UIFIRST_TRACE_RUNNABLE, 0, delta);
 #endif
 		trace_sched_stat_wait(p, delta);
@@ -1035,8 +1028,7 @@ update_stats_enqueue_sleeper(struct cfs_rq *cfs_rq, struct sched_entity *se)
 		if (tsk) {
 			account_scheduler_latency(tsk, delta >> 10, 1);
 			trace_sched_stat_sleep(tsk, delta);
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// Liujie.Xie@TECH.Kernel.Sched, 2019/08/29, add for stuck monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
             update_stuck_trace_info(tsk, UIFIRST_TRACE_SSTATE, 0, delta);
 #endif
 		}
@@ -1058,22 +1050,19 @@ update_stats_enqueue_sleeper(struct cfs_rq *cfs_rq, struct sched_entity *se)
 				schedstat_add(se->statistics.iowait_sum, delta);
 				schedstat_inc(se->statistics.iowait_count);
 				trace_sched_stat_iowait(tsk, delta);
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// wenbin.liu@PSW.BSP.MM, 2018/05/26
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
 // Add for get sched latency stat
 				ohm_schedstats_record(OHM_SCHED_IOWAIT, task_is_fg(tsk), (delta >> 20));
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 			}
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// Liujie.Xie@TECH.Kernel.Sched, 2019/08/29, add for stuck monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
             update_stuck_trace_info(tsk, UIFIRST_TRACE_DSTATE, 0, delta);
 #endif
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// Jiheng,Xie@TECH.BSP.Performance, 2019/05/18,add for get dstate statictics
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
 			if(!tsk->in_iowait) {
 				 ohm_schedstats_record(OHM_SCHED_DSTATE, task_is_fg(tsk), (delta >> 20));
 			}
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 			trace_sched_stat_blocked(tsk, delta);
 			trace_sched_blocked_reason(tsk);
@@ -5089,8 +5078,7 @@ enqueue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 
 		flags = ENQUEUE_WAKEUP;
 	}
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     if (sysctl_uifirst_enabled) {
         enqueue_ux_thread(rq, p);
     }
@@ -5187,8 +5175,7 @@ static void dequeue_task_fair(struct rq *rq, struct task_struct *p, int flags)
 		}
 		flags |= DEQUEUE_SLEEP;
 	}
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     if (sysctl_uifirst_enabled) {
         dequeue_ux_thread(rq, p);
     }
@@ -8049,8 +8036,7 @@ static void check_preempt_wakeup(struct rq *rq, struct task_struct *p, int wake_
 	update_curr(cfs_rq_of(se));
 	BUG_ON(!pse);
 
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     if (sysctl_uifirst_enabled && (p->static_ux || atomic64_read(&p->dynamic_ux))) {
         goto preempt;
     }
@@ -8140,8 +8126,7 @@ again:
 	} while (cfs_rq);
 
 	p = task_of(se);
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     if (sysctl_uifirst_enabled) {
         pick_ux_thread(rq, &p, &se);
     }
@@ -9121,9 +9106,7 @@ static void update_cpu_capacity(struct sched_domain *sd, int cpu)
 		mcc->cpu = cpu;
 #ifdef CONFIG_SCHED_DEBUG
 		raw_spin_unlock_irqrestore(&mcc->lock, flags);
-#ifndef VENDOR_EDIT
-/*xing.xing@BSP.Kernel.Stability, 2018/06/19, Modify for less kernel log*/
-/*Cong.Dai@BSP.TP.Function, 2019/07/03,removed for euclid compile macro*/
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 		printk_deferred(KERN_INFO "CPU%d: update max cpu_capacity %lu\n",
 				cpu, capacity);
 #endif

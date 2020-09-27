@@ -15,14 +15,12 @@
 #define NF_REPEAT 4
 #define NF_STOP 5
 
-#ifdef VENDOR_EDIT
-//Junyuan.Huang@PSW.CN.WiFi.Network.1471780, 2018/06/26,
-//Add for limit speed function
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #define NF_IMQ_QUEUE 6
 #define NF_MAX_VERDICT NF_IMQ_QUEUE
-#else /* VENDOR_EDIT */
+#else /* CONFIG_PRODUCT_REALME_SDM710 */
 #define NF_MAX_VERDICT NF_STOP
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 
 /* we overload the higher bits for encoding auxiliary data such as the queue

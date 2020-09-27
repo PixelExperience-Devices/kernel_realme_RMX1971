@@ -49,7 +49,7 @@
 #include <asm/cacheflush.h>
 #include "audit.h"	/* audit_signal_info() */
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HANS)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HANS)
 // Kun.Zhou@ROM.Framework, 2019/09/23, add for hans freeze manager
 #include <linux/hans.h>
 #endif
@@ -1044,7 +1044,7 @@ static inline void userns_fixup_signal_uid(struct siginfo *info, struct task_str
 }
 #endif
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //Haoran.Zhang@PSW.AD.Kernel.1052210, 2015/11/04, Modify for the sender who kill system_server
 static bool is_zygote_process(struct task_struct *t)
 {
@@ -1096,7 +1096,7 @@ static int __send_signal(int sig, struct siginfo *info, struct task_struct *t,
 	struct sigqueue *q;
 	int override_rlimit;
 	int ret = 0, result;
-#if defined(VENDOR_EDIT) && defined(CONFIG_ELSA_STUB)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_ELSA_STUB)
 //zhoumingjun@Swdp.shanghai, 2017/05/18, notify userspace when kill cgroup frozen tasks
 	struct process_event_data pe_data;
 #endif
@@ -1105,12 +1105,12 @@ static int __send_signal(int sig, struct siginfo *info, struct task_struct *t,
 
 	result = TRACE_SIGNAL_IGNORED;
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //Haoran.Zhang@PSW.AD.Kernel.1052210, 2015/11/04, Modify for the sender who kill system_server
         if(1) {
                 /*add the SIGKILL print log for some debug*/
                 if((sig == SIGHUP || sig == 33 || sig == SIGKILL || sig == SIGSTOP || sig == SIGABRT || sig == SIGTERM || sig == SIGCONT) && is_key_process(t)) {
-                        //#ifdef VENDOR_EDIT
+                        //#ifdef CONFIG_PRODUCT_REALME_SDM710
                         //Haoran.Zhang@PSW.AD.Kernel.1052210, 2016/03/11, Modify for, to dump call stack of killing android core process.
                         //Yongqiang.Du@PSW.AD.Stability.Crash.0, 2019/05/08, Modify for avoid kernel address leak issue
                         //dump_stack();
@@ -1120,7 +1120,7 @@ static int __send_signal(int sig, struct siginfo *info, struct task_struct *t,
         }
 #endif
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_ELSA_STUB)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_ELSA_STUB)
 //zhoumingjun@Swdp.shanghai, 2017/05/18, notify userspace when kill cgroup frozen tasks
 	if (sig == SIGKILL && (freezing(t) || frozen(t)) && cgroup_freezing(t)) {
 		pe_data.pid = task_pid_nr(t);
@@ -1287,7 +1287,7 @@ int do_send_sig_info(int sig, struct siginfo *info, struct task_struct *p,
 	unsigned long flags;
 	int ret = -ESRCH;
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HANS)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HANS)
 // Kun.Zhou@ROM.Framework, 2019/09/23, add for hans freeze manager
 	if (is_frozen_tg(p)  /*signal receiver thread group is frozen?*/
 		&& (sig == SIGKILL || sig == SIGTERM || sig == SIGABRT || sig == SIGQUIT)) {
@@ -1408,7 +1408,7 @@ struct sighand_struct *__lock_task_sighand(struct task_struct *tsk,
 	return sighand;
 }
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 EXPORT_SYMBOL(__lock_task_sighand);
 #endif
 

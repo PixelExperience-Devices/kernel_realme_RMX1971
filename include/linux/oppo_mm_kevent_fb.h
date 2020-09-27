@@ -1,6 +1,5 @@
 /***************************************************************
 ** Copyright (C),  2018,  OPPO Mobile Comm Corp.,  Ltd
-** VENDOR_EDIT
 ** File : oppo_mm_kevent_fb.h
 ** Description : MM kevent fb data
 ** Version : 1.0

@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2020, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2014-2019, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -4951,45 +4951,13 @@ static void msm_pcie_msi_nop(struct irq_data *d)
 {
 }
 
-static void msm_mask_msi_irq(struct irq_data *data)
-{
-	struct msi_desc *desc = irq_data_get_msi_desc(data);
-	struct pci_dev *pdev;
-	struct msm_pcie_dev_t *pcie_dev;
-	void __iomem *intr_en_addr;
-	uint32_t offset = 0;
-
-	pdev = msi_desc_to_pci_dev(desc);
-	pcie_dev = PCIE_BUS_PRIV_DATA(pdev->bus);
-	offset = data->irq - desc->irq;
-	intr_en_addr = pcie_dev->dm_core + PCIE20_MSI_CTRL_INTR_EN;
-	msm_pcie_write_mask(intr_en_addr, BIT(offset), 0);
-	pci_msi_mask_irq(data);
-}
-
-static void msm_unmask_msi_irq(struct irq_data *data)
-{
-	struct msi_desc *desc = irq_data_get_msi_desc(data);
-	struct pci_dev *pdev;
-	struct msm_pcie_dev_t *pcie_dev;
-	void __iomem *intr_en_addr;
-	uint32_t offset = 0;
-
-	pci_msi_unmask_irq(data);
-	pdev = msi_desc_to_pci_dev(desc);
-	pcie_dev = PCIE_BUS_PRIV_DATA(pdev->bus);
-	offset = data->irq - desc->irq;
-	intr_en_addr = pcie_dev->dm_core + PCIE20_MSI_CTRL_INTR_EN;
-	msm_pcie_write_mask(intr_en_addr, 0, BIT(offset));
-}
-
 static struct irq_chip pcie_msi_chip = {
 	.name = "msm-pcie-msi",
 	.irq_ack = msm_pcie_msi_nop,
-	.irq_enable = msm_unmask_msi_irq,
-	.irq_disable = msm_mask_msi_irq,
-	.irq_mask = msm_mask_msi_irq,
-	.irq_unmask = msm_unmask_msi_irq,
+	.irq_enable = unmask_msi_irq,
+	.irq_disable = mask_msi_irq,
+	.irq_mask = mask_msi_irq,
+	.irq_unmask = unmask_msi_irq,
 };
 
 static int msm_pcie_create_irq(struct msm_pcie_dev_t *dev)
@@ -5021,34 +4989,29 @@ again:
 static int arch_setup_msi_irq_default(struct pci_dev *pdev,
 		struct msi_desc *desc, int nvec)
 {
-	int irq, index, firstirq = 0;
+	int irq;
 	struct msi_msg msg;
 	struct msm_pcie_dev_t *dev = PCIE_BUS_PRIV_DATA(pdev->bus);
 
 	PCIE_DBG(dev, "RC%d\n", dev->rc_idx);
 
-	for (index = 0; index < nvec; index++) {
-		irq = msm_pcie_create_irq(dev);
+	irq = msm_pcie_create_irq(dev);
 
-		PCIE_DBG(dev, "IRQ %d is allocated.\n", irq);
+	PCIE_DBG(dev, "IRQ %d is allocated.\n", irq);
 
-		if (irq < 0)
-			return irq;
+	if (irq < 0)
+		return irq;
 
-		if (index == 0)
-			firstirq = irq;
+	PCIE_DBG(dev, "irq %d allocated\n", irq);
 
-		irq_set_msi_desc_off(firstirq, index, desc);
-	}
+	irq_set_chip_data(irq, pdev);
+	irq_set_msi_desc(irq, desc);
 
-	PCIE_DBG(dev, "firstirq:%d\n", firstirq);
-
-	irq_set_chip_data(firstirq, pdev);
 	/* write msi vector and data */
 	msg.address_hi = 0;
 	msg.address_lo = MSM_PCIE_MSI_PHY;
-	msg.data = firstirq - irq_find_mapping(dev->irq_domain, 0);
-	write_msi_msg(firstirq, &msg);
+	msg.data = irq - irq_find_mapping(dev->irq_domain, 0);
+	write_msi_msg(irq, &msg);
 
 	return 0;
 }
@@ -5226,6 +5189,7 @@ static const struct irq_domain_ops msm_pcie_msi_ops = {
 static int32_t msm_pcie_irq_init(struct msm_pcie_dev_t *dev)
 {
 	int rc;
+	int msi_start =  0;
 	struct device *pdev = &dev->pdev->dev;
 
 	PCIE_DBG(dev, "RC%d\n", dev->rc_idx);
@@ -5355,6 +5319,8 @@ static int32_t msm_pcie_irq_init(struct msm_pcie_dev_t *dev)
 
 			return PTR_ERR(dev->irq_domain);
 		}
+
+		msi_start = irq_create_mapping(dev->irq_domain, 0);
 	}
 
 	return 0;

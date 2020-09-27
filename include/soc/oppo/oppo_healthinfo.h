@@ -1,6 +1,6 @@
 /**********************************************************************************
 * Copyright (c)  2008-2015  Guangdong OPPO Mobile Comm Corp., Ltd
-* VENDOR_EDIT
+* CONFIG_PRODUCT_REALME_SDM710
 * Description:    OPPO Healthinfo Monitor
 *                          Record Kernel Resourse Abnormal Stat
 * Version    : 2.0

@@ -57,8 +57,7 @@ __mutex_init(struct mutex *lock, const char *name, struct lock_class_key *key)
 #ifdef CONFIG_MUTEX_SPIN_ON_OWNER
 	osq_lock_init(&lock->osq);
 #endif
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     lock->ux_dep_task = NULL;
 #endif
 	debug_mutex_init(lock, name, key);
@@ -554,8 +553,7 @@ __mutex_lock_common(struct mutex *lock, long state, unsigned int subclass,
 	debug_mutex_lock_common(lock, &waiter);
 	debug_mutex_add_waiter(lock, &waiter, task);
 
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     if (sysctl_uifirst_enabled) {
         mutex_list_add(task, &waiter.list, &lock->wait_list, lock);
     } else {
@@ -588,7 +586,7 @@ __mutex_lock_common(struct mutex *lock, long state, unsigned int subclass,
 		 * got a signal? (This code gets eliminated in the
 		 * TASK_UNINTERRUPTIBLE case.)
 		 */
-		//#ifdef VENDOR_EDIT fangpan@Swdp.shanghai,2015/11/12
+		//#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (unlikely(signal_pending_state(state, task))
 			|| hung_long_and_fatal_signal_pending(task)) {
 		//#endif
@@ -602,8 +600,7 @@ __mutex_lock_common(struct mutex *lock, long state, unsigned int subclass,
 				goto err;
 		}
 
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
         if (sysctl_uifirst_enabled) {
             mutex_dynamic_ux_enqueue(lock, task);
         }
@@ -612,15 +609,13 @@ __mutex_lock_common(struct mutex *lock, long state, unsigned int subclass,
 
 		/* didn't get the lock, go to sleep: */
 		spin_unlock_mutex(&lock->wait_lock, flags);
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// Liujie.Xie@TECH.Kernel.Sched, 2019/08/29, add for stuck monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
         if (state & TASK_UNINTERRUPTIBLE) {
             current->in_mutex = 1;
         }
 #endif
 		schedule_preempt_disabled();
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
-// Liujie.Xie@TECH.Kernel.Sched, 2019/08/29, add for stuck monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
         if (state & TASK_UNINTERRUPTIBLE) {
             current->in_mutex = 0;
         }
@@ -785,8 +780,7 @@ __mutex_unlock_common_slowpath(struct mutex *lock, int nested)
 	mutex_release(&lock->dep_map, nested, _RET_IP_);
 	debug_mutex_unlock(lock);
 
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     if (sysctl_uifirst_enabled) {
         mutex_dynamic_ux_dequeue(lock, current);
     }

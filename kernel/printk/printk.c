@@ -45,7 +45,6 @@
 #include <linux/utsname.h>
 #include <linux/ctype.h>
 #include <linux/uio.h>
-#include <soc/qcom/boot_stats.h>
 
 #include <asm/uaccess.h>
 #include <asm/sections.h>
@@ -57,8 +56,7 @@
 #include "braille.h"
 #include "internal.h"
 
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.CHG.Basic 2018/05/01 add for disable uart print
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <soc/oppo/boot_mode.h>
 #endif
 
@@ -66,16 +64,14 @@
 extern void printascii(char *);
 #endif
 
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.CHG.Basic 2018/05/01,add for get disable uart value from cmdline
-/*Cong.Dai@BSP.TP.Function, 2019/07/03, modified for replace daily build macro*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 bool printk_disable_uart = true;
 
 bool oem_get_uartlog_status(void)
 {
 	return !printk_disable_uart;
 }
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 int console_printk[4] = {
 	CONSOLE_LOGLEVEL_DEFAULT,	/* console_loglevel */
@@ -559,8 +555,7 @@ static int log_store(int facility, int level,
 	u32 size, pad_len;
 	u16 trunc_msg_len = 0;
 
-	#ifdef VENDOR_EDIT
-	//part 1/2: yixue.ge 2015-04-22 add for add cpu number and current id and current comm to kmsg
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	int this_cpu = smp_processor_id();
 	char tbuf[64];
 	unsigned tlen;
@@ -598,8 +593,7 @@ static int log_store(int facility, int level,
 
 	/* fill message */
 	msg = (struct printk_log *)(log_buf + log_next_idx);
-	#ifndef VENDOR_EDIT
-	//part 2/2: yixue.ge 2015-04-22 add for add cpu number and current id and current comm to kmsg
+	#ifndef CONFIG_PRODUCT_REALME_SDM710
 	memcpy(log_text(msg), text, text_len);
 	#else
 	memcpy(log_text(msg), tbuf, tlen);
@@ -1208,10 +1202,9 @@ static inline void boot_delay_msec(int level)
 static bool printk_time = IS_ENABLED(CONFIG_PRINTK_TIME);
 module_param_named(time, printk_time, bool, S_IRUGO | S_IWUSR);
 
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.CHG.Basic 2018/05/01,add for get disable uart value from cmdline
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 module_param_named(disable_uart, printk_disable_uart, bool, S_IRUGO | S_IWUSR);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 static size_t print_time(u64 ts, char *buf)
 {
@@ -1580,8 +1573,7 @@ static void call_console_drivers(int level,
 		return;
 
 	for_each_console(con) {
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.CHG.Basic 2018/05/01,add for disable uart print,this modify can reduce poweron time add ftm mode
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if(get_boot_mode() == MSM_BOOT_MODE__FACTORY || get_boot_mode() == MSM_BOOT_MODE__RF
 			|| get_boot_mode() == MSM_BOOT_MODE__WLAN)
 		{	
@@ -2181,7 +2173,6 @@ void resume_console(void)
 {
 	if (!console_suspend_enabled)
 		return;
-	place_marker("M - System Resume Started");
 	down_console_sem();
 	console_suspended = 0;
 	console_unlock();

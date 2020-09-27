@@ -2143,6 +2143,7 @@ u64 get_random_u64(void)
 		extract_crng((u8 *)batch->entropy_u64);
 		batch->position = 0;
 	}
+
 	ret = batch->entropy_u64[batch->position++];
 	put_cpu_var(batched_entropy_u64);
 	return ret;

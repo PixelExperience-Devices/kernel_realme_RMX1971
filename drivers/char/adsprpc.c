@@ -112,7 +112,6 @@
 #define FASTRPC_STATIC_HANDLE_MAX (20)
 #define FASTRPC_LATENCY_CTRL_ENB  (1)
 
-#define MAX_SIZE_LIMIT (0x78000000)
 #define INIT_FILELEN_MAX (2*1024*1024)
 #define INIT_MEMLEN_MAX  (8*1024*1024)
 
@@ -721,23 +720,12 @@ static void fastrpc_mmap_free(struct fastrpc_mmap *map, uint32_t flags)
 {
 	struct fastrpc_apps *me = &gfa;
 	struct fastrpc_file *fl;
-	int vmid, cid = -1, err = 0;
+	int vmid;
 	struct fastrpc_session_ctx *sess;
 
 	if (!map)
 		return;
 	fl = map->fl;
-	if (fl && !(map->flags == ADSP_MMAP_HEAP_ADDR ||
-				map->flags == ADSP_MMAP_REMOTE_HEAP_ADDR)) {
-		cid = fl->cid;
-		VERIFY(err, cid >= ADSP_DOMAIN_ID && cid < NUM_CHANNELS);
-		if (err) {
-			err = -ECHRNG;
-			pr_err("adsprpc: ERROR:%s, Invalid channel id: %d, err:%d",
-				__func__, cid, err);
-			return;
-		}
-	}
 	if (map->flags == ADSP_MMAP_HEAP_ADDR ||
 				map->flags == ADSP_MMAP_REMOTE_HEAP_ADDR) {
 		spin_lock(&me->hlock);
@@ -817,21 +805,15 @@ static int fastrpc_mmap_create(struct fastrpc_file *fl, int fd,
 	struct fastrpc_apps *me = &gfa;
 	struct fastrpc_session_ctx *sess;
 	struct fastrpc_apps *apps = fl->apps;
+	int cid = fl->cid;
+	struct fastrpc_channel_ctx *chan = &apps->channel[cid];
 	struct fastrpc_mmap *map = NULL;
-	struct fastrpc_channel_ctx *chan = NULL;
 	unsigned long attrs;
 	dma_addr_t region_phys = 0;
 	void *region_vaddr = NULL;
 	unsigned long flags;
-	int err = 0, vmid, cid = -1;
+	int err = 0, vmid;
 
-	cid = fl->cid;
-	VERIFY(err, cid >= ADSP_DOMAIN_ID && cid < NUM_CHANNELS);
-	if (err) {
-		err = -ECHRNG;
-		goto bail;
-	}
-	chan = &apps->channel[cid];
 	if (!fastrpc_mmap_find(fl, fd, va, len, mflags, 1, ppmap))
 		return 0;
 	map = kzalloc(sizeof(*map), GFP_KERNEL);
@@ -955,12 +937,6 @@ static int fastrpc_mmap_create(struct fastrpc_file *fl, int fd,
 			map->size = buf_page_size(len);
 		}
 
-		VERIFY(err, map->size >= len && map->size < MAX_SIZE_LIMIT);
-		if (err) {
-			err = -EFAULT;
-			goto bail;
-		}
-
 		vmid = fl->apps->channel[fl->cid].vmid;
 		if (!sess->smmu.enabled && !vmid) {
 			VERIFY(err, map->phys >= me->range.addr &&
@@ -1004,11 +980,9 @@ static int fastrpc_buf_alloc(struct fastrpc_file *fl, size_t size,
 	struct fastrpc_buf *buf = NULL, *fr = NULL;
 	struct hlist_node *n;
 
-	VERIFY(err, size > 0 && size < MAX_SIZE_LIMIT);
-	if (err) {
-		err = -EFAULT;
+	VERIFY(err, size > 0);
+	if (err)
 		goto bail;
-	}
 
 	if (!remote) {
 		/* find the smallest buffer that fits in the cache */
@@ -1876,22 +1850,12 @@ static int fastrpc_invoke_send(struct smq_invoke_ctx *ctx,
 {
 	struct smq_msg *msg = &ctx->msg;
 	struct fastrpc_file *fl = ctx->fl;
-	int err = 0, len, cid = -1;
-	struct fastrpc_channel_ctx *channel_ctx = NULL;
-
-	cid = fl->cid;
-	VERIFY(err, cid >= ADSP_DOMAIN_ID && cid < NUM_CHANNELS);
-	if (err) {
-		err = -ECHRNG;
-		goto bail;
-	}
-	channel_ctx = &fl->apps->channel[fl->cid];
+	struct fastrpc_channel_ctx *channel_ctx = &fl->apps->channel[fl->cid];
+	int err = 0, len;
 
 	VERIFY(err, NULL != channel_ctx->chan);
-	if (err) {
-		err = -ECHRNG;
+	if (err)
 		goto bail;
-	}
 	msg->pid = fl->tgid;
 	msg->tid = current->pid;
 	if (fl->sessionid)
@@ -2010,22 +1974,11 @@ static int fastrpc_internal_invoke(struct fastrpc_file *fl, uint32_t mode,
 {
 	struct smq_invoke_ctx *ctx = NULL;
 	struct fastrpc_ioctl_invoke *invoke = &inv->inv;
-	int err = 0, cid = -1, interrupted = 0;
+	int cid = fl->cid;
+	int interrupted = 0;
+	int err = 0;
 	struct timespec invoket = {0};
-	int64_t *perf_counter = NULL;
-
-	cid = fl->cid;
-	VERIFY(err, cid >= ADSP_DOMAIN_ID && cid < NUM_CHANNELS);
-	if (err) {
-		err = -ECHRNG;
-		goto bail;
-	}
-	VERIFY(err, fl->sctx != NULL);
-	if (err) {
-		err = -EBADR;
-		goto bail;
-	}
-	perf_counter = getperfcounter(fl, PERF_COUNT);
+	int64_t *perf_counter = getperfcounter(fl, PERF_COUNT);
 
 	if (fl->profile)
 		getnstimeofday(&invoket);
@@ -2038,6 +1991,13 @@ static int fastrpc_internal_invoke(struct fastrpc_file *fl, uint32_t mode,
 			goto bail;
 		}
 	}
+
+	VERIFY(err, fl->sctx != NULL);
+	if (err)
+		goto bail;
+	VERIFY(err, fl->cid >= 0 && fl->cid < NUM_CHANNELS);
+	if (err)
+		goto bail;
 
 	if (!kernel) {
 		VERIFY(err, 0 == context_restore_interrupted(fl, inv,
@@ -3448,7 +3408,7 @@ static const struct file_operations debugfs_fops = {
 static int fastrpc_channel_open(struct fastrpc_file *fl)
 {
 	struct fastrpc_apps *me = &gfa;
-	int cid = -1, ii, err = 0;
+	int cid, ii, err = 0;
 
 	mutex_lock(&me->smd_mutex);
 
@@ -3456,11 +3416,9 @@ static int fastrpc_channel_open(struct fastrpc_file *fl)
 	if (err)
 		goto bail;
 	cid = fl->cid;
-	VERIFY(err, cid >= ADSP_DOMAIN_ID && cid < NUM_CHANNELS);
-	if (err) {
-		err = -ECHRNG;
+	VERIFY(err, cid >= 0 && cid < NUM_CHANNELS);
+	if (err)
 		goto bail;
-	}
 	if (me->channel[cid].ssrcount !=
 				 me->channel[cid].prevssrcount) {
 		if (!me->channel[cid].issubsystemup) {
@@ -3526,8 +3484,11 @@ bail:
 static int fastrpc_device_open(struct inode *inode, struct file *filp)
 {
 	int err = 0;
+	struct dentry *debugfs_file;
 	struct fastrpc_file *fl = NULL;
 	struct fastrpc_apps *me = &gfa;
+	char strpid[PID_SIZE];
+	int buf_size = 0;
 
 	/*
 	 * Indicates the device node opened
@@ -3545,6 +3506,18 @@ static int fastrpc_device_open(struct inode *inode, struct file *filp)
 	VERIFY(err, NULL != (fl = kzalloc(sizeof(*fl), GFP_KERNEL)));
 	if (err)
 		return err;
+	snprintf(strpid, PID_SIZE, "%d", current->pid);
+	buf_size = strlen(current->comm) + strlen("_") + strlen(strpid) + 1;
+#ifdef CONFIG_PRODUCT_REALME_SDM710
+	if (buf_size < UL_SIZE)
+		buf_size = UL_SIZE;
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
+
+	fl->debug_buf = kzalloc(buf_size, GFP_KERNEL);
+	snprintf(fl->debug_buf, UL_SIZE, "%.10s%s%d",
+	current->comm, "_", current->pid);
+	debugfs_file = debugfs_create_file(fl->debug_buf, 0644,
+	debugfs_root, fl, &debugfs_fops);
 
 	context_list_ctor(&fl->clst);
 	spin_lock_init(&fl->hlock);
@@ -3554,11 +3527,14 @@ static int fastrpc_device_open(struct inode *inode, struct file *filp)
 	INIT_HLIST_HEAD(&fl->remote_bufs);
 	INIT_HLIST_NODE(&fl->hn);
 	fl->sessionid = 0;
+	fl->tgid = current->tgid;
 	fl->apps = me;
 	fl->mode = FASTRPC_MODE_SERIAL;
 	fl->cid = -1;
 	fl->dev_minor = dev_minor;
 	fl->init_mem = NULL;
+	if (debugfs_file != NULL)
+		fl->debugfs_file = debugfs_file;
 	fl->qos_request = 0;
 	fl->refcount = 0;
 	filp->private_data = fl;
@@ -3571,38 +3547,12 @@ static int fastrpc_device_open(struct inode *inode, struct file *filp)
 	return 0;
 }
 
-static int fastrpc_set_process_info(struct fastrpc_file *fl)
-{
-	int err = 0, buf_size = 0;
-	char strpid[PID_SIZE];
-
-	fl->tgid = current->tgid;
-	snprintf(strpid, PID_SIZE, "%d", current->pid);
-	buf_size = strlen(current->comm) + strlen("_") + strlen(strpid) + 1;
-	fl->debug_buf = kzalloc(buf_size, GFP_KERNEL);
-	if (!fl->debug_buf) {
-		err = -ENOMEM;
-		return err;
-	}
-	snprintf(fl->debug_buf, UL_SIZE, "%.10s%s%d",
-			current->comm, "_", current->pid);
-	fl->debugfs_file = debugfs_create_file(fl->debug_buf, 0644,
-					debugfs_root, fl, &debugfs_fops);
-	if (!fl->debugfs_file)
-		pr_warn("Error: %s: %s: failed to create debugfs file %s\n",
-				current->comm, __func__, fl->debug_buf);
-	return err;
-}
-
 static int fastrpc_get_info(struct fastrpc_file *fl, uint32_t *info)
 {
 	int err = 0;
 	uint32_t cid;
 
 	VERIFY(err, fl != NULL);
-	if (err)
-		goto bail;
-	err = fastrpc_set_process_info(fl);
 	if (err)
 		goto bail;
 	if (fl->cid == -1) {
@@ -4088,7 +4038,7 @@ static int fastrpc_cb_probe(struct device *dev)
 		start = 0x60000000;
 	VERIFY(err, !IS_ERR_OR_NULL(sess->smmu.mapping =
 				arm_iommu_create_mapping(&platform_bus_type,
-						start, MAX_SIZE_LIMIT)));
+						start, 0x78000000)));
 	if (err)
 		goto bail;
 

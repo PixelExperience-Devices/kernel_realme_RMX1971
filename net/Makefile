@@ -84,14 +84,7 @@ obj-$(CONFIG_NET_NCSI)		+= ncsi/
 obj-$(CONFIG_RMNET_DATA) += rmnet_data/
 obj-$(CONFIG_IPC_ROUTER)       += ipc_router/
 
-#ifdef VENDOR_EDIT
-#Yuan.Huang@PSW.CN.WiFi.Network.internet.1461349, 2018/06/18,
-#Add for WeChat lucky money recognition
+ifdef CONFIG_PRODUCT_REALME_SDM710
 obj-y				+= oppo_nf_hooks/
-#endif /* VENDOR_EDIT */
-
-#ifdef VENDOR_EDIT
-#Xiong.Li@TECH.CN.WiFi.Network.2022890,2019/06/14,
-#Add for apps network monitors
 obj-y				+= oppo_apps_monitor/
-#endif /* VENDOR_EDIT */
+endif

@@ -10,15 +10,10 @@
 #include <linux/mm.h>
 #include <linux/rmap.h>
 #include <linux/uaccess.h>
-/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2019-01-01,
- * Create /proc/process_reclaim interface for process reclaim. */
 #include <linux/proc_fs.h>
 #include <linux/cred_oppo.h>
 #include <soc/oppo/oppo_healthinfo.h>
 
-/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25, check current need
- * cancel reclaim or not, please check task not NULL first.
- * If the reclaimed task has goto foreground, cancel reclaim immediately*/
 #define RECLAIM_SCAN_REGION_LEN (400ul<<20)
 
 static inline int _is_reclaim_should_cancel(struct mm_walk *walk)
@@ -80,11 +75,6 @@ int is_reclaim_addr_over(struct mm_walk *walk, unsigned long addr)
 	return _is_reclaim_should_cancel(walk);
 }
 
-/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2019-01-01,
- * Create /proc/process_reclaim interface for process reclaim.
- * Because /proc/$pid/reclaim has deifferent permissiones of different processes,
- * and can not set to 0444 because that have security risk.
- * Use /proc/process_reclaim and setting with selinux */
 #ifdef CONFIG_PROC_FS
 
 #define PROCESS_RECLAIM_CMD_LEN 64

@@ -179,8 +179,7 @@ struct psi_group psi_system = {
 
 static void psi_avgs_work(struct work_struct *work);
 
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@Tech.BSP.Kernel.Performance, 2019-05-17 ,add psi monitor support*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static BLOCKING_NOTIFIER_HEAD(psi_mem_notifier);
 
 int psi_mem_notifier_register(struct notifier_block *nb)
@@ -197,7 +196,7 @@ static void  psi_mem_notify(u64 growth, void* data)
 {
 	blocking_notifier_call_chain(& psi_mem_notifier, growth, data);
 }
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 static void group_init(struct psi_group *group)
 {
 	int cpu;
@@ -556,8 +555,7 @@ static u64 update_triggers(struct psi_group *group, u64 now)
 		/* Generate an event */
 		if (cmpxchg(&t->event, 0, 1) == 0)
 			wake_up_interruptible(&t->event_wait);
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@Tech.BSP.Kernel.Performance, 2019-05-17 ,add psi monitor support*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (t->state == PSI_MEM_SOME || t->state == PSI_MEM_FULL)
 			psi_mem_notify( growth,(void *)t);
 #endif
@@ -1242,10 +1240,9 @@ static ssize_t psi_write(struct file *file, const char __user *user_buf,
 	mutex_lock(&seq->lock);
 	psi_trigger_replace(&seq->private, new);
 	mutex_unlock(&seq->lock);
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@Tech.BSP.Kernel.Performance, 2019-05-17, add kernel trigger support*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	kref_get(&new->refcount);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 	return nbytes;
 }
 

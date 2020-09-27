@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2020, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2015-2019, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -33,12 +33,11 @@
 #include "msm-analog-cdc-regmap.h"
 #include "../wcd-mbhc-v2-api.h"
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #ifdef CONFIG_OPPO_KEVENT_UPLOAD
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.Stability, 2019/02/03, Add for audio driver kevent log*/
 #include <asoc/oppo_mm_audio_kevent.h>
 #endif /* CONFIG_OPPO_KEVENT_UPLOAD */
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 #define DRV_NAME "pmic_analog_codec"
 #define SDM660_CDC_RATES (SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_16000 |\
@@ -65,14 +64,13 @@
 #define SPK_PMD 2
 #define SPK_PMU 3
 
-#ifndef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2018/05/21,
+#ifndef CONFIG_PRODUCT_REALME_SDM710
  *Modify for micbias output voltage 2.7v.
  */
 #define MICBIAS_DEFAULT_VAL 1800000
-#else /* VENDOR_EDIT */
+#else /* CONFIG_PRODUCT_REALME_SDM710 */
 #define MICBIAS_DEFAULT_VAL 2700000
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 #define MICBIAS_MIN_VAL 1600000
 #define MICBIAS_STEP_SIZE 50000
 
@@ -86,7 +84,6 @@
 
 #define VOLTAGE_CONVERTER(value, min_value, step_size)\
 	((value - min_value)/step_size)
-#define APR_DEST_QDSP6 1
 
 enum {
 	BOOST_SWITCH = 0,
@@ -215,12 +212,9 @@ static void msm_anlg_cdc_set_auto_zeroing(struct snd_soc_codec *codec,
 static void msm_anlg_cdc_configure_cap(struct snd_soc_codec *codec,
 				       bool micbias1, bool micbias2);
 static bool msm_anlg_cdc_use_mb(struct snd_soc_codec *codec);
-#ifdef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.Codec, 2018/07/31,
- *Add for set different micbias voltage.
- */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 void msm_anlg_cdc_set_micb_v_switch(struct snd_soc_codec *codec, u32 voltage);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 static int get_codec_version(struct sdm660_cdc_priv *sdm660_cdc)
 {
@@ -510,12 +504,9 @@ static int msm_anlg_cdc_mbhc_map_btn_code_to_num(struct snd_soc_codec *codec)
 		break;
 	};
 
-	#ifdef VENDOR_EDIT
-	/* Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2017/04/07,
-	 * Add for headset button log.
-	 */
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	pr_info("%s: btn is %d", __func__, btn);
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	return btn;
 }
@@ -942,12 +933,9 @@ static const struct wcd_mbhc_cb mbhc_cb = {
 	.trim_btn_reg = msm_anlg_cdc_trim_btn_reg,
 	.compute_impedance = msm_anlg_cdc_mbhc_calc_impedance,
 	.set_micbias_value = msm_anlg_cdc_set_micb_v,
-	#ifdef VENDOR_EDIT
-	/*Jianfeng.Qiu@PSW.MM.AudioDriver.Codec, 2018/07/31,
-	 *Add for set different micbias voltage.
-	 */
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	.set_micbias_value_switch = msm_anlg_cdc_set_micb_v_switch,
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	.set_auto_zeroing = msm_anlg_cdc_set_auto_zeroing,
 	.get_hwdep_fw_cal = msm_anlg_cdc_get_hwdep_fw_cal,
 	.set_cap_mode = msm_anlg_cdc_configure_cap,
@@ -1612,10 +1600,7 @@ static int msm_anlg_cdc_ear_pa_boost_set(struct snd_kcontrol *kcontrol,
 	return 0;
 }
 
-#ifdef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.FTM.954616, 2016/08/24,
- *Add for AT command to enable micbias.
- */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static int micbias_get(struct snd_kcontrol *kcontrol,
         struct snd_ctl_elem_value *ucontrol)
 {
@@ -1670,12 +1655,9 @@ static int micbias_put(struct snd_kcontrol *kcontrol,
 
 	return 0;
 }
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
-#ifdef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.Codec, 2018/07/31,
- *Add for set different micbias voltage.
- */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static int micbias_voltage_get(struct snd_kcontrol *kcontrol,
         struct snd_ctl_elem_value *ucontrol)
 {
@@ -1716,7 +1698,7 @@ static int micbias_voltage_put(struct snd_kcontrol *kcontrol,
 
 	return 0;
 }
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 static int msm_anlg_cdc_pa_gain_get(struct snd_kcontrol *kcontrol,
 				    struct snd_ctl_elem_value *ucontrol)
 {
@@ -2011,28 +1993,21 @@ static int msm_anlg_cdc_ext_spk_boost_set(struct snd_kcontrol *kcontrol,
 }
 
 
-#ifdef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.FTM.954616, 2016/08/24,
- *Add for AT command to enable micbias.
- */
- /* xiang.fei@PSW.MM.AudioDriver.Codec, 2018/10/29, Modify for micbias */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static char const *msm_anlg_cdc_micbias_ctrl_text[] = {
 		"DISABLE", "MICBIAS1", "MICBIAS2", "FORCE_MICBIAS1"};
 static const struct soc_enum msm_anlg_cdc_micbias_ctl_enum[] = {
 		SOC_ENUM_SINGLE_EXT(4, msm_anlg_cdc_micbias_ctrl_text),
 };
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
-#ifdef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.Codec, 2018/07/31,
- *Add for set different micbias voltage.
- */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static char const *msm_anlg_cdc_micbias_v_switch_text[] = {
 		"V_1P80", "V_2P70"};
 static const struct soc_enum msm_anlg_cdc_micbias_v_switch_enum[] = {
 		SOC_ENUM_SINGLE_EXT(2, msm_anlg_cdc_micbias_v_switch_text),
 };
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 static const char * const msm_anlg_cdc_ear_pa_boost_ctrl_text[] = {
 		"DISABLE", "ENABLE"};
@@ -2078,13 +2053,10 @@ static const char * const cf_text[] = {
 
 
 static const struct snd_kcontrol_new msm_anlg_cdc_snd_controls[] = {
-	#ifdef VENDOR_EDIT
-	/*Jianfeng.Qiu@PSW.MM.AudioDriver.FTM.954616, 2016/08/24,
-	 *Add for AT command to enable micbias.
-	 */
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	SOC_ENUM_EXT("Enable Micbias", msm_anlg_cdc_micbias_ctl_enum[0],
 		micbias_get, micbias_put),
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	SOC_ENUM_EXT("RX HPH Mode", msm_anlg_cdc_hph_mode_ctl_enum[0],
 		msm_anlg_cdc_hph_mode_get, msm_anlg_cdc_hph_mode_set),
@@ -2111,13 +2083,10 @@ static const struct snd_kcontrol_new msm_anlg_cdc_snd_controls[] = {
 	SOC_SINGLE_TLV("ADC3 Volume", MSM89XX_PMIC_ANALOG_TX_3_EN, 3,
 					8, 0, analog_gain),
 
-	#ifdef VENDOR_EDIT
-	/*Jianfeng.Qiu@PSW.MM.AudioDriver.Codec, 2018/07/31,
-	 *Add for set different micbias voltage.
-	 */
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	SOC_ENUM_EXT("MicBias_V_Switch", msm_anlg_cdc_micbias_v_switch_enum[0],
 		micbias_voltage_get, micbias_voltage_put),
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 };
 
@@ -4007,12 +3976,11 @@ static int sdm660_cdc_notifier_service_cb(struct notifier_block *nb,
 	unsigned long timeout;
 	static bool initial_boot = true;
 	struct audio_notifier_cb_data *cb_data = ptr;
-	#ifdef VENDOR_EDIT
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	#ifdef CONFIG_OPPO_KEVENT_UPLOAD
-	/*Jianfeng.Qiu@PSW.MM.AudioDriver.Stability, 2019/02/03, Add for audio driver kevent log*/
 	unsigned char payload[64] = "";
 	#endif /* CONFIG_OPPO_KEVENT_UPLOAD */
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	codec = sdm660_cdc_priv->codec;
 	dev_dbg(codec->dev, "%s: Service opcode 0x%lx\n", __func__, opcode);
@@ -4058,14 +4026,13 @@ static int sdm660_cdc_notifier_service_cb(struct notifier_block *nb,
 powerup:
 		if (adsp_ready)
 			msm_anlg_cdc_device_up(codec);
-		#ifdef VENDOR_EDIT
+		#ifdef CONFIG_PRODUCT_REALME_SDM710
 		#ifdef CONFIG_OPPO_KEVENT_UPLOAD
-		/*Jianfeng.Qiu@PSW.MM.AudioDriver.Stability, 2019/02/03, Add for audio driver kevent log*/
 		scnprintf(payload, sizeof(payload), "NULL$$EventID@@%d$$adsp_ssr",
 			OPPO_MM_AUDIO_EVENT_ID_ADSP_RESET);
 		upload_mm_audio_kevent_data(payload);
 		#endif /* CONFIG_OPPO_KEVENT_UPLOAD */
-		#endif /* VENDOR_EDIT */
+		#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 		break;
 	default:
 		break;
@@ -4114,10 +4081,7 @@ static void msm_anlg_cdc_set_micb_v(struct snd_soc_codec *codec)
 			0xF8, (reg_val << 3));
 }
 
-#ifdef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.Codec, 2018/07/31,
- *Add for set different micbias voltage.
- */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 void msm_anlg_cdc_set_micb_v_switch(struct snd_soc_codec *codec, u32 voltage)
 {
 
@@ -4138,7 +4102,7 @@ void msm_anlg_cdc_set_micb_v_switch(struct snd_soc_codec *codec, u32 voltage)
 	snd_soc_update_bits(codec, MSM89XX_PMIC_ANALOG_MICB_1_VAL,
 			0xF8, (reg_val << 3));
 }
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 static void msm_anlg_cdc_set_boost_v(struct snd_soc_codec *codec)
 {
@@ -4275,13 +4239,8 @@ int msm_anlg_codec_info_create_codec_entry(struct snd_info_entry *codec_root,
 
 	sdm660_cdc_priv->audio_ssr_nb.notifier_call =
 				sdm660_cdc_notifier_service_cb;
-	if (apr_get_dest_id("ADSP") == APR_DEST_QDSP6)
-		ret = audio_notifier_register("pmic_analog_cdc",
+	ret = audio_notifier_register("pmic_analog_cdc",
 				      AUDIO_NOTIFIER_ADSP_DOMAIN,
-				      &sdm660_cdc_priv->audio_ssr_nb);
-	else
-		ret = audio_notifier_register("pmic_analog_cdc",
-				      AUDIO_NOTIFIER_MODEM_DOMAIN,
 				      &sdm660_cdc_priv->audio_ssr_nb);
 	if (ret < 0) {
 		pr_err("%s: Audio notifier register failed ret = %d\n",

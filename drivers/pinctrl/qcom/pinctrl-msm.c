@@ -40,8 +40,7 @@
 #include "../pinconf.h"
 #include "pinctrl-msm.h"
 #include "../pinctrl-utils.h"
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.Power.Basic 2018/06/14 add formodem irq, ,case03529649
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <linux/syscore_ops.h>
 static struct msm_pinctrl *msm_pinctrl_data;
 #endif
@@ -85,8 +84,7 @@ struct msm_pinctrl {
 
 static struct msm_pinctrl *msm_pinctrl_data;
 
-#ifdef VENDOR_EDIT
-/*wanghao@BSP.Bootloader.Bootflow, 2018/06/04, Add for get gpio status*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	static const char * const values[] = {
 		"high",
 		"low"
@@ -513,8 +511,7 @@ static void msm_gpio_dbg_show_one(struct seq_file *s,
 	int drive;
 	int pull;
 	u32 ctl_reg;
-#ifdef VENDOR_EDIT
-/*wanghao@BSP.Bootloader.Bootflow, 2018/06/04, Add for get gpio status*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	int in_value;
 	int out_value;
 	int intr_enable;
@@ -539,8 +536,7 @@ static void msm_gpio_dbg_show_one(struct seq_file *s,
 	drive = (ctl_reg >> g->drv_bit) & 7;
 	pull = (ctl_reg >> g->pull_bit) & 3;
 
-#ifdef VENDOR_EDIT
-/*wanghao@BSP.Bootloader.Bootflow, 2018/06/04, Add for get gpio status*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
         printk("  g->in_bit = %x,g->on_bit = %x,  g->intr_enable = %d,g->intr_polarity = %d, intr_detection = %d\n",g->in_bit, g->out_bit,g->intr_enable_bit,g->intr_polarity_bit,g->intr_detection_bit);
 	io_reg = readl(pctrl->regs + g->io_reg);
 	intr_cfg_reg = readl(pctrl->regs + g->intr_cfg_reg);
@@ -569,8 +565,7 @@ static void msm_gpio_dbg_show_one(struct seq_file *s,
 	seq_printf(s, " %dmA", msm_regval_to_drive(drive));
 	seq_printf(s, " %s", pulls[pull]);
 
-#ifdef VENDOR_EDIT
-/*wanghao@BSP.Bootloader.Bootflow, 2018/06/04, Add for get gpio status*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	seq_printf(s, " %d", is_out? out_value: in_value);
 #endif
 }

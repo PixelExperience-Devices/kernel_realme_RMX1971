@@ -35,8 +35,7 @@
 #include "reset.h"
 #include "clk-alpha-pll.h"
 #include "vdd-level-sdm845.h"
-//#ifdef VENDOR_EDIT
-//PengNan@BSP.Power.Basic,remove ufs and emmc compatibility for standby current, 2019/07/30
+//#ifdef CONFIG_PRODUCT_REALME_SDM710
 //#include "clk-voter.h"
 //#endif
 
@@ -1508,8 +1507,7 @@ static struct clk_branch gcc_aggre_ufs_phy_axi_clk = {
 		},
 	},
 };
-//#ifdef VENDOR_EDIT
-//PengNan@BSP.Power.Basic,remove ufs and emmc compatibility for standby current, 2019/07/30
+//#ifdef CONFIG_PRODUCT_REALME_SDM710
 //static DEFINE_CLK_VOTER(ufs_phy_axi_emmc_vote_clk,
 //					gcc_aggre_ufs_phy_axi_clk, 0);
 //static DEFINE_CLK_VOTER(ufs_phy_axi_ufs_vote_clk,
@@ -3790,8 +3788,7 @@ struct clk_hw *gcc_sdm845_hws[] = {
 	[MEASURE_ONLY_CNOC_CLK] = &measure_only_cnoc_clk.hw,
 	[MEASURE_ONLY_BIMC_CLK] = &measure_only_bimc_clk.hw,
 	[MEASURE_ONLY_IPA_2X_CLK] = &measure_only_ipa_2x_clk.hw,
-	//#ifdef VENDOR_EDIT
-	//PengNan@BSP.Power.Basic,remove ufs and emmc compatibility for standby current, 2019/07/30
+	//#ifdef CONFIG_PRODUCT_REALME_SDM710
 	//[UFS_PHY_AXI_EMMC_VOTE_CLK] = &ufs_phy_axi_emmc_vote_clk.hw,
 	//[UFS_PHY_AXI_UFS_VOTE_CLK] = &ufs_phy_axi_ufs_vote_clk.hw,
 	//#endif
@@ -4076,8 +4073,7 @@ static const struct qcom_cc_desc gcc_sdm845_desc = {
 	.config = &gcc_sdm845_regmap_config,
 	.clks = gcc_sdm845_clocks,
 	.num_clks = ARRAY_SIZE(gcc_sdm845_clocks),
-	//#ifdef VENDOR_EDIT
-	//PengNan@BSP.Power.Basic,remove ufs and emmc compatibility for standby current, 2019/07/30
+	//#ifdef CONFIG_PRODUCT_REALME_SDM710
 	//.hwclks = gcc_sdm845_hws,
 	//.num_hwclks = ARRAY_SIZE(gcc_sdm845_hws),
 	//#endif
@@ -4299,13 +4295,11 @@ static int gcc_sdm845_fixup(struct platform_device *pdev)
 
 static int gcc_sdm845_probe(struct platform_device *pdev)
 {
-	//#ifdef VENDOR_EDIT
-	//PengNan@BSP.Power.Basic,remove ufs and emmc compatibility for standby current, 2019/07/30
+	//#ifdef CONFIG_PRODUCT_REALME_SDM710
 	struct clk *clk;
 	//#endif
 	struct regmap *regmap;
-	//#ifndef VENDOR_EDIT
-	//PengNan@BSP.Power.Basic,remove ufs and emmc compatibility for standby current, 2019/07/30
+	//#ifndef CONFIG_PRODUCT_REALME_SDM710
 	//int ret = 0;
 	//#else
 	int i, ret = 0;
@@ -4334,8 +4328,7 @@ static int gcc_sdm845_probe(struct platform_device *pdev)
 	ret = gcc_sdm845_fixup(pdev);
 	if (ret)
 		return ret;
-	//#ifdef VENDOR_EDIT
-	//PengNan@BSP.Power.Basic,remove ufs and emmc compatibility for standby current, 2019/07/30
+	//#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/* Register the dummy measurement clocks */
 	for (i = 0; i < ARRAY_SIZE(gcc_sdm845_hws); i++) {
 		clk = devm_clk_register(&pdev->dev, gcc_sdm845_hws[i]);

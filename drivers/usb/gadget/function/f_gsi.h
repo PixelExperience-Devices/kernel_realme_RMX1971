@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2015-2019, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -43,7 +43,7 @@
 #define GSI_MAX_CTRL_PKT_SIZE 8192
 #define GSI_CTRL_DTR (1 << 0)
 
-#define GSI_NUM_IN_RNDIS_RMNET_ECM_BUFFERS 50
+#define GSI_NUM_IN_RNDIS_BUFFERS 50
 #define GSI_NUM_IN_BUFFERS 15
 #define GSI_IN_BUFF_SIZE 2048
 #define GSI_NUM_OUT_BUFFERS 14
@@ -264,7 +264,7 @@ struct gsi_data_port {
 
 struct f_gsi {
 	struct usb_function function;
-	enum usb_prot_id prot_id;
+	int prot_id;
 	int ctrl_id;
 	int data_id;
 	u32 vendorID;

@@ -42,7 +42,7 @@ static int cam_eeprom_read_memory(struct cam_eeprom_ctrl_t *e_ctrl,
 		return -EINVAL;
 	}
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /* Huanyun.Tang@Camera.Driver, 20190514, add for hi846 otp */
 	memset(&i2c_reg_settings, 0, sizeof(struct cam_sensor_i2c_reg_setting));
 #endif
@@ -850,8 +850,7 @@ int32_t cam_eeprom_driver_cmd(struct cam_eeprom_ctrl_t *e_ctrl, void *arg)
 	int                            rc = 0;
 	struct cam_eeprom_query_cap_t  eeprom_cap = {0};
 	struct cam_control            *cmd = (struct cam_control *)arg;
-#ifdef VENDOR_EDIT
-//add by yufeng@camera, 20190115 for write eeprom
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     uint32_t i = 0 ;
     int idx = 0;
     int idy = 0;
@@ -866,9 +865,7 @@ int32_t cam_eeprom_driver_cmd(struct cam_eeprom_ctrl_t *e_ctrl, void *arg)
     struct cam_sensor_i2c_reg_array    i2c_reg_arrays[8];
     struct cam_sensor_i2c_reg_array    i2c_reg_array;
     struct cam_eeprom_soc_private  *soc_private =(struct cam_eeprom_soc_private *)e_ctrl->soc_info.soc_private;
-//add by yufeng@camera, 20190115 for read eeprom SN
     struct read_eeprom_SN_t read_eeprom_SN;
-//add by yufeng@camera, 20190216 for check eeprom data
     struct check_eeprom_data_t check_eeprom_data;
 
 #endif
@@ -896,7 +893,7 @@ int32_t cam_eeprom_driver_cmd(struct cam_eeprom_ctrl_t *e_ctrl, void *arg)
 			&eeprom_cap,
 			sizeof(struct cam_eeprom_query_cap_t))) {
 			CAM_ERR(CAM_EEPROM, "Failed Copy to User");
-			#ifdef VENDOR_EDIT
+			#ifdef CONFIG_PRODUCT_REALME_SDM710
 			/*Xiaoyang.Huang@RM.Camera add Google-Patch-CVE-2019-14034_QC-CR#2491649,20191224*/
 			rc = -EFAULT;
 			#else
@@ -947,8 +944,7 @@ int32_t cam_eeprom_driver_cmd(struct cam_eeprom_ctrl_t *e_ctrl, void *arg)
 			goto release_mutex;
 		}
 		break;
-#ifdef VENDOR_EDIT
-//add by yufeng@camera, 20190115 for write eeprom
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     case CAM_WRITE_EEPROM_DATA:
         memset(&cam_write_eeprom, 0, sizeof(struct cam_write_eeprom_t));
         if (copy_from_user(&cam_write_eeprom, (void __user *) cmd->handle, sizeof(struct cam_write_eeprom_t))) {
@@ -1156,7 +1152,6 @@ int32_t cam_eeprom_driver_cmd(struct cam_eeprom_ctrl_t *e_ctrl, void *arg)
             rc = cam_eeprom_power_down(e_ctrl);
         }
         break;
-    //add by yufeng@camera, 20190216 for check eeprom data
     case CAM_CHECK_EEPROM_DATA:
         memset(&check_eeprom_data, 0, sizeof(struct check_eeprom_data_t));
         if (copy_from_user(&check_eeprom_data, (void __user *) cmd->handle, sizeof(struct check_eeprom_data_t))) {

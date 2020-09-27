@@ -235,10 +235,7 @@ void __vma_link_list(struct mm_struct *mm, struct vm_area_struct *vma,
 		struct vm_area_struct *prev, struct rb_node *rb_parent)
 {
 	struct vm_area_struct *next;
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
-	/* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
-	 * use reserved area
-	 */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 	struct vm_area_struct *curr_vma = NULL;
 #endif
 
@@ -247,10 +244,7 @@ void __vma_link_list(struct mm_struct *mm, struct vm_area_struct *vma,
 		next = prev->vm_next;
 		prev->vm_next = vma;
 	} else {
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
-		/* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
-		 * use reserved area
-		 */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 		curr_vma = vma;
 #else
 		mm->mmap = vma;
@@ -265,10 +259,7 @@ void __vma_link_list(struct mm_struct *mm, struct vm_area_struct *vma,
 	if (next)
 		next->vm_prev = vma;
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
-	/* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
-	 * use reserved area
-	 */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 	if (curr_vma) {
 		if (BACKUP_ALLOC_FLAG(vma->vm_flags))
 			mm->reserve_mmap = curr_vma;
@@ -354,7 +345,7 @@ unsigned long vm_mmap_pgoff(struct file *file, unsigned long addr,
 
 		ret = do_mmap_pgoff(file, addr, len, prot, flag, pgoff,
 				    &populate);
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 		/* Kui.Zhang@TEC.Kernel.Performance, 2019/03/27,
 		 * update the mm->mmap_base while create reserved area pass,
 		 * the gap between stack and mmap_base is decreased.

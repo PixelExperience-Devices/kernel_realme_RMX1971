@@ -1,6 +1,6 @@
 /**********************************************************************************
 * Copyright (c)  2008-2015  Guangdong OPPO Mobile Comm Corp., Ltd
-* VENDOR_EDIT
+* CONFIG_PRODUCT_REALME_SDM710
 * Description:     shutdown_detect Monitor  Kernel Driver
 *
 * Version   : 1.0

@@ -1,5 +1,5 @@
 /************************************************************************************
-** VENDOR_EDIT
+** CONFIG_PRODUCT_REALME_SDM710
 ** Copyright (C), 2018-2019, OPPO Mobile Comm Corp., Ltd
 **
 ** Description:

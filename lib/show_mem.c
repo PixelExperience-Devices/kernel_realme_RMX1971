@@ -8,10 +8,9 @@
 #include <linux/mm.h>
 #include <linux/quicklist.h>
 #include <linux/cma.h>
-#ifdef VENDOR_EDIT
-/* Huacai.Zhou@PSW.BSP.Kernel.MM, 2018-06-26, add ion total used account*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <linux/ion.h>
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 
 void show_mem(unsigned int filter)
@@ -54,8 +53,7 @@ void show_mem(unsigned int filter)
 #ifdef CONFIG_MEMORY_FAILURE
 	printk("%lu pages hwpoisoned\n", atomic_long_read(&num_poisoned_pages));
 #endif
-#ifdef VENDOR_EDIT
-/* Huacai.Zhou@PSW.BSP.Kernel.MM, 2018-06-26, add ion total used account*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	printk("%lu pages ion total used\n", ion_total()>> PAGE_SHIFT);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 }

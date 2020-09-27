@@ -1,6 +1,6 @@
 /******************************************************************
 ** Copyright (C), 2019-2030, OPPO Mobile Comm Corp., Ltd.
-** VENDOR_EDIT
+** CONFIG_PRODUCT_REALME_SDM710
 ** File: - oppo_attr_custom.h
 ** Description: header file for oppo power attr.
 ** Version: 1.0
@@ -9,7 +9,7 @@
 **
 ** --------------------------- Revision History: ---------------------
 * <version>	<date>		<author>              		<desc>
-* Revision 1.0      2019/07/09       Cong.Dai@PSW.BSP.TP   	Created
+* Revision 1.0      2019/07/09       Cong.Dai@PSW.BSP.TP       Created
 *******************************************************************/
 #ifndef _OPPO_ATTR_CUSTOM_H_
 #define _OPPO_ATTR_CUSTOM_H_

@@ -41,18 +41,16 @@ static ktime_t curr_monotime; /* monotonic time after last suspend */
 static ktime_t last_stime; /* monotonic boottime offset before last suspend */
 static ktime_t curr_stime; /* monotonic boottime offset after last suspend */
 
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.Power.Basic, 2018/04/28, add for analysis power coumption.
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <linux/notifier.h>
 #include <linux/fb.h>
 #include <linux/msm_drm_notify.h>
-#endif /* VENDOR_EDIT */
-#ifdef VENDOR_EDIT
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //Wenxian.zhen@Prd.BaseDrv, 2016/07/19, add for analysis power consumption
 void wakeup_src_clean(void);
-#endif /* VENDOR_EDIT */
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.Power.Basic, 2018/04/28, add for analysis power coumption.
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 extern u64 wakeup_source_count_wifi;
 
 extern u64	wakeup_source_count_modem;
@@ -108,9 +106,8 @@ static ssize_t ap_resume_reason_stastics_show(struct kobject *kobj, struct kobj_
 	
 	return buf_offset;
 }
-#endif /* VENDOR_EDIT */
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.Power.Basic, 2018/04/28 add for analysis power coumption.
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static void wakeup_reason_count_clear(void)
 {
     printk(KERN_INFO  "ENTER %s\n", __func__);
@@ -208,7 +205,7 @@ static int wakeup_src_fb_notifier_callback(struct notifier_block *self,
 static struct notifier_block wakeup_src_fb_notif = {
 	.notifier_call = wakeup_src_fb_notifier_callback,
 };
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 static ssize_t last_resume_reason_show(struct kobject *kobj, struct kobj_attribute *attr,
 		char *buf)
 {
@@ -260,8 +257,7 @@ static ssize_t last_suspend_time_show(struct kobject *kobj,
 				sleep_time.tv_sec, sleep_time.tv_nsec);
 }
 
-#ifdef VENDOR_EDIT
-//Wenxian.Zhen@BSP.Power.Basic, 2018/11/17, Add for  clean wake up source  according to echo reset >   /sys/kernel/wakeup_reasons/wakeup_stastisc_reset
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static ssize_t  wakeup_stastisc_reset_store(struct kobject *kobj,
 		struct kobj_attribute *attr, const char *buf, size_t count)
 {
@@ -279,32 +275,28 @@ static ssize_t  wakeup_stastisc_reset_store(struct kobject *kobj,
 }
 
 
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 static struct kobj_attribute resume_reason = __ATTR_RO(last_resume_reason);
 static struct kobj_attribute suspend_time = __ATTR_RO(last_suspend_time);
 
-#ifdef VENDOR_EDIT
-//Wenxian.Zhen@BSP.Power.Basic, 2018/11/17, Add for  clean wake up source  according to echo reset >   /sys/kernel/wakeup_reasons/wakeup_stastisc_reset
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static struct kobj_attribute wakeup_stastisc_reset_sys =
 	__ATTR(wakeup_stastisc_reset, S_IWUSR|S_IRUGO, NULL, wakeup_stastisc_reset_store);
-#endif /* VENDOR_EDIT */
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.Power.Basic, 2018/04/28, add for analysis power coumption.
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static struct kobj_attribute ap_resume_reason_stastics = __ATTR_RO(ap_resume_reason_stastics);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 static struct attribute *attrs[] = {
 	&resume_reason.attr,
 	&suspend_time.attr,
 	
-#ifdef VENDOR_EDIT
-//Nanwei.Deng@BSP.Power.Basic, 2018/04/28, add for analysis power coumption.
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     &ap_resume_reason_stastics.attr,
-#endif /* VENDOR_EDIT */
-#ifdef VENDOR_EDIT
-//Wenxian.Zhen@BSP.Power.Basic, 2018/11/17, Add for  clean wake up source  according to echo reset >   /sys/kernel/wakeup_reasons/wakeup_stastisc_reset
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     &wakeup_stastisc_reset_sys.attr,
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	NULL,
 };
 static struct attribute_group attr_group = {
@@ -426,14 +418,13 @@ int __init wakeup_reason_init(void)
 		printk(KERN_WARNING "[%s] failed to create a sysfs group %d\n",
 				__func__, retval);
 	}
-    #ifdef VENDOR_EDIT
-    //Nanwei.Deng@BSP.Power.Basic, 2018/04/28, add for analysis power coumption.  
+    #ifdef CONFIG_PRODUCT_REALME_SDM710
 #ifdef CONFIG_DRM_MSM
 	msm_drm_register_client(&wakeup_src_fb_notif);
 #else
 	fb_register_client(&wakeup_src_fb_notif);
 #endif
-    #endif /* VENDOR_EDIT */
+    #endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	return 0;
 }
 

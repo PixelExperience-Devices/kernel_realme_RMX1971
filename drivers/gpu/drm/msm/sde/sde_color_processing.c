@@ -651,8 +651,7 @@ static void _sde_cp_crtc_enable_hist_irq(struct sde_crtc *sde_crtc)
 	spin_unlock_irqrestore(&node->state_lock, flags);
 }
 
-#ifdef VENDOR_EDIT
-/*Mark.Yao@PSW.MM.Display.LCD.Stable,2019-04-28 fix pcc abnormal on onscreenfinger scene */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 struct drm_msm_pcc oppo_save_pcc;
 bool oppo_pcc_enabled = false;
 bool oppo_fp_mode = false;
@@ -748,8 +747,7 @@ static void sde_cp_crtc_setfeature(struct sde_cp_node *prop_node,
 				ret = -EINVAL;
 				continue;
 			}
-#ifdef VENDOR_EDIT
-/*Mark.Yao@PSW.MM.Display.LCD.Stable,2019-04-28 fix pcc abnormal on onscreenfinger scene */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 			if (is_dsi_panel(&sde_crtc->base)) {
 				if (hw_cfg.payload && (hw_cfg.len == sizeof(oppo_save_pcc))) {
 					memcpy(&oppo_save_pcc, hw_cfg.payload, hw_cfg.len);
@@ -979,10 +977,9 @@ void sde_cp_crtc_apply_properties(struct drm_crtc *crtc)
 	struct msm_drm_private *priv = NULL;
 	struct sde_kms *sde_kms = NULL;
 	bool mdss_bus_vote = false;
-	#ifdef VENDOR_EDIT
-	/*Mark.Yao@PSW.MM.Display.LCD.Stable,2019-04-28 fix pcc abnormal on onscreenfinger scene */
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	bool dirty_pcc = false;
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	if (!crtc || !crtc->dev) {
 		DRM_ERROR("invalid crtc %pK dev %pK\n", crtc,
@@ -1014,20 +1011,18 @@ void sde_cp_crtc_apply_properties(struct drm_crtc *crtc)
 	}
 
 	mutex_lock(&sde_crtc->crtc_cp_lock);
-	#ifdef VENDOR_EDIT
-	/*Mark.Yao@PSW.MM.Display.LCD.Stable,2019-04-28 fix pcc abnormal on onscreenfinger scene */
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	dirty_pcc = sde_cp_crtc_update_pcc(crtc);
 	if (dirty_pcc) {
 		set_dspp_flush = true;
 	}
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	/* Check if dirty lists are empty and ad features are disabled for
 	 * early return. If ad properties are active then we need to issue
 	 * dspp flush.
 	 **/
-	#ifdef VENDOR_EDIT
-	/*Mark.Yao@PSW.MM.Display.LCD.Stable,2019-04-28 fix pcc abnormal on onscreenfinger scene */
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (!dirty_pcc && list_empty(&sde_crtc->dirty_list) &&
 		list_empty(&sde_crtc->ad_dirty)) {
 	#else

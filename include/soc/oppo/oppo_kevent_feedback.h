@@ -1,6 +1,6 @@
 /***************************************************************
 ** Copyright (C),  2018,  OPPO Mobile Comm Corp.,  Ltd
-** VENDOR_EDIT
+** CONFIG_PRODUCT_REALME_SDM710
 ** File : oppo_kevent_feedback.h
 ** Description : oppo kevent feedback data
 ** Version : 1.2

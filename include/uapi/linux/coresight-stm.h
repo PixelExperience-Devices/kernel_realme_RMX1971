@@ -1,12 +1,9 @@
 #ifndef __UAPI_CORESIGHT_STM_H_
 #define __UAPI_CORESIGHT_STM_H_
 
-#include <linux/const.h>
-
+#define STM_FLAG_NONE		0x00
 #define STM_FLAG_TIMESTAMPED   _BITUL(3)
 #define STM_FLAG_GUARANTEED    _BITUL(7)
-
-#define STM_FLAG_NONE		0x00
 
 #define	OST_ENTITY_NONE			0x00
 #define	OST_ENTITY_FTRACE_EVENTS	0x01
@@ -16,6 +13,8 @@
 #define	OST_ENTITY_DIAG			0xEE
 #define	OST_ENTITY_QVIEW		0xFE
 #define	OST_ENTITY_MAX			0xFF
+
+#include <linux/const.h>
 
 /*
  * The CoreSight STM supports guaranteed and invariant timing

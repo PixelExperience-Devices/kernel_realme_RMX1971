@@ -43,16 +43,14 @@
 #include <linux/msm_dma_iommu_mapping.h>
 #include <trace/events/kmem.h>
 
-#ifdef VENDOR_EDIT
-// wenbin.liu@PSW.BSP.MM, 2018/07/11
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 // Add for ion used cnt
 #include <linux/module.h>
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO) && defined (CONFIG_OPPO_MEM_MONITOR)
-//Jiheng.Xie@TECH.BSP.Performance, 2019/07/11, add for ion wait monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO) && defined (CONFIG_OPPO_MEM_MONITOR)
 #include <linux/memory_monitor.h>
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 #include "ion.h"
 #include "ion_priv.h"
@@ -191,8 +189,7 @@ static void ion_buffer_add(struct ion_device *dev,
 	rb_insert_color(&buffer->node, &dev->buffers);
 }
 
-#ifdef VENDOR_EDIT
-/* Huacai.Zhou@PSW.BSP.Kernel.MM, 2018-06-26, add ion total used account*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static atomic_long_t ion_total_size;
 static bool ion_cnt_enable = true;
 unsigned long ion_total(void)
@@ -201,7 +198,7 @@ unsigned long ion_total(void)
 		return 0;
 	return (unsigned long)atomic_long_read(&ion_total_size);
 }
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 /* this function should only be called while dev->lock is held */
 static struct ion_buffer *ion_buffer_create(struct ion_heap *heap,
@@ -289,8 +286,7 @@ static struct ion_buffer *ion_buffer_create(struct ion_heap *heap,
 	ion_buffer_add(dev, buffer);
 	mutex_unlock(&dev->buffer_lock);
 	atomic_long_add(len, &heap->total_allocated);
-#ifdef VENDOR_EDIT
-/* Huacai.Zhou@PSW.BSP.Kernel.MM, 2018-06-26, add ion total used account*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (ion_cnt_enable)
 		atomic_long_add(buffer->size, &ion_total_size);
 #endif
@@ -315,11 +311,10 @@ void ion_buffer_destroy(struct ion_buffer *buffer)
 	buffer->heap->ops->unmap_dma(buffer->heap, buffer);
 
 	atomic_long_sub(buffer->size, &buffer->heap->total_allocated);
-#ifdef VENDOR_EDIT
-/* Huacai.Zhou@PSW.BSP.Kernel.MM, 2018-06-26, add ion total used account*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if (ion_cnt_enable)
 		atomic_long_sub(buffer->size, &ion_total_size);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 	buffer->heap->ops->free(buffer);
 	vfree(buffer->pages);
 	kfree(buffer);
@@ -593,10 +588,9 @@ static struct ion_handle *__ion_alloc(
 	const unsigned int MAX_DBG_STR_LEN = 64;
 	char dbg_str[MAX_DBG_STR_LEN];
 	unsigned int dbg_str_idx = 0;
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO) && defined (CONFIG_OPPO_MEM_MONITOR)
-//Jiheng.Xie@TECH.BSP.Performance, 2019/07/11, add for ion wait monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO) && defined (CONFIG_OPPO_MEM_MONITOR)
 	unsigned long oppo_ionwait_start = jiffies;
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 	dbg_str[0] = '\0';
 
@@ -696,10 +690,9 @@ static struct ion_handle *__ion_alloc(
 		ion_handle_put(handle);
 		handle = ERR_PTR(ret);
 	}
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO) && defined (CONFIG_OPPO_MEM_MONITOR)
-//Jiheng.Xie@TECH.BSP.Performance, 2019/07/11, add for ion wait monitor
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO) && defined (CONFIG_OPPO_MEM_MONITOR)
 	oppo_ionwait_monitor(jiffies_to_msecs(jiffies - oppo_ionwait_start));
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 	return handle;
 }
@@ -1920,7 +1913,7 @@ static void ion_heap_print_debug(struct seq_file *s, struct ion_heap *heap)
 	}
 }
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /* yanghao@PSW.Kernel.Stability, 2019/04/26, Add for Process memory statistics */
 size_t get_ion_heap_by_pid(pid_t pid)
 {
@@ -2147,7 +2140,7 @@ void ion_device_add_heap(struct ion_device *dev, struct ion_heap *heap)
 EXPORT_SYMBOL(ion_device_add_heap);
 
 int ion_walk_heaps(struct ion_client *client, int heap_id,
-		   enum ion_heap_type type, void *data,
+		   unsigned int type, void *data,
 		   int (*f)(struct ion_heap *heap, void *data))
 {
 	int ret_val = 0;

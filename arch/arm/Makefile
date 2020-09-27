@@ -328,11 +328,8 @@ all:	$(KBUILD_IMAGE) $(KBUILD_DTBS)
 
 boot := arch/arm/boot
 
-archheaders:
-	$(Q)$(MAKE) $(build)=arch/arm/tools uapi
-
 archprepare:
-	$(Q)$(MAKE) $(build)=arch/arm/tools kapi
+	$(Q)$(MAKE) $(build)=arch/arm/tools include/generated/mach-types.h
 
 # Convert bzImage to zImage
 bzImage: zImage

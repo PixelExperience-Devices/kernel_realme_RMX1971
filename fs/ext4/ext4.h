@@ -39,8 +39,7 @@
 #endif
 
 #include <linux/fscrypt.h>
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2018-11-26 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
 #include "discard.h"
 #endif
 
@@ -1141,8 +1140,7 @@ struct ext4_inode_info {
 #define EXT4_MOUNT_DIOREAD_NOLOCK	0x400000 /* Enable support for dio read nolocking */
 #define EXT4_MOUNT_JOURNAL_CHECKSUM	0x800000 /* Journal checksums */
 #define EXT4_MOUNT_JOURNAL_ASYNC_COMMIT	0x1000000 /* Journal Async Commit */
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2018-11-26 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
 #define EXT4_MOUNT_ASYNC_DISCARD	0x2000000 /* Async issue discard request */
 #endif
 #define EXT4_MOUNT_DELALLOC		0x8000000 /* Delalloc support */
@@ -1354,8 +1352,7 @@ struct ext4_super_block {
 /* Number of quota types we support */
 #define EXT4_MAXQUOTAS 3
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2018-11-26 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
 struct discard_policy {
 	int type;			/* type of discard */
 	unsigned int min_interval;	/* used for candidates exist */
@@ -1553,19 +1550,17 @@ struct ext4_sb_info {
 	struct ratelimit_state s_warning_ratelimit_state;
 	struct ratelimit_state s_msg_ratelimit_state;
 
+        /*
+         * Barrier between writepages ops and changing any inode's JOURNAL_DATA
+         * or EXTENTS flag.
+         */
+        struct percpu_rw_semaphore s_writepages_rwsem;
 	/* for discard command control */
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2018-11-26 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
 	struct discard_cmd_control *dcc_info;
 	unsigned long last_time;	/* to store time in jiffies */
 	long interval_time;		/* to store thresholds */
 #endif
-
-	/*
-	 * Barrier between writepages ops and changing any inode's JOURNAL_DATA
-	 * or EXTENTS flag.
-	 */
-	struct percpu_rw_semaphore s_writepages_rwsem;
 };
 
 static inline struct ext4_sb_info *EXT4_SB(struct super_block *sb)
@@ -3027,8 +3022,7 @@ static inline void ext4_unlock_group(struct super_block *sb,
 	spin_unlock(ext4_group_lock_ptr(sb, group));
 }
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2018-11-26 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
 static inline int ext4_utilization(struct ext4_sb_info *sbi)
 {
 	return div_u64((u64)ext4_free_blocks_count(sbi->s_es) * 100,

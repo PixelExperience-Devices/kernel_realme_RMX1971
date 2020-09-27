@@ -2250,8 +2250,7 @@ static int fill_cmi_header(struct cmi_hdr *hdr,
 			   u16 opcode, bool obm_flag)
 {
 	/* sanitize the data */
-	if (hdr == NULL ||
-	    !IS_VALID_SESSION_ID(session_id) ||
+	if (!IS_VALID_SESSION_ID(session_id) ||
 	    !IS_VALID_SERVICE_ID(service_id) ||
 	    !IS_VALID_PLD_SIZE(payload_size)) {
 		pr_err("Invalid header creation request\n");
@@ -2905,8 +2904,6 @@ static int wcd_cpe_send_param_snd_model(struct wcd_cpe_core *core,
 	struct cmi_obm_msg obm_msg;
 	struct cpe_param_data *param_d;
 
-	obm_msg.hdr.hdr_info = 0;
-	obm_msg.hdr.pld_info = 0;
 
 	ret = fill_cmi_header(&obm_msg.hdr, session->id,
 			CMI_CPE_LSM_SERVICE_ID, 0, 20,

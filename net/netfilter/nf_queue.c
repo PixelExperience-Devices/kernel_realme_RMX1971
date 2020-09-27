@@ -27,9 +27,7 @@
  * receives, no matter what.
  */
 
-#ifdef VENDOR_EDIT
-//Junyuan.Huang@PSW.CN.WiFi.Network.1471780, 2018/06/26,
-//Add for limit speed function
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static const struct nf_queue_handler __rcu *queue_imq_handler __read_mostly;
 
 void nf_register_queue_imq_handler(const struct nf_queue_handler *qh)
@@ -44,7 +42,7 @@ void nf_unregister_queue_imq_handler(void)
 	synchronize_rcu();
 }
 EXPORT_SYMBOL_GPL(nf_unregister_queue_imq_handler);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 /* return EBUSY when somebody else is registered, return EEXIST if the
  * same handler is registered, return 0 in case of success. */
@@ -126,39 +124,33 @@ void nf_queue_nf_hook_drop(struct net *net, const struct nf_hook_entry *entry)
 	rcu_read_unlock();
 }
 
-#ifdef VENDOR_EDIT
-//Junyuan.Huang@PSW.CN.WiFi.Network.1471780, 2018/06/26,
-//Add for limit speed function
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static int __nf_queue(struct sk_buff *skb, const struct nf_hook_state *state,
 		      unsigned int verdict)
-#else /* VENDOR_EDIT */
+#else /* CONFIG_PRODUCT_REALME_SDM710 */
 static int __nf_queue(struct sk_buff *skb, const struct nf_hook_state *state,
 		      unsigned int queuenum)
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 {
 	int status = -ENOENT;
 	struct nf_queue_entry *entry = NULL;
 	const struct nf_afinfo *afinfo;
 	const struct nf_queue_handler *qh;
 	struct net *net = state->net;
-#ifdef VENDOR_EDIT
-//Junyuan.Huang@PSW.CN.WiFi.Network.1471780, 2018/06/26,
-//Add for limit speed function
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	unsigned int queuetype = verdict & NF_VERDICT_MASK;
 	unsigned int queuenum  = verdict >> NF_VERDICT_QBITS;
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	/* QUEUE == DROP if no one is waiting, to be safe. */
-#ifdef VENDOR_EDIT
-//Junyuan.Huang@PSW.CN.WiFi.Network.1471780, 2018/06/26,
-//Add for limit speed function
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (queuetype == NF_IMQ_QUEUE) {
 			qh = rcu_dereference(queue_imq_handler);
 		} else {
 			qh = rcu_dereference(net->nf.queue_handler);
 		}
-#else /* VENDOR_EDIT */
+#else /* CONFIG_PRODUCT_REALME_SDM710 */
 		qh = rcu_dereference(net->nf.queue_handler);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 
 	if (!qh) {
@@ -208,23 +200,19 @@ int nf_queue(struct sk_buff *skb, struct nf_hook_state *state,
 
 	RCU_INIT_POINTER(state->hook_entries, entry);
 
-#ifdef VENDOR_EDIT
-//Junyuan.Huang@PSW.CN.WiFi.Network.1471780, 2018/06/26,
-//Add for limit speed function
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	ret = __nf_queue(skb, state, verdict);
-#else /* VENDOR_EDIT */
+#else /* CONFIG_PRODUCT_REALME_SDM710 */
 	ret = __nf_queue(skb, state, verdict >> NF_VERDICT_QBITS);
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	if (ret < 0) {
-#ifdef VENDOR_EDIT
-//Junyuan.Huang@PSW.CN.WiFi.Network.1471780, 2018/06/26,
-//Add for limit speed function
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (ret == -ECANCELED && skb->imq_flags == 0) { // down interface
 			*entryp = rcu_dereference(entry->next);
 			return 1;
 		}
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 		if (ret == -ESRCH &&
 		    (verdict & NF_VERDICT_FLAG_QUEUE_BYPASS)) {
 			*entryp = rcu_dereference(entry->next);
@@ -277,11 +265,9 @@ okfn:
 		local_bh_enable();
 		break;
 	case NF_QUEUE:
-#ifdef VENDOR_EDIT
-//Junyuan.Huang@PSW.CN.WiFi.Network.1471780, 2018/06/26,
-//Add for limit speed function
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	case NF_IMQ_QUEUE:
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 		err = nf_queue(skb, &entry->state, &hook_entry, verdict);
 		if (err == 1) {
 			if (hook_entry)

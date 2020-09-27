@@ -1,5 +1,4 @@
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 
 #include <linux/version.h>
 #include <linux/sched.h>

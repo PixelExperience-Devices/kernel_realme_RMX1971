@@ -293,8 +293,7 @@ static const struct file_operations process_mem_fops = {
 	.release = process_mem_release,
 };
 
-#ifdef VENDOR_EDIT
-/* Wen.Luo@BSP.Kernel.Stability, 2019/04/26, Add for Process memory statistics */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 size_t get_gl_mem_by_pid(pid_t pid)
 {
 	int ret = 0;

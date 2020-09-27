@@ -12,13 +12,10 @@
 
 extern int isolate_lru_page(struct page *page);
 extern void putback_lru_page(struct page *page);
-#if defined(VENDOR_EDIT) && defined(CONFIG_PROCESS_RECLAIM)
-/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25, record the scaned task*/
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_PROCESS_RECLAIM)
 extern unsigned long reclaim_pages_from_list(struct list_head *page_list,
 			struct vm_area_struct *vma, struct mm_walk *walk);
 
-/* Kui.Zhang@PSW.BSP.Kernel.Performance, 2018-12-25, check current need
- * cancel reclaim or not, please check task not NULL first.*/
 extern int is_reclaim_should_cancel(struct mm_walk *walk);
 extern int is_reclaim_addr_over(struct mm_walk *walk, unsigned long addr);
 #else

@@ -175,7 +175,7 @@ ld_flags       = $(LDFLAGS) $(ldflags-y)
 
 dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc                    \
 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                   \
-		 -I$(srctree)/scripts/dtc/include-prefixes               \
+		 -I$(srctree)/arch/$(SRCARCH)/boot/dts/include           \
 		 -I$(srctree)/drivers/of/testcase-data                   \
 		 -undef -D__DTS__
 
@@ -289,9 +289,7 @@ DTC_FLAGS += -Wno-unit_address_vs_reg \
 	-Wno-avoid_default_addr_size \
 	-Wno-interrupts_property \
 	-Wno-reg_format \
-	-Wno-gpios_property \
-        -Wno-graph_port \
-        -Wno-graph_child_address
+	-Wno-gpios_property
 endif
 
 ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),2)
@@ -316,12 +314,6 @@ cmd_dt_S_dtb=						\
 
 $(obj)/%.dtb.S: $(obj)/%.dtb
 	$(call cmd,dt_S_dtb)
-
-ifneq ($(DTC_EXT),)
-DTC = $(DTC_EXT)
-else
-DTC = $(objtree)/scripts/dtc/dtc
-endif
 
 quiet_cmd_dtc = DTC     $@
 cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \

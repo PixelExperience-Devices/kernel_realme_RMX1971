@@ -8270,8 +8270,7 @@ enum rateid lim_get_min_session_txrate(tpPESession session)
 void lim_send_sme_mgmt_frame_ind(tpAniSirGlobal mac_ctx, uint8_t frame_type,
 				 uint8_t *frame, uint32_t frame_len,
 				 uint16_t session_id, uint32_t rx_channel,
-				 tpPESession psession_entry, int8_t rx_rssi,
-				 enum rxmgmt_flags rx_flags)
+				 tpPESession psession_entry, int8_t rx_rssi)
 {
 	tpSirSmeMgmtFrameInd sme_mgmt_frame = NULL;
 	uint16_t length;
@@ -8296,7 +8295,6 @@ void lim_send_sme_mgmt_frame_ind(tpAniSirGlobal mac_ctx, uint8_t frame_type,
 	sme_mgmt_frame->frameType = frame_type;
 	sme_mgmt_frame->rxRssi = rx_rssi;
 	sme_mgmt_frame->rxChan = rx_channel;
-	sme_mgmt_frame->rx_flags = rx_flags;
 
 	qdf_mem_zero(sme_mgmt_frame->frameBuf, frame_len);
 	qdf_mem_copy(sme_mgmt_frame->frameBuf, frame, frame_len);

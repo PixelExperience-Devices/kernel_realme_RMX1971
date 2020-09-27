@@ -16,8 +16,7 @@
                             INCLUDE FILES FOR MODULE
 
 =============================================================================*/
-#ifdef VENDOR_EDIT
-//Liang.Zhang@PSW.TECH.BOOTUP, 2018/10/19, Add for get bootup log
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #ifdef HANG_OPPO_ALL
 
 #define OPPO_PARTITION_OPPORESERVE1_EMMC "/dev/block/platform/soc/c0c4000.sdhci/by-name/opporeserve1"

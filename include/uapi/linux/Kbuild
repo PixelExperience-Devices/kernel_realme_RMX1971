@@ -520,7 +520,6 @@ ifneq ($(VSERVICES_SUPPORT), "")
 include include/linux/Kbuild.vservices
 endif
 header-y += okl4-link-shbuf.h
-
 header-y += auto_dev-ioctl.h
 header-y += bcache.h
 header-y += btrfs_tree.h

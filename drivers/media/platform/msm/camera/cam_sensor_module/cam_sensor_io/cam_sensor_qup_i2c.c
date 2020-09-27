@@ -14,10 +14,9 @@
 #include "cam_sensor_i2c.h"
 #include "cam_sensor_io.h"
 
-#ifndef VENDOR_EDIT
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 #define I2C_REG_DATA_MAX       (8*1024)
 #else
-//add by yufeng@camera, 20190211 for backup eeprom data
 #define I2C_REG_DATA_MAX       (16*1024)
 #endif
 

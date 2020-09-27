@@ -261,7 +261,7 @@ extern void init_wait_entry(wait_queue_t *__wait, int flags);
  * on purpose; we use long where we can return timeout values and int
  * otherwise.
  */
-//#ifdef VENDOR_EDIT //fangpan@Swdp.shanghai,2015/11/12
+//#ifdef CONFIG_PRODUCT_REALME_SDM710
 #define ___wait_event(wq, condition, state, exclusive, ret, cmd)	\
 ({									\
 	__label__ __out;						\

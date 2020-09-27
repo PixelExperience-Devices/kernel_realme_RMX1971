@@ -6425,7 +6425,7 @@ enum hdd_link_speed_rpt_type {
  * gSapGetPeerInfo - Enable/Disable remote peer info query support
  * @Min: 0 - Disable remote peer info query support
  * @Max: 1 - Enable remote peer info query support
- * @Default: 1
+ * @Default: 0
  *
  * This ini is used to enable/disable remote peer info query support
  *
@@ -6436,7 +6436,7 @@ enum hdd_link_speed_rpt_type {
 #define CFG_SAP_GET_PEER_INFO                      "gSapGetPeerInfo"
 #define CFG_SAP_GET_PEER_INFO_MIN                   (0)
 #define CFG_SAP_GET_PEER_INFO_MAX                   (1)
-#define CFG_SAP_GET_PEER_INFO_DEFAULT               (1)
+#define CFG_SAP_GET_PEER_INFO_DEFAULT               (0)
 
 /*
  * <ini>
@@ -10073,27 +10073,6 @@ enum dot11p_mode {
 
 /*
  * <ini>
- * enable_dynamic_nss_chain_config - Enable/Disable dynamic nss and chain config
- * to FW.
- * @Min: 0
- * @Max: 1
- * @Default: 1
- *
- * Related: STA/SAP/P2P/NAN.
- *
- * Supported Feature: Dynamic chainmask
- *
- * Usage: External
- *
- * </ini>
- */
-#define CFG_ENABLE_DYNAMIC_NSS_CHAIN_CFG       "enable_dynamic_nss_chain_config"
-#define CFG_ENABLE_DYNAMIC_NSS_CHAIN_CFG_MIN   0
-#define CFG_ENABLE_DYNAMIC_NSS_CHAIN_CFG_MAX   1
-#define CFG_ENABLE_DYNAMIC_NSS_CHAIN_CFG_DEF   1
-
-/*
- * <ini>
  * disable_rx_mrc_5g - Config Param to disable 2 chains in 1x1 nss mode
  * @Min: 0
  * @Max: 1
@@ -10239,7 +10218,7 @@ enum dot11p_mode {
  * g_sta_sap_scc_on_lte_coex_chan - Allow STA+SAP SCC on LTE coex channel
  * @Min: 0
  * @Max: 1
- * @Default: 1
+ * @Default: 0
  *
  * This ini is used to allow STA+SAP SCC on LTE coex channel
  * 0 - Disallow STA+SAP SCC on LTE coex channel
@@ -10256,28 +10235,7 @@ enum dot11p_mode {
 #define CFG_STA_SAP_SCC_ON_LTE_COEX_CHAN              "g_sta_sap_scc_on_lte_coex_chan"
 #define CFG_STA_SAP_SCC_ON_LTE_COEX_CHAN_MIN          (0)
 #define CFG_STA_SAP_SCC_ON_LTE_COEX_CHAN_MAX          (1)
-#define CFG_STA_SAP_SCC_ON_LTE_COEX_CHAN_DEFAULT      (1)
-
-/*
- * <ini>
- * g_enable_go_force_scc - Enable/Disable force SCC on P2P GO
- * @Min: 0
- * @Max: 1
- * @Default: 0
- *
- * This ini and along with "gWlanMccToSccSwitchMode" is used to enable
- * force SCC on P2P GO interface.
- *
- * Supported Feature: P2P GO
- *
- * Usage: External
- *
- * </ini>
- */
-#define CFG_P2P_GO_ENABLE_FORCE_SCC              "g_enable_go_force_scc"
-#define CFG_P2P_GO_ENABLE_FORCE_SCC_MIN          (0)
-#define CFG_P2P_GO_ENABLE_FORCE_SCC_MAX          (1)
-#define CFG_P2P_GO_ENABLE_FORCE_SCC_DEFAULT      (0)
+#define CFG_STA_SAP_SCC_ON_LTE_COEX_CHAN_DEFAULT      (0)
 
 /*
  * gPNOChannelPrediction will allow user to enable/disable the
@@ -13758,7 +13716,7 @@ enum hdd_external_acs_policy {
  * sae_enabled - Enable/Disable SAE support in driver
  * @Min: 0
  * @Max: 1
- * @Default: 1
+ * @Default: 0
  *
  * This ini is used to enable/disable SAE support in driver
  * Driver will update config to supplicant based on this config.
@@ -13775,30 +13733,6 @@ enum hdd_external_acs_policy {
 #define CFG_IS_SAE_ENABLED_DEFAULT (1)
 #define CFG_IS_SAE_ENABLED_MIN     (0)
 #define CFG_IS_SAE_ENABLED_MAX     (1)
-
-/*
- * <ini>
- * enable_sae_for_sap - Enable/Disable SAE support in driver for SAP
- * channel&bandwidth in the mission mode
- * @Min: 0
- * @Max: 1
- * @Default: 1
- *
- * This ini is used to enable/disable SAE support in driver for SAP mode
- * Driver will process/drop the SAE authentication frames based on this config.
- *
- * Related: None
- *
- * Supported Feature: SAE
- *
- * Usage: External
- *
- * </ini>
- */
-#define CFG_IS_SAP_SAE_ENABLED_NAME    "enable_sae_for_sap"
-#define CFG_IS_SAP_SAE_ENABLED_DEFAULT (1)
-#define CFG_IS_SAP_SAE_ENABLED_MIN     (0)
-#define CFG_IS_SAP_SAE_ENABLED_MAX     (1)
 
 /*
  * Type declarations
@@ -15909,36 +15843,8 @@ enum hdd_external_acs_policy {
 #define CFG_ACTION_OUI_DISABLE_AGGRESSIVE_EDCA "gActionOUIDisableAggressiveEDCA"
 #define CFG_ACTION_OUI_DISABLE_AGGRESSIVE_EDCA_DEFAULT ""
 
-/*
- * <ini>
- * gActionOUIReconnAssocTimeout - Used to specify action OUIs to
- * reconnect to same BSSID when wait for association response timeout
- *
- * This ini is used to specify AP OUIs. Some of AP doesn't response our
- * first association request, but it would response our second association
- * request. Add such OUI configuration INI to apply reconnect logic when
- * association timeout happends with such AP.
- * For default:
- *     gActionOUIReconnAssocTimeout=00E04C 00 01
- *          Explain: 00E04C: OUI
- *                   00: data length is 0
- *                   01: infio mask, only OUI present in Info mask
- * Note: User should strictly add new action OUIs at the end of this
- * default value.
- * Refer to gEnableActionOUI for more detail about the format.
- *
- * Related: gEnableActionOUI
- *
- * Supported Feature: Action OUIs
- *
- * Usage: External
- *
- * </ini>
- */
-#define CFG_ACTION_OUI_RECONN_ASSOCTIMEOUT \
-	"gActionOUIReconnAssocTimeout"
-#define CFG_ACTION_OUI_RECONN_ASSOCTIMEOUT_DEFAULT "00E04C 00 01"
 /* End of action oui inis */
+
 
 /*
  * <ini>
@@ -16437,7 +16343,7 @@ enum hdd_external_acs_policy {
  * AP and roam candidate AP.
  * @Min: 0
  * @Max: 10000
- * @Default: 0
+ * @Default: 1850
  *
  * This ini is used during CU and low rssi based roam triggers, consider
  * AP as roam candidate only if its roam score is better than connected
@@ -16458,7 +16364,7 @@ enum hdd_external_acs_policy {
  * </ini>
  */
 #define CFG_CAND_MIN_ROAM_SCORE_DELTA "min_roam_score_delta"
-#define CFG_CAND_MIN_ROAM_SCORE_DELTA_DEFAULT 0
+#define CFG_CAND_MIN_ROAM_SCORE_DELTA_DEFAULT 1850
 #define CFG_CAND_MIN_ROAM_SCORE_DELTA_MAX 10000
 #define CFG_CAND_MIN_ROAM_SCORE_DELTA_MIN 0
 
@@ -17424,7 +17330,7 @@ enum hdd_external_acs_policy {
  */
 #define CFG_SAR_SAFETY_REQ_RESP_TIMEOUT          "gSarSafetyReqRespTimeout"
 #define CFG_SAR_SAFETY_REQ_RESP_TIMEOUT_MIN      (500)
-#define CFG_SAR_SAFETY_REQ_RESP_TIMEOUT_MAX      (1000)
+#define CFG_SAR_SAFETY_REQ_RESP_TIMEOUT_MAX      (3000)
 #define CFG_SAR_SAFETY_REQ_RESP_TIMEOUT_DEFAULT  (1000)
 
 /*
@@ -17450,7 +17356,7 @@ enum hdd_external_acs_policy {
  */
 #define CFG_SAR_SAFETY_REQ_RESP_RETRIES             "gSarSafetyReqRespRetry"
 #define CFG_SAR_SAFETY_REQ_RESP_RETRIES_MIN         (1)
-#define CFG_SAR_SAFETY_REQ_RESP_RETRIES_MAX         (5)
+#define CFG_SAR_SAFETY_REQ_RESP_RETRIES_MAX         (10)
 #define CFG_SAR_SAFETY_REQ_RESP_RETRIES_DEFAULT     (5)
 
 /*
@@ -17681,110 +17587,25 @@ enum hdd_external_acs_policy {
 #define CFG_BMISS_SKIP_FULL_SCAN_MAX           1
 #define CFG_BMISS_SKIP_FULL_SCAN_DEFAULT       0
 
-#ifdef WLAN_FEATURE_PERIODIC_STA_STATS
 /*
  * <ini>
- * periodic_stats_timer_interval - Print selective stats on this specified
- *				   interval
+ * p2p_disable_roam- Disable Roam on sta interface during P2P connection
+ * @Min: 0 - Roam Enabled on sta interface during P2P connection
+ * @Max: 1 - Roam Disabled on sta interface during P2P connection
+ * @Default: 0
  *
- * @Min: 0
- * @Max: 10000
- * Default: 3000
+ * Disable roaming on STA iface to avoid audio glitches on p2p if its connected
  *
- * This ini is used to specify interval in milliseconds for periodic stats
- * timer. This timer will print selective stats after expiration of each
- * interval. STA starts this periodic timer after initial connection or after
- * roaming is successful. This will be restarted for every
- * periodic_stats_timer_interval till the periodic_stats_timer_duration expires.
- *
- * Supported Feature: STA
+ * Supported Feature: Disable Roam during P2P
  *
  * Usage: Internal
  *
  * </ini>
  */
-#define CFG_PERIODIC_STATS_TIMER_INTERVAL		"periodic_stats_timer_interval"
-#define CFG_PERIODIC_STATS_TIMER_INTERVAL_MIN		(0)
-#define CFG_PERIODIC_STATS_TIMER_INTERVAL_MAX		(10000)
-#define CFG_PERIODIC_STATS_TIMER_INTERVAL_DEFAULT	(3000)
-
-/*
- * <ini>
- * periodic_stats_timer_duration - Used as duration for which periodic timer
- *				   should run
- *
- * @Min: 0
- * @Max: 60000
- * Default: 30000
- *
- * This ini is used as duration in milliseconds for which periodic stats timer
- * should run. This periodic timer will print selective stats for every
- * periodic_stats_timer_interval until this duration is reached.
- *
- * Supported Feature: STA
- *
- * Usage: Internal
- *
- * </ini>
- */
-#define CFG_PERIODIC_STATS_TIMER_DURATION		"periodic_stats_timer_duration"
-#define CFG_PERIODIC_STATS_TIMER_DURATION_MIN		(0)
-#define CFG_PERIODIC_STATS_TIMER_DURATION_MAX		(60000)
-#define CFG_PERIODIC_STATS_TIMER_DURATION_DEFAULT	(30000)
-
-#endif /* WLAN_FEATURE_PERIODIC_STA_STATS */
-
-/*
- * <ini>
- * sta_disable_roam - Disable Roam on sta interface
- * @Min: 0 - Roam Enabled on sta interface
- * @Max: 0xffffffff - Roam Disabled on sta interface irrespective
- * of other interface connections
- * @Default: 0x00
- *
- * Disable roaming on STA iface to avoid audio glitches on p2p and ndp if
- * those are in connected state. Each bit for "sta_disable_roam" INI represents
- * an interface for which sta roaming can be disabled.
- *
- * LFR3_STA_ROAM_DISABLE_BY_P2P BIT(0)
- * LFR3_STA_ROAM_DISABLE_BY_NAN BIT(1)
- *
- * Related: None.
- *
- * Supported Feature: ROAM
- *
- * Usage: Internal
- *
- * </ini>
- */
-#define CFG_STA_DISABLE_ROAM            "sta_disable_roam"
-#define CFG_STA_DISABLE_ROAM_MIN         (0)
-#define CFG_STA_DISABLE_ROAM_MAX         (0XFFFFFFFF)
-#define CFG_STA_DISABLE_ROAM_DEFAULT     (0X00)
-
-/*
- * <ini>
- * dfs_chan_ageout_time - Set DFS Channel ageout time(in seconds)
- * @Min: 0
- * @Max: 8
- * Default: 0
- *
- * Ageout time is the time upto which DFS channel information such as beacon
- * found is remembered. So that Firmware performs Active scan instead of the
- * Passive to reduce the Dwell time.
- * This ini Parameter used to set ageout timer value from host to FW.
- * If not set, Firmware will disable ageout time.
- *
- * Supported Feature: STA scan in DFS channels
- *
- * Usage: External
- *
- * </ini>
- */
-#define CFG_DFS_CHAN_AGEOUT_TIME		"dfs_chan_ageout_time"
-#define CFG_DFS_CHAN_AGEOUT_TIME_MIN		(0)
-#define CFG_DFS_CHAN_AGEOUT_TIME_MAX		(8)
-#define CFG_DFS_CHAN_AGEOUT_TIME_DEFAULT	(0)
+#define CFG_P2P_DISABLE_ROAM            "p2p_disable_roam"
+#define CFG_P2P_DISABLE_ROAM_MIN         (0)
+#define CFG_P2P_DISABLE_ROAM_MAX         (1)
+#define CFG_P2P_DISABLE_ROAM_DEFAULT     (0)
 
 /*
  * Type declarations
@@ -18403,7 +18224,6 @@ struct hdd_config {
 	uint8_t dbs_scan_selection[CFG_DBS_SCAN_PARAM_LENGTH];
 	uint32_t sta_sap_scc_on_dfs_chan;
 	uint32_t sta_sap_scc_on_lte_coex_chan;
-	uint32_t go_force_scc;
 	bool     tx_chain_mask_cck;
 	uint8_t  tx_chain_mask_1ss;
 	bool smart_chainmask_enabled;
@@ -18689,7 +18509,6 @@ struct hdd_config {
 	uint32_t btm_offload_config;
 #ifdef WLAN_FEATURE_SAE
 	bool is_sae_enabled;
-	bool sap_sae_enabled;
 #endif
 	uint32_t btm_solicited_timeout;
 	uint32_t btm_max_attempt_cnt;
@@ -18759,7 +18578,6 @@ struct hdd_config {
 	bool disable_rx_mrc_2g;
 	bool disable_tx_mrc_5g;
 	bool disable_rx_mrc_5g;
-	bool enable_dynamic_nss_chains_cfg;
 	bool mac_provision;
 	uint32_t provisioned_intf_pool;
 	uint32_t derived_intf_pool;
@@ -18827,15 +18645,7 @@ struct hdd_config {
 	bool time_sync_ftm_mode;
 	bool time_sync_ftm_role;
 #endif
-	uint32_t sta_disable_roam;
-
-#ifdef WLAN_FEATURE_PERIODIC_STA_STATS
-	/* Periodicity of logging */
-	uint32_t periodic_stats_timer_interval;
-	/* Duration for which periodic logging should be done */
-	uint32_t periodic_stats_timer_duration;
-#endif /* WLAN_FEATURE_PERIODIC_STA_STATS */
-	uint8_t dfs_chan_ageout_time;
+	bool p2p_disable_roam;
 };
 
 #define VAR_OFFSET(_Struct, _Var) (offsetof(_Struct, _Var))

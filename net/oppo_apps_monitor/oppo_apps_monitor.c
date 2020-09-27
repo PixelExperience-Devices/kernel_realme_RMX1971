@@ -1,8 +1,7 @@
 /***********************************************************
 ** Copyright (C), 2008-2019, OPPO Mobile Comm Corp., Ltd.
-** VENDOR_EDIT
+** CONFIG_PRODUCT_REALME_SDM710
 ** File: oppo_apps_monitor.c
-** Description: Add for apps network monitor
 **
 ** Version: 1.0
 ** Date : 2019/04/15

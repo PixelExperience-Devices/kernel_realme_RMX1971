@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2018, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -20,9 +20,9 @@
 #include <video/mipi_display.h>
 #include <linux/firmware.h>
 
-#ifdef VENDOR_EDIT //Cong.Dai@BSP.TP.Function, 2019/07/03, modified for replace daily build macro
+#ifdef CONFIG_PRODUCT_REALME_SDM710 //Cong.Dai@BSP.TP.Function, 2019/07/03, modified for replace daily build macro
 #include <soc/oppo/oppo_project.h>
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 #include "dsi_panel.h"
 #include "dsi_ctrl_hw.h"
@@ -47,11 +47,11 @@
 #define MAX_PANEL_JITTER		10
 #define DEFAULT_PANEL_PREFILL_LINES	25
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /*YunRui.Chen@BSP.TP.Function, 2018/12/05, add for trigger load tp fw by lcd driver after lcd reset*/
 extern void lcd_queue_load_tp_fw(void);
 static int tp_black_power_on_ff_flag = 0;
-#endif/*VENDOR_EDIT*/
+#endif/*CONFIG_PRODUCT_REALME_SDM710*/
 
 enum dsi_dsc_ratio_type {
 	DSC_8BPC_8BPP,
@@ -109,7 +109,7 @@ static char dsi_dsc_rc_range_max_qp_1_1_scr1[][15] = {
  */
 static char dsi_dsc_rc_range_bpg_offset[] = {2, 0, 0, -2, -4, -6, -8, -8,
 		-8, -10, -10, -12, -12, -12, -12};
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 //Wenping.ZHOU@BSP, 2019/09/20,
 //add for tp black gesture
 extern int tp_gesture_enable_flag(void);
@@ -122,7 +122,7 @@ static int mdss_tp_black_gesture_status(void){
 	pr_err("%s: ret = %d\n", __func__, ret);
 	return ret;
 }
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 int dsi_dsc_create_pps_buf_cmd(struct msm_display_dsc_info *dsc, char *buf,
 				int pps_id)
@@ -276,103 +276,6 @@ static int dsi_panel_vreg_put(struct dsi_panel *panel)
 	return rc;
 }
 
-static int dsi_panel_exd_gpio_request(struct dsi_panel *panel)
-{
-	int rc = 0;
-	struct dsi_panel_exd_config *e_config = &panel->exd_config;
-
-	if (!e_config->display_1p8_en && !e_config->led_5v_en &&
-		!e_config->led_en1 && !e_config->led_en2 &&
-		!e_config->oenab && !e_config->selab &&
-		!e_config->switch_power)
-		return 0;
-
-	if (gpio_is_valid(e_config->display_1p8_en)) {
-		rc = gpio_request(e_config->display_1p8_en, "display_1p8_en");
-		if (rc) {
-			pr_err("request for display_1p8_en failed, rc=%d\n",
-				rc);
-			goto error;
-		}
-	}
-
-	if (gpio_is_valid(e_config->led_5v_en)) {
-		rc = gpio_request(e_config->led_5v_en, "led_5v_en");
-		if (rc) {
-			pr_err("request for led_5v_en failed, rc=%d\n",
-				rc);
-			goto error_release_1p8;
-		}
-	}
-
-	if (gpio_is_valid(e_config->led_en1)) {
-		rc = gpio_request(e_config->led_en1, "led_en1");
-		if (rc) {
-			pr_err("request for led_en1 failed, rc=%d\n",
-				rc);
-			goto error_release_5v;
-		}
-	}
-
-	if (gpio_is_valid(e_config->led_en2)) {
-		rc = gpio_request(e_config->led_en2, "led_en2");
-		if (rc) {
-			pr_err("request for led_en2 failed, rc=%d\n",
-				rc);
-			goto error_release_led;
-		}
-	}
-
-	if (gpio_is_valid(e_config->oenab)) {
-		rc = gpio_request(e_config->oenab, "oenab");
-		if (rc) {
-			pr_err("request for oenab failed, rc=%d\n",
-				rc);
-			goto error_release_led2;
-		}
-	}
-
-	if (gpio_is_valid(e_config->selab)) {
-		rc = gpio_request(e_config->selab, "selab");
-		if (rc) {
-			pr_err("request for selab failed, rc=%d\n",
-				rc);
-			goto error_release_oenab;
-		}
-	}
-
-	if (gpio_is_valid(e_config->switch_power)) {
-		rc = gpio_request(e_config->switch_power, "switch_power");
-		if (rc) {
-			pr_err("request for switch_power failed, rc=%d\n",
-				rc);
-			goto error_release_selab;
-		}
-	}
-	return rc;
-
-error_release_selab:
-	if (gpio_is_valid(e_config->selab))
-		gpio_free(e_config->selab);
-error_release_oenab:
-	if (gpio_is_valid(e_config->oenab))
-		gpio_free(e_config->oenab);
-error_release_led2:
-	if (gpio_is_valid(e_config->led_en2))
-		gpio_free(e_config->led_en2);
-error_release_led:
-	if (gpio_is_valid(e_config->led_en1))
-		gpio_free(e_config->led_en1);
-error_release_5v:
-	if (gpio_is_valid(e_config->led_5v_en))
-		gpio_free(e_config->led_5v_en);
-error_release_1p8:
-	if (gpio_is_valid(e_config->display_1p8_en))
-		gpio_free(e_config->display_1p8_en);
-error:
-	return rc;
-}
-
 static int dsi_panel_gpio_request(struct dsi_panel *panel)
 {
 	int rc = 0;
@@ -422,34 +325,6 @@ error_release_reset:
 		gpio_free(r_config->reset_gpio);
 error:
 	return rc;
-}
-
-static int dsi_panel_exd_gpio_release(struct dsi_panel *panel)
-{
-	struct dsi_panel_exd_config *e_config = &panel->exd_config;
-
-	if (!e_config->display_1p8_en && !e_config->led_5v_en &&
-		!e_config->led_en1 && !e_config->led_en2 &&
-		!e_config->oenab && !e_config->selab &&
-		!e_config->switch_power)
-		return 0;
-
-	if (gpio_is_valid(e_config->display_1p8_en))
-		gpio_free(e_config->display_1p8_en);
-	if (gpio_is_valid(e_config->led_5v_en))
-		gpio_free(e_config->led_5v_en);
-	if (gpio_is_valid(e_config->led_en1))
-		gpio_free(e_config->led_en1);
-	if (gpio_is_valid(e_config->led_en2))
-		gpio_free(e_config->led_en2);
-	if (gpio_is_valid(e_config->oenab))
-		gpio_free(e_config->oenab);
-	if (gpio_is_valid(e_config->selab))
-		gpio_free(e_config->selab);
-	if (gpio_is_valid(e_config->switch_power))
-		gpio_free(e_config->switch_power);
-
-	return 0;
 }
 
 static int dsi_panel_gpio_release(struct dsi_panel *panel)
@@ -575,112 +450,7 @@ static int dsi_panel_set_pinctrl_state(struct dsi_panel *panel, bool enable)
 	return rc;
 }
 
-static int dsi_panel_exd_enable(struct dsi_panel *panel)
-{
-	int rc = 0;
-	struct dsi_panel_exd_config *e_config = &panel->exd_config;
-
-	if (!e_config->display_1p8_en && !e_config->led_5v_en &&
-			!e_config->led_en1 && !e_config->led_en2 &&
-			!e_config->oenab && !e_config->selab &&
-			!e_config->switch_power)
-		return 0;
-
-	if (gpio_is_valid(e_config->display_1p8_en)) {
-		rc = gpio_direction_output(e_config->display_1p8_en, 0);
-		if (rc) {
-			pr_err("unable to set dir for disp_1p8_en rc:%d\n",
-				rc);
-			goto exit;
-		}
-		gpio_set_value(e_config->display_1p8_en, 1);
-	}
-
-	if (gpio_is_valid(e_config->switch_power)) {
-		rc = gpio_direction_output(e_config->switch_power, 0);
-		if (rc) {
-			pr_err("unable to set dir for switch_power rc:%d\n",
-				rc);
-			goto exit;
-		}
-		gpio_set_value(e_config->switch_power, 1);
-	}
-
-	if (gpio_is_valid(e_config->led_5v_en)) {
-		rc = gpio_direction_output(e_config->led_5v_en, 0);
-		if (rc) {
-			pr_err("unable to set dir for led_5v_en rc:%d\n", rc);
-			goto exit;
-		}
-		gpio_set_value(e_config->led_5v_en, 1);
-	}
-
-	if (gpio_is_valid(e_config->led_en1)) {
-		rc = gpio_direction_output(e_config->led_en1, 0);
-		if (rc) {
-			pr_err("unable to set dir for led_en1 rc:%d\n", rc);
-			goto exit;
-		}
-		gpio_set_value(e_config->led_en1, 1);
-	}
-
-	if (gpio_is_valid(e_config->led_en2)) {
-		rc = gpio_direction_output(e_config->led_en2, 0);
-		if (rc) {
-			pr_err("unable to set dir for led_en2 rc:%d\n", rc);
-			goto exit;
-		}
-		gpio_set_value(e_config->led_en2, 1);
-	}
-
-	if (gpio_is_valid(e_config->oenab)) {
-		rc = gpio_direction_output(e_config->oenab, 0);
-		if (rc) {
-			pr_err("unable to set dir for oenab rc:%d\n", rc);
-			goto exit;
-		}
-		gpio_set_value(e_config->oenab, 0);
-	}
-
-	if (gpio_is_valid(e_config->selab)) {
-		rc = gpio_direction_output(e_config->selab, 0);
-		if (rc) {
-			pr_err("unable to set dir for selab rc:%d\n", rc);
-			goto exit;
-		}
-		gpio_set_value(e_config->selab, 1);
-	}
-exit:
-	return rc;
-}
-
-static void dsi_panel_exd_disable(struct dsi_panel *panel)
-{
-	struct dsi_panel_exd_config *e_config = &panel->exd_config;
-
-	if (!e_config->display_1p8_en && !e_config->led_5v_en &&
-		!e_config->led_en1 && !e_config->led_en2 &&
-		!e_config->oenab && !e_config->selab &&
-		!e_config->switch_power)
-		return;
-
-	if (gpio_is_valid(e_config->display_1p8_en))
-		gpio_set_value(e_config->display_1p8_en, 0);
-	if (gpio_is_valid(e_config->led_5v_en))
-		gpio_set_value(e_config->led_5v_en, 0);
-	if (gpio_is_valid(e_config->led_en1))
-		gpio_set_value(e_config->led_en1, 0);
-	if (gpio_is_valid(e_config->led_en2))
-		gpio_set_value(e_config->led_en2, 0);
-	if (gpio_is_valid(e_config->oenab))
-		gpio_set_value(e_config->oenab, 1);
-	if (gpio_is_valid(e_config->selab))
-		gpio_set_value(e_config->selab, 0);
-	if (gpio_is_valid(e_config->switch_power))
-		gpio_set_value(e_config->switch_power, 0);
-}
-
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static int dsi_panel_1p8_on_off(struct dsi_panel *panel , int value)
 {
 	int rc = 0;
@@ -700,7 +470,7 @@ static int dsi_panel_power_on(struct dsi_panel *panel)
 	int rc = 0;
     pr_err("%s:project_name = %d\n",__func__, get_project());
 
-#ifndef VENDOR_EDIT
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 /* Jinzhu.Han@RM.MM.LCD.stability 2019.11.23. Add for compatibility*/
 	rc = dsi_pwr_enable_regulator(&panel->power_info, true);
 	if (rc) {
@@ -728,7 +498,7 @@ static int dsi_panel_power_on(struct dsi_panel *panel)
             goto exit;
         }
 	}
-#endif /*VENDOR_EDIT */
+#endif /*CONFIG_PRODUCT_REALME_SDM710 */
 
 	rc = dsi_panel_set_pinctrl_state(panel, true);
 	if (rc) {
@@ -739,13 +509,6 @@ static int dsi_panel_power_on(struct dsi_panel *panel)
 	rc = dsi_panel_reset(panel);
 	if (rc) {
 		pr_err("[%s] failed to reset panel, rc=%d\n", panel->name, rc);
-		goto error_disable_gpio;
-	}
-
-	rc = dsi_panel_exd_enable(panel);
-	if (rc) {
-		pr_err("[%s] failed to reset panel, rc=%d\n", panel->name, rc);
-		dsi_panel_exd_disable(panel);
 		goto error_disable_gpio;
 	}
 
@@ -772,9 +535,7 @@ static int dsi_panel_power_off(struct dsi_panel *panel)
 	int rc = 0;
     pr_err("%s:project_name = %d\n",__func__, get_project());
 
-dsi_panel_exd_disable(panel);
-
-#ifndef VENDOR_EDIT
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 /* Jinzhu.Han@RM.MM.LCD.stability 2019.11.23. Add for compatibility*/
 	if (gpio_is_valid(panel->reset_config.disp_en_gpio))
 		gpio_set_value(panel->reset_config.disp_en_gpio, 0);
@@ -853,19 +614,18 @@ dsi_panel_exd_disable(panel);
         if (rc)
             pr_err("[%s] failed to enable vregs, rc=%d\n", panel->name, rc);
     }
-#endif /*VENDOR_EDIT */
+#endif /*CONFIG_PRODUCT_REALME_SDM710 */
 
 	return rc;
 }
-#ifndef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stability,2018/9/26,add for oppo display new structure*/
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 static int dsi_panel_tx_cmd_set(struct dsi_panel *panel,
 				enum dsi_cmd_set_type type)
-#else  /*VENDOR_EDIT*/
+#else  /*CONFIG_PRODUCT_REALME_SDM710*/
 const char *cmd_set_prop_map[];
 int dsi_panel_tx_cmd_set(struct dsi_panel *panel,
 				enum dsi_cmd_set_type type)
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 {
 	int rc = 0, i = 0;
 	ssize_t len;
@@ -886,10 +646,9 @@ int dsi_panel_tx_cmd_set(struct dsi_panel *panel,
 	cmds = mode->priv_info->cmd_sets[type].cmds;
 	count = mode->priv_info->cmd_sets[type].count;
 	state = mode->priv_info->cmd_sets[type].state;
-	#ifdef VENDOR_EDIT
-	/*liping-m@PSW.MM.Display.LCD.Stability,2018/9/26,add for oppo display new structure*/
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	pr_err("dsi_cmd %s\n", cmd_set_prop_map[type]);
-	#endif /*VENDOR_EDIT*/
+	#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 	if (count == 0) {
 		pr_debug("[%s] No commands to be sent for state(%d)\n",
@@ -1002,15 +761,14 @@ static int dsi_panel_led_bl_register(struct dsi_panel *panel,
 }
 #endif
 
-#ifdef VENDOR_EDIT
-/*gaosong@PSW.MM.Display.LCD.Params,2019-05-13 add for underscreen fingerprints */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 extern int oppo_dimlayer_bl_alpha;
 extern int oppo_dimlayer_bl_enabled;
 extern int oppo_dimlayer_bl_enable_real;
 ktime_t oppo_backlight_time;
 u32 oppo_last_backlight = 0;
 u32 oppo_backlight_delta = 0;
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 static int dsi_panel_update_backlight(struct dsi_panel *panel,
 	u32 bl_lvl)
@@ -1025,9 +783,8 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 
 	dsi = &panel->mipi_device;
 
-	#ifdef VENDOR_EDIT
-	/*liping-m@PSW.MM.Display.LCD.Feature,2018/9/26 temp add for OnScreenFingerprint feature*/
-	if (panel->is_hbm_enabled){
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
+	if (panel->is_hbm_enabled && bl_lvl != 0){
 		pr_err("panel hbm is enabled\n");
 		return 0;
 	}
@@ -1039,7 +796,6 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 	oppo_last_backlight = bl_lvl;
 	oppo_backlight_time = ktime_get();
 
-	/* LiPing-m@PSW.MM.Display.LCD.Stability,2019/01/10,add for lcd daily build and agingTest debug */
 	/* Cong.Dai@BSP.TP.Function, 2019/07/03, modified for replace daily build macro */
 	if (oppo_daily_build())
 		pr_err("backlight level %d\n", bl_lvl);
@@ -1059,7 +815,7 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 		if (bl_lvl > 1)
 			bl_lvl = oppo_dimlayer_bl_alpha;
 	}
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	rc = mipi_dsi_dcs_set_display_brightness(dsi, bl_lvl);
 	if (rc < 0)
 		pr_err("failed to update dcs backlight:%d\n", bl_lvl);
@@ -1909,8 +1665,7 @@ static int dsi_panel_parse_phy_props(struct dsi_panel_phy_props *props,
 error:
 	return rc;
 }
-#ifndef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stability,2018/9/26,add for support aod,hbm,seed*/
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 const char *cmd_set_prop_map[DSI_CMD_SET_MAX] = {
 	"qcom,mdss-dsi-pre-on-command",
 	"qcom,mdss-dsi-on-command",
@@ -1959,7 +1714,7 @@ const char *cmd_set_state_map[DSI_CMD_SET_MAX] = {
 	"qcom,mdss-dsi-post-mode-switch-on-command-state",
 };
 
-#else /*VENDOR_EDIT*/
+#else /*CONFIG_PRODUCT_REALME_SDM710*/
 const char *cmd_set_prop_map[DSI_CMD_SET_MAX] = {
 	"qcom,mdss-dsi-pre-on-command",
 	"qcom,mdss-dsi-on-command",
@@ -2047,7 +1802,7 @@ const char *cmd_set_state_map[DSI_CMD_SET_MAX] = {
 	"qcom,mdss-dsi-cabc-still-image-command-state",
 	"qcom,mdss-dsi-cabc-video-command-state",
 };
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 static int dsi_panel_get_cmd_pkt_count(const char *data, u32 length, u32 *cnt)
 {
@@ -2400,63 +2155,6 @@ error:
 	return rc;
 }
 
-static int dsi_panel_exd_parse_gpios(struct dsi_panel *panel,
-				 struct device_node *of_node)
-{
-	int rc = 0;
-	struct dsi_panel_exd_config *e_config = &panel->exd_config;
-
-	e_config->display_1p8_en = of_get_named_gpio(of_node,
-			"qcom,1p8-en-gpio", 0);
-	if (!e_config->display_1p8_en) {
-		pr_debug("%s qcom,display-1p8-en-gpio not found\n", __func__);
-		return -EINVAL;
-	}
-
-	e_config->led_5v_en = of_get_named_gpio(of_node,
-				"qcom,led-5v-en-gpio", 0);
-	if (!e_config->led_5v_en) {
-		pr_debug("%s qcom,led-5v-en-gpio not found\n", __func__);
-		return -EINVAL;
-	}
-
-	e_config->led_en1 = of_get_named_gpio(of_node,
-				"qcom,led-driver-en1-gpio", 0);
-	if (!e_config->led_en1) {
-		pr_debug("%s qcom,led-driver-en1-gpio not found\n", __func__);
-		return -EINVAL;
-	}
-
-	e_config->led_en2 = of_get_named_gpio(of_node,
-				"qcom,led-driver-en2-gpio", 0);
-	if (!e_config->led_en2) {
-		pr_debug("%s qcom,led-driver-en2-gpio not found\n", __func__);
-		return -EINVAL;
-	}
-
-	e_config->oenab = of_get_named_gpio(of_node,
-				"qcom,oenab-gpio", 0);
-	if (!e_config->oenab) {
-		pr_debug("%s qcom,oenab-gpio not found\n", __func__);
-		return -EINVAL;
-	}
-
-	e_config->selab = of_get_named_gpio(of_node,
-				"qcom,selab-gpio", 0);
-	if (!e_config->selab) {
-		pr_debug("%s qcom,selab-gpio not found\n", __func__);
-		return -EINVAL;
-	}
-
-	e_config->switch_power = of_get_named_gpio(of_node,
-				"qcom,switch-power-gpio", 0);
-	if (!e_config->switch_power) {
-		pr_debug("%s qcom,switch_power not found\n", __func__);
-		return -EINVAL;
-	}
-	return rc;
-}
-
 static int dsi_panel_parse_gpios(struct dsi_panel *panel,
 				 struct device_node *of_node)
 {
@@ -2511,12 +2209,6 @@ static int dsi_panel_parse_gpios(struct dsi_panel *panel,
 		/* Set default mode as SPLIT mode */
 		panel->reset_config.mode_sel_state = MODE_SEL_DUAL_PORT;
 	}
-
-	/* Extended display panel gpios parsed */
-	rc = dsi_panel_exd_parse_gpios(panel, of_node);
-	if (rc && rc != -EINVAL)
-		pr_err("[%s] failed to parse gpios, rc=%d\n",
-				panel->name, rc);
 
 	/* TODO:  release memory */
 	rc = dsi_panel_parse_reset_sequence(panel, of_node);
@@ -3681,17 +3373,8 @@ int dsi_panel_drv_init(struct dsi_panel *panel,
 		goto error_gpio_release;
 	}
 
-	rc = dsi_panel_exd_gpio_request(panel);
-	if (rc) {
-		pr_err("[%s] failed to request gpios, rc=%d\n", panel->name,
-				rc);
-		goto error_exd_gpio_release;
-	}
-
 	goto exit;
 
-error_exd_gpio_release:
-	(void)dsi_panel_exd_gpio_release(panel);
 error_gpio_release:
 	(void)dsi_panel_gpio_release(panel);
 error_pinctrl_deinit:
@@ -3726,11 +3409,6 @@ int dsi_panel_drv_deinit(struct dsi_panel *panel)
 	if (rc)
 		pr_err("[%s] failed to release gpios, rc=%d\n", panel->name,
 		       rc);
-
-	rc = dsi_panel_exd_gpio_release(panel);
-	if (rc)
-		pr_err("[%s] failed to release gpios, rc=%d\n", panel->name,
-			rc);
 
 	rc = dsi_panel_pinctrl_deinit(panel);
 	if (rc)
@@ -4053,8 +3731,7 @@ int dsi_panel_set_lp1(struct dsi_panel *panel)
 
 	if (panel->type == EXT_BRIDGE)
 		return 0;
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Lcd.Stability, 2018/9/26,add to mark power states*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	pr_err("debug for dsi_panel_set_lp1\n");
 #endif
 	mutex_lock(&panel->panel_lock);
@@ -4062,10 +3739,8 @@ int dsi_panel_set_lp1(struct dsi_panel *panel)
 	if (rc)
 		pr_err("[%s] failed to send DSI_CMD_SET_LP1 cmd, rc=%d\n",
 		       panel->name, rc);
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stable,2018/9/26 fix aod flash problem */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	panel->need_power_on_backlight = true;
-/*liping-m@PSW.MM.Display.LCD.Stability,2018/9/26,set and save display status*/
 	set_oppo_display_power_status(OPPO_DISPLAY_POWER_DOZE);
 #endif
 	mutex_unlock(&panel->panel_lock);
@@ -4083,8 +3758,7 @@ int dsi_panel_set_lp2(struct dsi_panel *panel)
 
 	if (panel->type == EXT_BRIDGE)
 		return 0;
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Lcd.Stability, 2018/9/26,add to mark power states*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	pr_err("debug for dsi_panel_set_lp2\n");
 #endif
 	mutex_lock(&panel->panel_lock);
@@ -4092,8 +3766,7 @@ int dsi_panel_set_lp2(struct dsi_panel *panel)
 	if (rc)
 		pr_err("[%s] failed to send DSI_CMD_SET_LP2 cmd, rc=%d\n",
 		       panel->name, rc);
-#ifdef VENDOR_EDIT
-/*liping-mo@PSW.MM.Display.LCD.Stability,2018/9/26,set and save display status*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	set_oppo_display_power_status(OPPO_DISPLAY_POWER_DOZE_SUSPEND);
 #endif
 	mutex_unlock(&panel->panel_lock);
@@ -4111,8 +3784,7 @@ int dsi_panel_set_nolp(struct dsi_panel *panel)
 
 	if (panel->type == EXT_BRIDGE)
 		return 0;
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Lcd.Stability, 2018/9/26,add to mark power states*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	pr_err("debug for dsi_panel_set_nolp\n");
 #endif
 	mutex_lock(&panel->panel_lock);
@@ -4120,8 +3792,7 @@ int dsi_panel_set_nolp(struct dsi_panel *panel)
 	if (rc)
 		pr_err("[%s] failed to send DSI_CMD_SET_NOLP cmd, rc=%d\n",
 		       panel->name, rc);
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stability,2018/9/26,set and save display status*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	set_oppo_display_power_status(OPPO_DISPLAY_POWER_ON);
 #endif
 	mutex_unlock(&panel->panel_lock);
@@ -4150,15 +3821,14 @@ int dsi_panel_prepare(struct dsi_panel *panel)
 			goto error;
 		}
 	}
- 	#ifdef VENDOR_EDIT
+ 	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/*YunRui.Chen@BSP.TP.Function, 2018/12/05, add for trigger load tp fw by lcd driver after lcd reset*/
 	lcd_queue_load_tp_fw();
-	#endif/*VENDOR_EDIT*/
+	#endif/*CONFIG_PRODUCT_REALME_SDM710*/
 
-	#ifdef VENDOR_EDIT
-	/*Mark.Yao@PSW.MM.Display.LCD.Stable,2018-07-17 need wait 5ms after lp11 init */
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	usleep_range(5 * 1000, 5 * 1000);
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_PRE_ON);
 	if (rc) {
@@ -4348,8 +4018,7 @@ int dsi_panel_enable(struct dsi_panel *panel)
 	if (panel->type == EXT_BRIDGE)
 		return 0;
 
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Lcd.Stability, 2018/9/26,add to mark power states*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	pr_err("debug for dsi_panel_enable\n");
 #endif
 	mutex_lock(&panel->panel_lock);
@@ -4360,12 +4029,10 @@ int dsi_panel_enable(struct dsi_panel *panel)
 		       panel->name, rc);
 	}
 	panel->panel_initialized = true;
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stable,2018/9/26 avoid screen flash when esd reset */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	panel->need_power_on_backlight = true;
 #endif
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stability,2018/9/26,add for save display panel power status at oppo display management*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	set_oppo_display_power_status(OPPO_DISPLAY_POWER_ON);
 #endif
 	mutex_unlock(&panel->panel_lock);
@@ -4434,8 +4101,7 @@ int dsi_panel_disable(struct dsi_panel *panel)
 
 	if (panel->type == EXT_BRIDGE)
 		return 0;
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Lcd.Stability, 2018/9/26,add to mark power states*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	pr_err("debug for dsi_panel_disable\n");
 #endif
 	mutex_lock(&panel->panel_lock);
@@ -4450,14 +4116,12 @@ int dsi_panel_disable(struct dsi_panel *panel)
 		}
 	}
 	panel->panel_initialized = false;
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stable,2018/9/26 fix esd not work when enable OnScreenFingerprint */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	panel->is_hbm_enabled = false;
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 error:
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stability,2018/9/26,add for save display panel power status at oppo display management*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	set_oppo_display_power_status(OPPO_DISPLAY_POWER_OFF);
 #endif
 	mutex_unlock(&panel->panel_lock);

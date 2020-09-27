@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018, 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2014-2018, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -29,14 +29,12 @@
 #include <linux/nvmem-consumer.h>
 #include <linux/debugfs.h>
 #include <linux/hrtimer.h>
-#ifdef VENDOR_EDIT
-/* tongfeng.Huang@BSP.CHG.Basic, 2018/09/06,  Add for 18181 usb eye diagram  */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <soc/oppo/oppo_project.h>
 #endif
 
 /* QUSB2PHY_PWR_CTRL1 register related bits */
 #define PWR_CTRL1_POWR_DOWN		BIT(0)
-#define CLAMP_N_EN			BIT(1)
 
 /* QUSB2PHY_PLL_COMMON_STATUS_ONE register related bits */
 #define CORE_READY_STATUS		BIT(0)
@@ -87,10 +85,6 @@
 /* STAT5 register bits */
 #define VSTATUS_PLL_LOCK_STATUS_MASK	BIT(0)
 
-/* DEBUG_CTRL4 register bits  */
-#define FORCED_UTMI_DPPULLDOWN	BIT(2)
-#define FORCED_UTMI_DMPULLDOWN	BIT(3)
-
 enum qusb_phy_reg {
 	PORT_TUNE1,
 	PLL_COMMON_STATUS_ONE,
@@ -103,8 +97,6 @@ enum qusb_phy_reg {
 	SQ_CTRL2,
 	DEBUG_CTRL1,
 	DEBUG_CTRL2,
-	DEBUG_CTRL3,
-	DEBUG_CTRL4,
 	STAT5,
 	USB2_PHY_REG_MAX,
 };
@@ -418,8 +410,7 @@ done:
 	mutex_unlock(&qphy->lock);
 	return ret;
 }
-#ifdef VENDOR_EDIT
-/* tongfeng.Huang@BSP.CHG.Basic, 2018/09/06,  Add for 18181 usb eye diagram  */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 unsigned int dev_phy_tune1 = 0x37;
 module_param(dev_phy_tune1, uint, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(dev_phy_tune1, "QUSB PHY v2 TUNE1");
@@ -495,24 +486,6 @@ static void qusb_phy_write_seq(void __iomem *base, u32 *seq, int cnt,
 		if (delay)
 			usleep_range(delay, (delay + 2000));
 	}
-}
-static void msm_usb_write_readback(void __iomem *base, u32 offset,
-					const u32 mask, u32 val)
-{
-	u32 write_val, tmp = readl_relaxed(base + offset);
-
-	tmp &= ~mask;		/* retain other bits */
-	write_val = tmp | val;
-
-	writel_relaxed(write_val, base + offset);
-
-	/* Read back to see if val was written */
-	tmp = readl_relaxed(base + offset);
-	tmp &= mask;		/* clear other bits */
-
-	if (tmp != val)
-		pr_err("%s: write: %x to QSCRATCH: %x FAILED\n",
-			__func__, val, offset);
 }
 
 static void qusb_phy_reset(struct qusb_phy *qphy)
@@ -673,7 +646,6 @@ static int qusb_phy_init(struct usb_phy *phy)
 		pr_err("%s(): Programming TUNE1 parameter as:%x\n", __func__,
 				qphy->tune_val);
 
-/* Jianchao.Shi@BSP.CHG.Basic, 2018/04/16, sjc Delete for USB */
 
 		qusb_phy_get_tune1_param(qphy);
 		writel_relaxed(qphy->tune_val,
@@ -699,8 +671,7 @@ static int qusb_phy_init(struct usb_phy *phy)
 		writel_relaxed(qphy->bias_ctrl2,
 				qphy->base + qphy->phy_reg[BIAS_CTRL_2]);
 
-#ifdef VENDOR_EDIT
-	/* tongfeng.Huang@BSP.CHG.Basic, 2018/09/06,  Add for 18181 usb eye diagram	*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	if((get_project() == 18181) || (get_project() == 19651)){
 		if(dev_phy_bias2 != 0) {
 			dev_phy_bias2 = 0x13;
@@ -999,48 +970,6 @@ static int qusb_phy_disable_chirp(struct usb_phy *phy, bool disable)
 done:
 	mutex_unlock(&qphy->lock);
 	return ret;
-}
-static int msm_qusb_phy_drive_dp_pulse(struct usb_phy *phy,
-					unsigned int interval_ms)
-{
-	struct qusb_phy *qphy = container_of(phy, struct qusb_phy, phy);
-
-	qusb_phy_enable_clocks(qphy, true);
-
-	msm_usb_write_readback(qphy->base, qphy->phy_reg[PWR_CTRL1],
-				PWR_CTRL1_POWR_DOWN, 0x00);
-	msm_usb_write_readback(qphy->base, qphy->phy_reg[DEBUG_CTRL4],
-				FORCED_UTMI_DPPULLDOWN, 0x00);
-	msm_usb_write_readback(qphy->base, qphy->phy_reg[DEBUG_CTRL4],
-				FORCED_UTMI_DMPULLDOWN,
-				FORCED_UTMI_DMPULLDOWN);
-	msm_usb_write_readback(qphy->base, qphy->phy_reg[DEBUG_CTRL3],
-				0xd1, 0xd1);
-	msm_usb_write_readback(qphy->base, qphy->phy_reg[PWR_CTRL1],
-				CLAMP_N_EN, CLAMP_N_EN);
-	msm_usb_write_readback(qphy->base, qphy->phy_reg[INTR_CTRL],
-				DPSE_INTR_HIGH_SEL, 0x00);
-	msm_usb_write_readback(qphy->base, qphy->phy_reg[INTR_CTRL],
-				DPSE_INTR_EN, DPSE_INTR_EN);
-
-	msleep(interval_ms);
-
-	msm_usb_write_readback(qphy->base, qphy->phy_reg[INTR_CTRL],
-				DPSE_INTR_HIGH_SEL |
-				DPSE_INTR_EN, 0x00);
-	msm_usb_write_readback(qphy->base, qphy->phy_reg[DEBUG_CTRL3],
-				0xd1, 0x00);
-	msm_usb_write_readback(qphy->base, qphy->phy_reg[DEBUG_CTRL4],
-				FORCED_UTMI_DPPULLDOWN |
-				FORCED_UTMI_DMPULLDOWN, 0x00);
-	msm_usb_write_readback(qphy->base, qphy->phy_reg[PWR_CTRL1],
-				PWR_CTRL1_POWR_DOWN |
-				CLAMP_N_EN, 0x00);
-
-	msleep(20);
-
-	qusb_phy_enable_clocks(qphy, false);
-	return 0;
 }
 
 static int qusb_phy_dpdm_regulator_enable(struct regulator_dev *rdev)
@@ -1485,7 +1414,6 @@ skip_pinctrl_config:
 	qphy->phy.type			= USB_PHY_TYPE_USB2;
 	qphy->phy.notify_connect        = qusb_phy_notify_connect;
 	qphy->phy.notify_disconnect     = qusb_phy_notify_disconnect;
-	qphy->phy.drive_dp_pulse	= msm_qusb_phy_drive_dp_pulse;
 
 	/*
 	 * qusb_phy_disable_chirp is not required if soc version is

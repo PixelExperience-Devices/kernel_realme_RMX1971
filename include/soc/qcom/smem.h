@@ -106,12 +106,11 @@ enum {
 	SMEM_ID_VENDOR0,
 	SMEM_ID_VENDOR1,
 	SMEM_ID_VENDOR2,
-    //#ifdef VENDOR_EDIT gyx for oppo common project
+    //#ifdef CONFIG_PRODUCT_REALME_SDM710
     SMEM_PROJECT = SMEM_ID_VENDOR1,
     //SMEM_DRAM_TYPE = SMEM_ID_VENDOR2,		//lfc del for not use
     //#endif
-    //#ifdef VENDOR_EDIT
-	//Fuchun.Liao@BSP.CHG.Basic 2018/11/27 add for rf info
+    //#ifdef CONFIG_PRODUCT_REALME_SDM710
 	SMEM_RF_INFO = SMEM_ID_VENDOR2,	//SMEM_DRAM_TYPE not used now
 	//#endif
 	SMEM_HW_SW_BUILD_ID,

@@ -27,10 +27,9 @@
 #include "dsi_ctrl.h"
 #include "dsi_phy.h"
 #include "dsi_panel.h"
-//#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stability,2018/9/26,add for save select panel and give different feature*/
+//#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <linux/dsi_oppo_support.h>
-//#endif /*VENDOR_EDIT*/
+//#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 #define MAX_DSI_CTRLS_PER_DISPLAY             2
 #define DSI_CLIENT_NAME_SIZE		20
@@ -661,11 +660,9 @@ enum dsi_pixel_format dsi_display_get_dst_format(void *display);
  */
 int dsi_display_cont_splash_config(void *display);
 
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Stability,2018/9/26,add for support aod,hbm,seed*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 struct dsi_display *get_main_display(void);
 
-/*liping-m@PSW.MM.Display.LCD.Stability,2018/9/26, just modify for implement panel register read*/
 int dsi_host_alloc_cmd_tx_buffer(struct dsi_display *display);
 int dsi_display_cmd_engine_enable(struct dsi_display *display);
 int dsi_display_cmd_engine_disable(struct dsi_display *display);

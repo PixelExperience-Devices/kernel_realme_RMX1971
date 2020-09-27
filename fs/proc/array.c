@@ -412,10 +412,7 @@ int proc_pid_status(struct seq_file *m, struct pid_namespace *ns,
 	return 0;
 }
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
-/* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
- * show the task's reserved area info
- */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 int proc_pid_reserve_area(struct seq_file *m, struct pid_namespace *ns,
 			struct pid *pid, struct task_struct *task)
 {
@@ -430,7 +427,7 @@ int proc_pid_reserve_area(struct seq_file *m, struct pid_namespace *ns,
 	return 0;
 
 }
-#endif /* defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY) */
+#endif /* defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY) */
 
 static int do_task_stat(struct seq_file *m, struct pid_namespace *ns,
 			struct pid *pid, struct task_struct *task, int whole)

@@ -70,7 +70,7 @@ struct shrinker {
 extern int register_shrinker(struct shrinker *);
 extern void unregister_shrinker(struct shrinker *);
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #define BALANCE_PG_BEGIN 1
 #define BALANCE_PG_END 2
 #define MIN_ORDER_NOTIFY_HYPNUS 2

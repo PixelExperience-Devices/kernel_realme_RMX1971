@@ -133,13 +133,12 @@ static inline void blk_clear_rq_complete(struct request *rq)
 #define ELV_ON_HASH(rq) ((rq)->cmd_flags & REQ_HASHED)
 
 void blk_insert_flush(struct request *rq);
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 extern int fg_count;
 extern int both_count;
 extern bool fg_debug;
 extern unsigned int sysctl_fg_io_opt;
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 static inline struct request *__elv_next_request(struct request_queue *q)
 {
@@ -148,8 +147,7 @@ static inline struct request *__elv_next_request(struct request_queue *q)
 
 	while (1) {
 		if (!list_empty(&q->queue_head)) {
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 			if ( unlikely(!sysctl_fg_io_opt))
 				rq = list_entry_rq(q->queue_head.next);
 			else {
@@ -173,7 +171,7 @@ static inline struct request *__elv_next_request(struct request_queue *q)
 			}
 #else
 			rq = list_entry_rq(q->queue_head.next);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 			return rq;
 		}
 

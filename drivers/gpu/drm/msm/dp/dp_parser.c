@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -157,14 +157,6 @@ static int dp_parser_misc(struct dp_parser *parser)
 	if (rc)
 		parser->max_pclk_khz = DP_MAX_PIXEL_CLK_KHZ;
 
-	parser->yuv_support = of_property_read_bool(of_node,
-			"qcom,yuv-support");
-
-	parser->display_type = of_get_property(of_node,
-			"qcom,display-type", NULL);
-	if (!parser->display_type)
-		parser->display_type = "unknown";
-
 	return 0;
 }
 
@@ -249,10 +241,9 @@ static int dp_parser_gpio(struct dp_parser *parser)
 
 		if (!gpio_is_valid(mp->gpio_config[i].gpio)) {
 			pr_err("%s gpio not specified\n", dp_gpios[i]);
-			#ifndef VENDOR_EDIT
-			/*liping-m@PSW.MM.Display.LCD.Stable,2018/9/26 modify for dp support */
+			#ifndef CONFIG_PRODUCT_REALME_SDM710
 			return -EINVAL;
-			#endif /* VENDOR_EDIT */
+			#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 		}
 
 		strlcpy(mp->gpio_config[i].gpio_name, dp_gpios[i],

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2020, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2019, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -734,10 +734,9 @@ void kgsl_device_snapshot(struct kgsl_device *device,
 			&pa, snapshot->size);
 
 	sysfs_notify(&device->snapshot_kobj, NULL, "timestamp");
-#ifdef VENDOR_EDIT
-/*Wenhua.Leng@PSW.MM.Display.LCD.Machine, 2019/02/11,add for mm kevent gpu.*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	sysfs_notify(&device->snapshot_kobj, NULL, "snapshot_hashid");
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 	/*
 	 * Queue a work item that will save the IB data in snapshot into
@@ -813,10 +812,9 @@ static int snapshot_release(struct kgsl_device *device,
 	return ret;
 }
 
-#ifdef VENDOR_EDIT
-//wenhua.Leng@PSW.MM.Display.GPU.minidump,2019-04-21
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static bool snapshot_ontrol_on = 0;
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 /* Dump the sysfs binary data to the user */
 static ssize_t snapshot_show(struct file *filep, struct kobject *kobj,
@@ -832,14 +830,13 @@ static ssize_t snapshot_show(struct file *filep, struct kobject *kobj,
 	if (device == NULL)
 		return 0;
 
-#ifdef VENDOR_EDIT
-//wenhua.Leng@PSW.MM.Display.GPU.minidump,2019-04-21
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     if (snapshot_ontrol_on) {
         KGSL_DRV_ERR(device,
                 "snapshot: snapshot_ontrol_on is true, skip snapshot\n");
         return 0;
 	}
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 	mutex_lock(&device->mutex);
 	snapshot = device->snapshot;
@@ -967,8 +964,7 @@ static ssize_t force_panic_store(struct kgsl_device *device, const char *buf,
 	return (ssize_t) ret < 0 ? ret : count;
 }
 
-#ifdef VENDOR_EDIT
-//wenhua.Leng@PSW.MM.Display.GPU.minidump,2019-04-21
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static ssize_t snapshot_control_show(struct kgsl_device *device, char *buf)
 {
 	return snprintf(buf, PAGE_SIZE, "%d\n", device->snapshot_control);
@@ -992,7 +988,7 @@ static ssize_t snapshot_control_store(struct kgsl_device *device, const char *bu
 
 	return (ssize_t) ret < 0 ? ret : count;
 }
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 /* Show the prioritize_unrecoverable status */
 static ssize_t prioritize_unrecoverable_show(
@@ -1095,8 +1091,7 @@ static SNAPSHOT_ATTR(snapshot_crashdumper, 0644, snapshot_crashdumper_show,
 static SNAPSHOT_ATTR(snapshot_legacy, 0644, snapshot_legacy_show,
 	snapshot_legacy_store);
 
-#ifdef VENDOR_EDIT
-//wenhua.Leng@PSW.MM.Display.GPU.minidump,2019-04-2
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 static ssize_t snapshot_hashid_show(struct kgsl_device *device, char *buf)
 {
 	unsigned int uid =
@@ -1106,7 +1101,7 @@ static ssize_t snapshot_hashid_show(struct kgsl_device *device, char *buf)
 }
 static SNAPSHOT_ATTR(snapshot_hashid, 0666, snapshot_hashid_show, NULL);
 static SNAPSHOT_ATTR(snapshot_control, 0666, snapshot_control_show, snapshot_control_store);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 
 static ssize_t snapshot_sysfs_show(struct kobject *kobj,
@@ -1191,10 +1186,9 @@ int kgsl_device_snapshot_init(struct kgsl_device *device)
 	device->prioritize_unrecoverable = true;
 	device->snapshot_crashdumper = 1;
 	device->snapshot_legacy = 0;
-#ifdef VENDOR_EDIT
-//wenhua.Leng@PSW.MM.Display.GPU.minidump,2019-04-21
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	device->snapshot_control = 0;
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 	ret = kobject_init_and_add(&device->snapshot_kobj, &ktype_snapshot,
 		&device->dev->kobj, "snapshot");
@@ -1231,8 +1225,7 @@ int kgsl_device_snapshot_init(struct kgsl_device *device)
 	ret  = sysfs_create_file(&device->snapshot_kobj,
 			&attr_snapshot_legacy.attr);
 
-#ifdef VENDOR_EDIT
-//wenhua.Leng@PSW.MM.Display.GPU.minidump,2019-04-21
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	ret  = sysfs_create_file(&device->snapshot_kobj, &attr_snapshot_hashid.attr);
 	if (ret)
 		goto done;
@@ -1240,7 +1233,7 @@ int kgsl_device_snapshot_init(struct kgsl_device *device)
 	ret  = sysfs_create_file(&device->snapshot_kobj, &attr_snapshot_control.attr);
 	if (ret)
 		goto done;
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 done:
 	return ret;
@@ -1268,10 +1261,9 @@ void kgsl_device_snapshot_close(struct kgsl_device *device)
 	device->snapshot_faultcount = 0;
 	device->force_panic = 0;
 	device->snapshot_crashdumper = 1;
-#ifdef VENDOR_EDIT
-//wenhua.Leng@PSW.MM.Display.GPU.minidump,2019-04-21
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	device->snapshot_control = 0;
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 }
 EXPORT_SYMBOL(kgsl_device_snapshot_close);
 
@@ -1373,11 +1365,6 @@ static void kgsl_snapshot_save_frozen_objs(struct work_struct *work)
 
 	if (size == 0)
 		goto done;
-
-	if (size > device->snapshot_memory.size) {
-		SNAPSHOT_ERR_NOMEM(device, "OBJS");
-		goto done;
-	}
 
 	snapshot->mempool = vmalloc(size);
 

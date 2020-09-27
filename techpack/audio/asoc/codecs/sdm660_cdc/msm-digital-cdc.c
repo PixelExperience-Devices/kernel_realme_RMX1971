@@ -60,14 +60,13 @@ static unsigned long tx_digital_gain_reg[] = {
 	MSM89XX_CDC_CORE_TX5_VOL_CTL_GAIN,
 };
 
-#ifndef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.Codec.1447862, 2018/06/26,
+#ifndef CONFIG_PRODUCT_REALME_SDM710
  *Modify for pop noise when start dmic
  */
 #define SDM660_TX_UNMUTE_DELAY_MS 40
-#else /* VENDOR_EDIT */
+#else /* CONFIG_PRODUCT_REALME_SDM710 */
 #define SDM660_TX_UNMUTE_DELAY_MS 50
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 static int tx_unmute_delay = SDM660_TX_UNMUTE_DELAY_MS;
 module_param(tx_unmute_delay, int, 0664);
 MODULE_PARM_DESC(tx_unmute_delay, "delay to unmute the tx path");

@@ -13,10 +13,9 @@ obj-y     = fork.o exec_domain.o panic.o \
 
 obj-$(CONFIG_MULTIUSER) += groups.o
 
-#ifdef VENDOR_EDIT
-#yanwu@TECH.Storage.FS, 2019/08/27, add code to flush device cache in panic
+ifdef CONFIG_PRODUCT_REALME_SDM710
 obj-y += panic_flush.o
-#endif
+endif
 
 ifdef CONFIG_FUNCTION_TRACER
 # Do not trace internal ftrace files
@@ -49,12 +48,12 @@ obj-y += irq/
 obj-y += rcu/
 obj-y += livepatch/
 
+ifdef CONFIG_PRODUCT_REALME_SDM710
 #ChenYong@Rom.Framework,2019/01/15, add for kevent action upload,root action upload to user layer
 obj-$(CONFIG_OPPO_KEVENT_UPLOAD) += oppo_kevent_upload.o
 
-#ifdef VENDOR_EDIT
-#Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
 obj-y += oppocfs/
+endif
 
 obj-$(CONFIG_CHECKPOINT_RESTORE) += kcmp.o
 obj-$(CONFIG_FREEZER) += freezer.o

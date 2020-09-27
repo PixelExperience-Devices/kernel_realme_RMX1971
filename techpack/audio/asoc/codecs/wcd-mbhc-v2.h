@@ -138,21 +138,19 @@ do {                                                    \
 				  SND_JACK_BTN_2 | SND_JACK_BTN_3 | \
 				  SND_JACK_BTN_4 | SND_JACK_BTN_5)
 #define OCP_ATTEMPT 20
-#ifndef VENDOR_EDIT
-/*Jianfeng.Qiu@PSW.MM.AudioDriver.HeadsetDet, 2017/04/10,
+#ifndef CONFIG_PRODUCT_REALME_SDM710
  *Modify for headphone detect.
  */
 #define HS_DETECT_PLUG_TIME_MS (3 * 1000)
-#else /* VENDOR_EDIT */
+#else /* CONFIG_PRODUCT_REALME_SDM710 */
 #define HS_DETECT_PLUG_TIME_MS (5 * 1000)
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 #define SPECIAL_HS_DETECT_TIME_MS (2 * 1000)
 #define MBHC_BUTTON_PRESS_THRESHOLD_MIN 250
-#ifndef VENDOR_EDIT
-/* Huiqun.Han@PSW.MM.AudioDriver.Machine, 2018/06/29, Add for usb type-c audio */
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 #define GND_MIC_SWAP_THRESHOLD 4
 #define GND_MIC_USBC_SWAP_THRESHOLD 2
-#else /* VENDOR_EDIT */
+#else /* CONFIG_PRODUCT_REALME_SDM710 */
 #ifdef USB_SWITCH_MAX20328
 #define GND_MIC_SWAP_THRESHOLD 1
 #define GND_MIC_USBC_SWAP_THRESHOLD 1
@@ -160,21 +158,20 @@ do {                                                    \
 #define GND_MIC_SWAP_THRESHOLD 4
 #define GND_MIC_USBC_SWAP_THRESHOLD 2
 #endif //USB_SWITCH_MAX20328
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 #define WCD_FAKE_REMOVAL_MIN_PERIOD_MS 100
 #define HS_VREF_MIN_VAL 1400
 #define FW_READ_ATTEMPTS 15
 #define FW_READ_TIMEOUT 4000000
 #define FAKE_REM_RETRY_ATTEMPTS 3
 #define MAX_IMPED 60000
-#ifdef VENDOR_EDIT
-/* Huiqun.Han@PSW.MM.AudioDriver.Machine, 2018/06/29, Add for usb type-c audio */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #ifdef USB_SWITCH_MAX20328
 #define HP_DETECT_WORK_DELAY_MS 50
 #else
 #define HP_DETECT_WORK_DELAY_MS 400
 #endif
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 #define WCD_MBHC_BTN_PRESS_COMPL_TIMEOUT_MS  50
 #define ANC_DETECT_RETRY_CNT 7
 #define WCD_MBHC_SPL_HS_CNT  1
@@ -481,12 +478,9 @@ struct wcd_mbhc_cb {
 	void (*trim_btn_reg)(struct snd_soc_codec *);
 	void (*compute_impedance)(struct wcd_mbhc *, uint32_t *, uint32_t *);
 	void (*set_micbias_value)(struct snd_soc_codec *);
-	#ifdef VENDOR_EDIT
-	/*Jianfeng.Qiu@PSW.MM.AudioDriver.Codec, 2018/07/31,
-	 *Add for set different micbias voltage.
-	 */
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	void (*set_micbias_value_switch)(struct snd_soc_codec *, u32);
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	void (*set_auto_zeroing)(struct snd_soc_codec *, bool);
 	struct firmware_cal * (*get_hwdep_fw_cal)(struct wcd_mbhc *,
 			enum wcd_cal_type);
@@ -599,12 +593,9 @@ struct wcd_mbhc {
 
 	/* Work to correct accessory type */
 	struct work_struct correct_plug_swch;
-	#ifdef VENDOR_EDIT
-	/*xiang.fei@PSW.MM.AudioDriver.HeadsetDet, 2017/04/15,
-	 *Add for headset detect.
-	 */
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	struct delayed_work hp_detect_work;
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	struct notifier_block nblock;
 
 	struct wcd_mbhc_register *wcd_mbhc_regs;
@@ -629,8 +620,7 @@ struct wcd_mbhc {
 	bool force_linein;
 };
 
-#ifdef VENDOR_EDIT
-/* Huiqun.Han@PSW.MM.AudioDriver.Machine, 2018/09/03, Add for usb type-c audio */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #ifdef USB_SWITCH_MAX20328
 #define POWER_SUPPLY_TYPEC_USBMODE 1
 #define POWER_SUPPLY_TYPEC_OFF 0
@@ -658,7 +648,7 @@ struct mbhc_usb_c_analog_switch {
 	struct wcd_mbhc *mbhc;
 };
 #endif
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 void wcd_mbhc_find_plug_and_report(struct wcd_mbhc *mbhc,
 				   enum wcd_mbhc_plug_type plug_type);

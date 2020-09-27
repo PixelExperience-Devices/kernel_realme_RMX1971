@@ -541,10 +541,7 @@ struct mm_struct {
 #endif
 	struct work_struct async_put_work;
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
-	/* Kui.Zhang@PSW.TEC.KERNEL.Performance, 2019/03/18,
-	 * reserved vma
-	 */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 	struct vm_area_struct *reserve_vma;
 	struct vm_area_struct *reserve_mmap;
 	struct rb_root reserve_mm_rb;
@@ -556,11 +553,7 @@ struct mm_struct {
 #endif
 };
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
-/* Kui.Zhang@TEC.Kernel.Performance, 2019/03/27,
- * create reserved area depend on do_reserve_mmap value,
- * but need check the env, only 32bit process can used reserved area
- */
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
 #define DONE_RESERVE_MMAP 0xDE
 #define DOING_RESERVE_MMAP 0xDA
 

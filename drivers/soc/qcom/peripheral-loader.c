@@ -148,7 +148,7 @@ struct pil_priv {
 static int pil_do_minidump(struct pil_desc *desc, void *ramdump_dev)
 {
 	struct md_ss_region __iomem *region_info_ss;
-	struct md_ss_region __iomem *region_info_pdr = NULL;
+	struct md_ss_region __iomem *region_info_pdr;
 	struct ramdump_segment *ramdump_segs, *s;
 	struct pil_priv *priv = desc->priv;
 	void __iomem *subsys_segtable_base_ss;
@@ -293,7 +293,6 @@ int pil_do_ramdump(struct pil_desc *desc,
 			(desc->minidump_ss->md_ss_toc_init == true) &&
 			(desc->minidump_ss->md_ss_enable_status ==
 				MD_SS_ENABLED)) {
-
 			if (encryption_status == MD_SS_ENCR_DONE ||
 				encryption_status == MD_SS_ENCR_NOTREQ) {
 				pr_info("Minidump : Dumping for %s\n",

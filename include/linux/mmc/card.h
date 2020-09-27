@@ -159,10 +159,9 @@ struct sd_ssr {
 	unsigned int		au;			/* In sectors */
 	unsigned int		erase_timeout;		/* In milliseconds */
 	unsigned int		erase_offset;		/* In milliseconds */
-#ifdef VENDOR_EDIT
-//Chunyi.Mei@PSW.BSP.Storage.Sdcard, 2018-12-10, Add for SD Card device information
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	unsigned int		speed_class;		/* speed_class */
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 };
 
 struct sd_switch_caps {

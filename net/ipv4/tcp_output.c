@@ -2387,7 +2387,7 @@ void tcp_send_loss_probe(struct sock *sk)
 		return;
 	}
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	//Zhenjian Jiang@BSP.Kernel.Stability, 2019/02/01, add for fix tcp warn_on issue
 	/* Already in TCP_FIN_WAIT1, if there is nothing in write queue
 	 * do not rearm the timers

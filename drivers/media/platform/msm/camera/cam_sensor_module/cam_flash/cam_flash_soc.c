@@ -1,4 +1,4 @@
-/* Copyright (c) 2017-2018, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2017, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -201,7 +201,7 @@ int cam_flash_get_dt_data(struct cam_flash_ctrl *fctrl,
 		return rc;
 	}
 
-	#ifdef VENDOR_EDIT
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	/*Add by Zhengrong.Zhang@Camera 20160630 for flash*/
 	rc = of_property_read_string(of_node, "qcom,flash-name",
 		&fctrl->flash_name);

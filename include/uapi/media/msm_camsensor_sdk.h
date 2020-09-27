@@ -22,10 +22,9 @@
 #define CSI_DECODE_DPCM_10_8_10 5
 #define MAX_CID                 16
 #define I2C_SEQ_REG_DATA_MAX    1024
-#ifndef VENDOR_EDIT
+#ifndef CONFIG_PRODUCT_REALME_SDM710
 #define I2C_REG_DATA_MAX       (8*1024)
 #else
-//add by yufeng@camera, 20190211 for backup eeprom data
 #define I2C_REG_DATA_MAX       (16*1024)
 #endif
 

@@ -183,11 +183,10 @@ struct sock_common {
 	struct proto		*skc_prot;
 	possible_net_t		skc_net;
 
-	//#ifdef VENDOR_EDIT
-	//Junyuan.Huang@PSW.CN.WiFi.Network.internet.1197891, 2018/04/10,
+	//#ifdef CONFIG_PRODUCT_REALME_SDM710
 	//Add code for appo sla function
 	u32 skc_oppo_mark;
-	//#endif /* VENDOR_EDIT */
+	//#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 #if IS_ENABLED(CONFIG_IPV6)
 	struct in6_addr		skc_v6_daddr;
@@ -349,11 +348,10 @@ struct sock {
 #define sk_flags		__sk_common.skc_flags
 #define sk_rxhash		__sk_common.skc_rxhash
 
-//#ifdef VENDOR_EDIT
-//Junyuan.Huang@PSW.CN.WiFi.Network.internet.1197891, 2018/04/10,
+//#ifdef CONFIG_PRODUCT_REALME_SDM710
 //Add code for appo sla function
 #define oppo_sla_mark   __sk_common.skc_oppo_mark
-//#endif /* VENDOR_EDIT */
+//#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	socket_lock_t		sk_lock;
 	struct sk_buff_head	sk_receive_queue;

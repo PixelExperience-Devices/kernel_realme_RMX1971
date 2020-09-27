@@ -38,10 +38,8 @@
 
 	qcom,vddp-ref-clk-supply = <&pm660_l1>;
 	qcom,vddp-ref-clk-max-microamp = <100>;
-	//#ifdef VENDOR_EDIT
-	//PengNan@BSP.Power.Basic,remove ufs and emmc compatibility for standby current, 2019/07/30
-	//force-ufshc-probe;
-	//#endif
+
+	force-ufshc-probe;
 
 	status = "ok";
 };
@@ -65,7 +63,7 @@
 };
 
 &qupv3_se3_i2c {
-	status = "disabled";
+	status = "ok";
 	nq@28 {
 		compatible = "qcom,nq-nci";
 		reg = <0x28>;

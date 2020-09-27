@@ -5308,8 +5308,7 @@ out:
 	return ret;
 }
 
-#if defined(VENDOR_EDIT) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
-//yh@PSW.BSP.Storage.EXT4, 2018-11-26 add for ext4 async discard suppot
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_EXT4_ASYNC_DISCARD_SUPPORT)
 /**
  * ext4_trim_group_partial_seq -- function to trim all free space in alloc. group
  * @sb:			super block for file system

@@ -38,8 +38,7 @@
 #include "sde_power_handle.h"
 #include "sde_core_perf.h"
 #include "sde_trace.h"
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Lcd.Stability, 2018/9/26,add for drm notifier for display connect*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <linux/msm_drm_notify.h>
 #include <linux/notifier.h>
 #include <linux/dsi_oppo_support.h>
@@ -1834,8 +1833,7 @@ static void _sde_crtc_blend_setup_mixer(struct drm_crtc *crtc,
 		for (i = 0; i < cstate->num_dim_layers; i++)
 			_sde_crtc_setup_dim_layer_cfg(crtc, sde_crtc,
 					mixer, &cstate->dim_layer[i]);
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Service.Feature,2018/9/26,for OnScreenFingerprint feature*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 		if (cstate->fingerprint_dim_layer)
 			_sde_crtc_setup_dim_layer_cfg(crtc, sde_crtc,
 					mixer, cstate->fingerprint_dim_layer);
@@ -2689,7 +2687,7 @@ void sde_crtc_complete_commit(struct drm_crtc *crtc,
 	SDE_EVT32_VERBOSE(DRMID(crtc));
 
 	sde_core_perf_crtc_update(crtc, 0, false);
-	#ifdef VENDOR_EDIT
+	#ifdef CONFIG_PRODUCT_REALME_SDM710
 	{
 		struct sde_crtc_state *old_cstate;
 		struct sde_crtc_state *cstate;
@@ -2712,7 +2710,7 @@ void sde_crtc_complete_commit(struct drm_crtc *crtc,
 					&notifier_data);
 		}
 	}
-	#endif /* VENDOR_EDIT */
+	#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 }
 
 /**
@@ -2816,8 +2814,7 @@ static void _sde_crtc_set_dim_layer_v1(struct sde_crtc_state *cstate,
 	}
 }
 
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Service.Feature,2018/9/26,for OnScreenFingerprint feature*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 extern int oppo_onscreenfp_status;
 bool sde_crtc_get_dimlayer_mode(struct drm_crtc_state *crtc_state)
 {
@@ -4921,8 +4918,7 @@ static int _sde_crtc_check_secure_state(struct drm_crtc *crtc,
 	return 0;
 }
 
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Feature,2018/9/26 add for OnScreenFingerprint */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 int oppo_dimlayer_bl = 0;
 extern int oppo_force_screenfp;
 extern int lcd_closebl_flag_fp;
@@ -5060,7 +5056,7 @@ static int sde_crtc_onscreenfinger_atomic_check(struct sde_crtc_state *cstate,
 
 	return 0;
 }
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 static int sde_crtc_atomic_check(struct drm_crtc *crtc,
 		struct drm_crtc_state *state)
@@ -5212,8 +5208,7 @@ static int sde_crtc_atomic_check(struct drm_crtc *crtc,
 		}
 	}
 
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.Service.Feature,2018/9/26,for OnScreenFingerprint feature*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	rc = sde_crtc_onscreenfinger_atomic_check(cstate, pstates, cnt);
 	if (rc)
 		goto end;
@@ -5567,8 +5562,7 @@ static void sde_crtc_install_properties(struct drm_crtc *crtc,
 		"idle_time", 0, 0, U64_MAX, 0,
 		CRTC_PROP_IDLE_TIMEOUT);
 
-#ifdef VENDOR_EDIT
-/*liping-m@PSW.MM.Display.LCD.Feature,2018/9/26 support custom propertys */
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	msm_property_install_range(&sde_crtc->property_info,"CRTC_CUST",
 		0x0, 0, INT_MAX, 0, CRTC_PROP_CUSTOM);
 #endif

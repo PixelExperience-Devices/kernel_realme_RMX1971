@@ -1,6 +1,6 @@
 /**********************************************************************************
 * Copyright (c)  2008-2015  Guangdong OPPO Mobile Comm Corp., Ltd
-* VENDOR_EDIT
+* CONFIG_PRODUCT_REALME_SDM710
 * Description: Charger IC management module for charger system framework.
 *                          Manage all charger IC and define abstarct function flow.
 * Version   : 1.0
@@ -1474,7 +1474,7 @@ int oppo_chg_parse_charger_dt(struct oppo_chg_chip *chip)
 		chip->limits.input_current_charger_ma
 			= OPCHG_INPUT_CURRENT_LIMIT_CHARGER_MA;
 	}
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /* wangsen@BSP.CHG.Basic,charger 2020/01/17,modify PD current to 3A */
 	chip->limits.pd_input_current_charger_ma = 3000;
 #else
@@ -1484,7 +1484,7 @@ int oppo_chg_parse_charger_dt(struct oppo_chg_chip *chip)
 		chip->limits.pd_input_current_charger_ma
 			= OPCHG_INPUT_CURRENT_LIMIT_CHARGER_MA;
 	}
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 	rc = of_property_read_u32(node, "qcom,qc_input_current_charger_ma",
 			&chip->limits.qc_input_current_charger_ma);
 	if (rc) {
@@ -1553,7 +1553,7 @@ int oppo_chg_parse_charger_dt(struct oppo_chg_chip *chip)
 		chip->limits.led_warm_bat_decidegc = 350;
 	}
 
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /* wangsen@BSP.CHG.Basic,charger 2020/01/17,modify PD current to 3A */
 	chip->limits.input_current_led_ma_normal = 3000;
 	chg_err(" CONFIG input_current_led_ma_normal to 3A \n");
@@ -1563,7 +1563,7 @@ int oppo_chg_parse_charger_dt(struct oppo_chg_chip *chip)
 	if (rc) {
 		chip->limits.input_current_led_ma_normal = chip->limits.input_current_led_ma;;
 	}
-#endif /* VENDOR_EDIT */
+#endif /* CONFIG_PRODUCT_REALME_SDM710 */
 
 	rc = of_property_read_u32(node, "qcom,input_current_camera_ma",
 			&chip->limits.input_current_camera_ma);
@@ -1763,7 +1763,7 @@ int oppo_chg_parse_charger_dt(struct oppo_chg_chip *chip)
 	if (rc < 0) {
 		chip->limits.temp_normal_vfloat_mv = 4320;
 	}
-#ifdef VENDOR_EDIT
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 /* wangsen@BSP.CHG.Basic,charger 2020/01/17,modify PD current to 3A */
 	chip->limits.pd_temp_normal_fastchg_current_ma = 3000;
 #else

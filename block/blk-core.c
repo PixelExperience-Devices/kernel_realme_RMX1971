@@ -42,15 +42,13 @@
 #include "blk-mq.h"
 
 #include <linux/math64.h>
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #include <linux/oppocfs/oppo_cfs_common.h>
 #include <linux/cred_oppo.h>
 #endif
 
 
-/*Hank.liu@TECH.BSP Kernel IO Latency  2019-03-21,io information*/
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
 extern void ohm_iolatency_record(struct request * req,unsigned int nr_bytes, int fg, u64 delta_ms);
 extern unsigned long ufs_outstanding;
 static u64 latency_count;
@@ -58,7 +56,7 @@ static u32 io_print_count;
 bool       io_print_flag;
 #define    PRINT_LATENCY     500*1000
 #define    COUNT_TIME      24*60*60*1000
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 EXPORT_TRACEPOINT_SYMBOL_GPL(block_bio_remap);
 EXPORT_TRACEPOINT_SYMBOL_GPL(block_rq_remap);
@@ -128,10 +126,9 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
 	memset(rq, 0, sizeof(*rq));
 
 	INIT_LIST_HEAD(&rq->queuelist);
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	INIT_LIST_HEAD(&rq->fg_list);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 	INIT_LIST_HEAD(&rq->timeout_list);
 	rq->cpu = -1;
 	rq->q = q;
@@ -693,11 +690,10 @@ static void blk_rq_timed_out_timer(unsigned long data)
 	kblockd_schedule_work(&q->timeout_work);
 }
 
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #define FG_CNT_DEF 20
 #define BOTH_CNT_DEF 10
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
 {
 	struct request_queue *q;
@@ -723,13 +719,12 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
 			(VM_MAX_READAHEAD * 1024) / PAGE_SIZE;
 	q->backing_dev_info->capabilities = BDI_CAP_CGROUP_WRITEBACK;
 	q->backing_dev_info->name = "block";
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	q->fg_count_max = FG_CNT_DEF;
 	q->both_count_max = BOTH_CNT_DEF;
 	q->fg_count = FG_CNT_DEF;
 	q->both_count = BOTH_CNT_DEF;
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 	q->node = node_id;
 
 	setup_timer(&q->backing_dev_info->laptop_mode_wb_timer,
@@ -737,10 +732,9 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
 	setup_timer(&q->timeout, blk_rq_timed_out_timer, (unsigned long) q);
 	INIT_WORK(&q->timeout_work, NULL);
 	INIT_LIST_HEAD(&q->queue_head);
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	INIT_LIST_HEAD(&q->fg_head);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 	INIT_LIST_HEAD(&q->timeout_list);
 	INIT_LIST_HEAD(&q->icq_list);
 #ifdef CONFIG_BLK_CGROUP
@@ -2111,8 +2105,7 @@ out:
 }
 EXPORT_SYMBOL(generic_make_request);
 
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 #define SYSTEM_APP_UID 1000
 static bool is_system_uid(struct task_struct *t)
 {
@@ -2181,7 +2174,7 @@ static bool high_prio_for_task(struct task_struct *t)
 
 	return false;
 }
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 /**
  * submit_bio - submit a bio to the block device layer for I/O
@@ -2230,6 +2223,10 @@ blk_qc_t submit_bio(struct bio *bio)
 		}
 	}
 
+#ifdef CONFIG_PRODUCT_REALME_SDM710
+        if (high_prio_for_task(current))
+                bio->bi_opf |= REQ_FG;
+#endif
 	/*
 	 * If we're reading data that is part of the userspace
 	 * workingset, count submission time as memory stall. When the
@@ -2520,8 +2517,7 @@ struct request *blk_peek_request(struct request_queue *q)
 			 * not be passed by new incoming requests
 			 */
 			rq->cmd_flags |= REQ_STARTED;
-/*Hank.liu@PSW.BSP Kernel IO Latency  2019-03-19,request start ktime */
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
 			rq-> block_io_start = ktime_get();
 #endif
 			trace_block_rq_issue(q, rq);
@@ -2597,10 +2593,9 @@ void blk_dequeue_request(struct request *rq)
 	BUG_ON(ELV_ON_HASH(rq));
 
 	list_del_init(&rq->queuelist);
-#ifdef VENDOR_EDIT
-/*Huacai.Zhou@PSW.BSP.Kernel.Performance, 2018-04-28, add foreground task io opt*/
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	list_del_init(&rq->fg_list);
-#endif /*VENDOR_EDIT*/
+#endif /*CONFIG_PRODUCT_REALME_SDM710*/
 
 	/*
 	 * the time frame between a request being removed from the lists
@@ -2700,8 +2695,7 @@ bool blk_update_request(struct request *req, int error, unsigned int nr_bytes)
 	char rwbs[RWBS_LEN];
 
 	trace_block_rq_complete(req->q, req, nr_bytes);
-/*Hank.liu@TECH.BSP Kernel IO Latency	2019-03-19,request complete ktime*/
-#if defined(VENDOR_EDIT) && defined(CONFIG_OPPO_HEALTHINFO)
+#if defined(CONFIG_PRODUCT_REALME_SDM710) && defined(CONFIG_OPPO_HEALTHINFO)
 			if(req->tag >= 0	&& req->block_io_start.tv64 > 0)
 			{
 				io_print_flag = false;

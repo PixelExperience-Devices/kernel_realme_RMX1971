@@ -109,8 +109,7 @@ static inline bool rwsem_list_add_per_prio(struct rwsem_waiter *waiter_in,
 		return true;
 	}
 
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
     if (sysctl_uifirst_enabled) {
         if (rwsem_list_add(waiter_in->task, &waiter_in->list, &sem->wait_list, sem)) {
             return &waiter_in->list == head->next;
@@ -123,8 +122,7 @@ static inline bool rwsem_list_add_per_prio(struct rwsem_waiter *waiter_in,
 
 		list_for_each(pos, head) {
 			waiter = list_entry(pos, struct rwsem_waiter, list);
-#ifdef VENDOR_EDIT
-// Liujie.Xie@TECH.Kernel.Sched, 2019/05/22, add for ui first
+#ifdef CONFIG_PRODUCT_REALME_SDM710
             if (sysctl_uifirst_enabled && waiter_in->task->prio > MAX_RT_PRIO &&
                 (waiter->task->static_ux || atomic64_read(&waiter->task->dynamic_ux))) {
                 continue;

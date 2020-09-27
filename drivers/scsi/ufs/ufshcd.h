@@ -256,8 +256,7 @@ struct ufs_desc_size {
 	int interc_desc;
 	int unit_desc;
 	int conf_desc;
-#ifdef VENDOR_EDIT
-    //xiaofan.yang@PSW.TECH.Stability, 2019/03/15,Add for check storage endurance    
+#ifdef CONFIG_PRODUCT_REALME_SDM710
 	int hlth_desc;
 #endif
 };
